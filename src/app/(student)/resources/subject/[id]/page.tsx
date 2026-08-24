@@ -1,0 +1,234 @@
+import { createClient } from "@/lib/supabase/server";
+import { Subject, Resource, Video } from "@/types";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import RatingPrompt from "@/components/resources/RatingPrompt";
+import {
+  ArrowLeft,
+  PlayCircle,
+  FileText,
+  User,
+  Clock,
+  Star,
+  CheckCircle,
+} from "lucide-react";
+
+interface Props {
+  params: Promise<{ id: string }>;
+}
+
+export default async function SubjectDetailsPage({ params }: Props) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // 1. Fetch Subject
+  const { data: subject } = await supabase
+    .from("subjects")
+    .select("*, level:levels(*)")
+    .eq("id", id)
+    .single();
+
+  if (!subject) {
+    notFound();
+  }
+
+  // 2. Fetch Resources and Videos
+  const { data: resources } = await supabase
+    .from("resources")
+    .select("*")
+    .eq("subject_id", id)
+    .eq("is_published", true);
+
+  const { data: videos } = await supabase
+    .from("videos")
+    .select("*")
+    .eq("subject_id", id)
+    .eq("is_published", true);
+
+  const totalItems = (resources?.length || 0) + (videos?.length || 0);
+
+  // 3. Fetch User Progress (Calculate real progress %)
+  let completedCount = 0;
+  if (user && totalItems > 0) {
+    const resourceIds = resources?.map((r) => r.id) || [];
+    const videoIds = videos?.map((v) => v.id) || [];
+
+    const { count } = await supabase
+      .from("user_progress")
+      .select("id", { count: "exact" })
+      .eq("user_id", user.id)
+      .or(
+        `resource_id.in.(${resourceIds.join(",") || "00000000-0000-0000-0000-000000000000"}),video_id.in.(${videoIds.join(",") || "00000000-0000-0000-0000-000000000000"})`,
+      );
+
+    completedCount = count || 0;
+  }
+
+  const progressPercentage =
+    totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0;
+
+  // 4. Calculate Dynamic Rating
+  const { data: ratings } = await supabase
+    .from("course_ratings")
+    .select("rating")
+    .eq("subject_id", id);
+
+  let avgRating: number | null = null;
+  if (ratings && ratings.length > 0) {
+    const sum = ratings.reduce((acc, curr) => acc + curr.rating, 0);
+    avgRating = parseFloat((sum / ratings.length).toFixed(1));
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white p-4 sm:p-6 md:p-10">
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* BACK TO COURSES */}
+        <Link
+          href="/resources"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition bg-slate-900 px-3.5 py-2 rounded-lg border border-slate-800 shadow-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Courses</span>
+        </Link>
+
+        {/* COURSE HEADER CARD */}
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div>
+            <span className="px-3 py-1 bg-blue-950/80 text-blue-400 border border-blue-800/50 text-xs font-semibold rounded-full uppercase">
+              {subject.level?.name} Stage
+            </span>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
+              {subject.name}
+            </h1>
+            {subject.description && (
+              <p className="text-slate-400 text-xs sm:text-sm mt-2 leading-relaxed">
+                {subject.description}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 border-t border-slate-800 pt-4">
+            {subject.instructor_name && (
+              <span className="flex items-center gap-1 font-semibold text-white">
+                <User className="w-4 h-4 text-amber-400" />
+                {subject.instructor_name}
+              </span>
+            )}
+
+            {subject.estimated_hours > 0 && (
+              <span className="flex items-center gap-1">
+                <Clock className="w-4 h-4 text-slate-400" />
+                {subject.estimated_hours} Hours Total
+              </span>
+            )}
+
+            {/* DYNAMIC RATING DISPLAY (Hides if 0 ratings exist) */}
+            {avgRating !== null ? (
+              <span className="flex items-center gap-1 text-amber-500 font-semibold">
+                <Star className="w-4 h-4 fill-amber-400" />
+                {avgRating} / 5.0 ({ratings?.length} student reviews)
+              </span>
+            ) : (
+              <span className="text-slate-500 font-medium">No reviews yet</span>
+            )}
+          </div>
+
+          {/* DYNAMIC PROGRESS BAR */}
+          {user && (
+            <div className="space-y-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-between text-xs font-bold text-slate-300">
+                <span>Your Progress</span>
+                <span>
+                  {progressPercentage}% Complete ({completedCount}/{totalItems}{" "}
+                  items)
+                </span>
+              </div>
+              <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div
+                  className="bg-amber-500 h-full rounded-full transition-all duration-500"
+                  style={{ width: `${progressPercentage}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* COURSE CONTENT BREAKDOWN */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold text-white">
+            Course Content & Modules ({totalItems})
+          </h2>
+
+          <div className="space-y-3">
+            {/* VIDEO LECTURES */}
+            {videos?.map((vid: Video, index: number) => (
+              <div
+                key={vid.id}
+                className="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 flex items-center justify-between gap-4 hover:border-amber-400 transition shadow-sm"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="bg-slate-800 text-amber-400 p-2.5 rounded-lg flex-shrink-0">
+                    <PlayCircle className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white text-sm sm:text-base">
+                      {index + 1}. {vid.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {vid.duration_minutes
+                        ? `${vid.duration_minutes} mins`
+                        : "Video Lecture"}
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href={`/resources/item/${vid.id}?type=video`}
+                  className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg transition whitespace-nowrap shadow-sm"
+                >
+                  Start Video →
+                </Link>
+              </div>
+            ))}
+
+            {/* STUDY TEXTS & PATHFINDERS */}
+            {resources?.map((res: Resource, index: number) => (
+              <div
+                key={res.id}
+                className="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 flex items-center justify-between gap-4 hover:border-amber-400 transition shadow-sm"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="bg-slate-800 text-amber-400 p-2.5 rounded-lg flex-shrink-0">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white text-sm sm:text-base">
+                      {(videos?.length || 0) + index + 1}. {res.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5 capitalize">
+                      {res.resource_type.replace("_", " ")} • {res.exam_diet}{" "}
+                      {res.exam_year}
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href={`/resources/item/${res.id}?type=doc`}
+                  className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg transition whitespace-nowrap shadow-sm"
+                >
+                  View Material →
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* STUDENT RATING PROMPT (MOVED TO BOTTOM) */}
+        {user && <RatingPrompt subjectId={id} />}
+      </div>
+    </div>
+  );
+}
