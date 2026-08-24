@@ -1,34 +1,76 @@
 "use client";
 
-import { useState } from "react";
-import { Level, Subject, Resource } from "@/types";
+import { useState, useTransition } from "react";
+import { Level, Subject, Resource, Video } from "@/types";
 import ResourceUploadForm from "@/components/admin/ResourceUploadForm";
 import VideoUploadForm from "@/components/admin/VideoUploadForm";
 import AddSubjectForm from "@/components/admin/AddSubjectForm";
 import AddAnnouncementForm from "@/components/admin/AddAnnouncementForm";
+import ManageFacultyForm from "@/components/admin/ManageFacultyForm";
+import { deleteResource } from "@/lib/actions/resources";
+import { deleteVideo } from "@/lib/actions/videos";
 import {
   FileText,
-  Video,
+  Video as VideoIcon,
   BookOpen,
   Layers,
   Download,
   Megaphone,
+  ShieldCheck,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 
 interface Props {
   levels: Level[];
   subjects: Subject[];
   resources: Resource[];
+  videos?: Video[];
 }
 
-type TabType = "pdf" | "video" | "subject" | "announcement" | "list";
+type TabType =
+  | "pdf"
+  | "video"
+  | "subject"
+  | "announcement"
+  | "faculty"
+  | "list";
 
 export default function AdminDashboardTabs({
   levels,
   subjects,
-  resources,
+  resources: initialResources,
+  videos: initialVideos = [],
 }: Props) {
   const [activeTab, setActiveTab] = useState<TabType>("pdf");
+  const [resourcesList, setResourcesList] =
+    useState<Resource[]>(initialResources);
+  const [videosList, setVideosList] = useState<Video[]>(initialVideos);
+  const [isPending, startTransition] = useTransition();
+
+  const handleDeleteResource = (id: string, title: string) => {
+    if (!confirm(`Delete "${title}"?`)) return;
+
+    startTransition(async () => {
+      const res = await deleteResource(id);
+      if (!res?.error) {
+        setResourcesList((prev) => prev.filter((item) => item.id !== id));
+      }
+    });
+  };
+
+  const handleDeleteVideo = (id: string, title: string) => {
+    if (!confirm(`Delete video "${title}"?`)) return;
+
+    startTransition(async () => {
+      const res = await deleteVideo(id);
+      if (!res?.error) {
+        setVideosList((prev) => prev.filter((item) => item.id !== id));
+      }
+    });
+  };
+
+  const totalPublishedCount = resourcesList.length + videosList.length;
 
   return (
     <div className="space-y-6">
@@ -54,7 +96,7 @@ export default function AdminDashboardTabs({
               : "text-slate-400 hover:text-white"
           }`}
         >
-          <Video className="w-4 h-4" />
+          <VideoIcon className="w-4 h-4" />
           <span>Add Video</span>
         </button>
 
@@ -83,6 +125,18 @@ export default function AdminDashboardTabs({
         </button>
 
         <button
+          onClick={() => setActiveTab("faculty")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center ${
+            activeTab === "faculty"
+              ? "bg-amber-500 text-slate-950 shadow-md"
+              : "text-slate-400 hover:text-white"
+          }`}
+        >
+          <ShieldCheck className="w-4 h-4" />
+          <span>Faculty Access</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab("list")}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center ${
             activeTab === "list"
@@ -91,7 +145,7 @@ export default function AdminDashboardTabs({
           }`}
         >
           <Layers className="w-4 h-4" />
-          <span>All Published ({resources.length})</span>
+          <span>All Published ({totalPublishedCount})</span>
         </button>
       </div>
 
@@ -172,72 +226,124 @@ export default function AdminDashboardTabs({
       {/* TAB 4: ANNOUNCEMENT COMPONENT */}
       {activeTab === "announcement" && <AddAnnouncementForm />}
 
-      {/* TAB 5: ALL PUBLISHED MATERIALS TABLE */}
+      {/* TAB 5: FACULTY ACCESS MANAGEMENT */}
+      {activeTab === "faculty" && <ManageFacultyForm />}
+
+      {/* TAB 6: ALL PUBLISHED MATERIALS TABLE (PDFs & VIDEOS WITH DELETE BUTTONS) */}
       {activeTab === "list" && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-          <div className="p-4 sm:p-6 border-b border-slate-800">
-            <h2 className="font-bold text-white text-base">
-              Published Resources Library
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              View and manage all uploaded documents across levels.
-            </p>
+          <div className="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between">
+            <div>
+              <h2 className="font-bold text-white text-base">
+                Published Resources Library ({totalPublishedCount})
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                View and manage all uploaded PDF documents and embedded video
+                lectures.
+              </p>
+            </div>
+            {isPending && (
+              <Loader2 className="w-5 h-5 text-amber-400 animate-spin flex-shrink-0" />
+            )}
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs sm:text-sm">
-              <thead className="bg-slate-950 text-slate-400 uppercase text-[11px] font-semibold border-b border-slate-800">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[600px]">
+              <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] sm:text-[11px] font-semibold border-b border-slate-800">
                 <tr>
-                  <th className="p-4">Title</th>
-                  <th className="p-4">Subject</th>
-                  <th className="p-4">Stage</th>
-                  <th className="p-4">Type</th>
-                  <th className="p-4">Diet / Year</th>
-                  <th className="p-4 text-right">Action</th>
+                  <th className="p-3 sm:p-4">Title</th>
+                  <th className="p-3 sm:p-4">Subject</th>
+                  <th className="p-3 sm:p-4">Stage</th>
+                  <th className="p-3 sm:p-4">Type</th>
+                  <th className="p-3 sm:p-4 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 text-slate-300">
-                {resources.length === 0 ? (
+                {resourcesList.length === 0 && videosList.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center text-slate-500">
+                    <td colSpan={5} className="p-8 text-center text-slate-500">
                       No materials published yet. Use the tabs above to upload
                       your first PDF or video!
                     </td>
                   </tr>
                 ) : (
-                  resources.map((res: Resource) => (
-                    <tr
-                      key={res.id}
-                      className="hover:bg-slate-800/50 transition"
-                    >
-                      <td className="p-4 font-semibold text-white">
-                        {res.title}
-                      </td>
-                      <td className="p-4 text-slate-400">
-                        {res.subject?.name}
-                      </td>
-                      <td className="p-4 text-slate-400">{res.level?.name}</td>
-                      <td className="p-4">
-                        <span className="px-2.5 py-1 bg-amber-500/10 text-amber-400 text-[11px] font-semibold rounded-full uppercase">
-                          {res.resource_type.replace("_", " ")}
-                        </span>
-                      </td>
-                      <td className="p-4 text-slate-400">
-                        {res.exam_diet} {res.exam_year}
-                      </td>
-                      <td className="p-4 text-right">
-                        <a
-                          href={res.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-amber-400 hover:underline font-semibold"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          PDF
-                        </a>
-                      </td>
-                    </tr>
-                  ))
+                  <>
+                    {/* LIST PDF DOCUMENTS */}
+                    {resourcesList.map((res: Resource) => (
+                      <tr
+                        key={res.id}
+                        className="hover:bg-slate-800/50 transition"
+                      >
+                        <td className="p-3 sm:p-4 font-semibold text-white">
+                          📄 {res.title}
+                        </td>
+                        <td className="p-3 sm:p-4 text-slate-400">
+                          {res.subject?.name || "—"}
+                        </td>
+                        <td className="p-3 sm:p-4 text-slate-400">
+                          {res.level?.name || "—"}
+                        </td>
+                        <td className="p-3 sm:p-4">
+                          <span className="px-2.5 py-1 bg-amber-500/10 text-amber-400 text-[10px] font-bold rounded-full uppercase whitespace-nowrap">
+                            {res.resource_type.replace("_", " ")}
+                          </span>
+                        </td>
+                        <td className="p-3 sm:p-4 text-right flex items-center justify-end gap-3">
+                          <a
+                            href={res.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-amber-400 font-semibold hover:underline flex items-center gap-1"
+                          >
+                            <Download className="w-3.5 h-3.5" /> PDF
+                          </a>
+                          <button
+                            onClick={() =>
+                              handleDeleteResource(res.id, res.title)
+                            }
+                            disabled={isPending}
+                            className="p-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-lg transition cursor-pointer disabled:opacity-50"
+                            title="Delete PDF"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+
+                    {/* LIST VIDEO LECTURES */}
+                    {videosList.map((vid: Video) => (
+                      <tr
+                        key={vid.id}
+                        className="hover:bg-slate-800/50 transition"
+                      >
+                        <td className="p-3 sm:p-4 font-semibold text-white">
+                          🎥 {vid.title}
+                        </td>
+                        <td className="p-3 sm:p-4 text-slate-400">
+                          {vid.subject?.name || "—"}
+                        </td>
+                        <td className="p-3 sm:p-4 text-slate-400">
+                          {vid.level?.name || "—"}
+                        </td>
+                        <td className="p-3 sm:p-4">
+                          <span className="px-2.5 py-1 bg-blue-500/10 text-blue-400 text-[10px] font-bold rounded-full uppercase whitespace-nowrap">
+                            VIDEO LECTURE
+                          </span>
+                        </td>
+                        <td className="p-3 sm:p-4 text-right">
+                          <button
+                            onClick={() => handleDeleteVideo(vid.id, vid.title)}
+                            disabled={isPending}
+                            className="p-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-lg transition cursor-pointer disabled:opacity-50"
+                            title="Delete Video"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </>
                 )}
               </tbody>
             </table>

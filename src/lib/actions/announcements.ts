@@ -41,3 +41,29 @@ export async function getLatestAnnouncement() {
 
   return data || null;
 }
+// Add to src/lib/actions/announcements.ts:
+export async function deleteAnnouncement(announcementId: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("announcements")
+    .delete()
+    .eq("id", announcementId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
+export async function getAllAnnouncements() {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("announcements")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  return data || [];
+}

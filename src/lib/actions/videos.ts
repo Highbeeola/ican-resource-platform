@@ -39,3 +39,16 @@ export async function createVideo(formData: FormData) {
   revalidatePath("/admin/resources");
   return { success: true };
 }
+// Add to src/lib/actions/videos.ts:
+export async function deleteVideo(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("videos").delete().eq("id", id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/resources");
+  revalidatePath("/admin/resources");
+  return { success: true };
+}

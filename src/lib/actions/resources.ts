@@ -70,13 +70,10 @@ export async function uploadResource(formData: FormData) {
 
   return { success: true };
 }
-export async function deleteResource(resourceId: string) {
+// Add to src/lib/actions/resources.ts:
+export async function deleteResource(id: string) {
   const supabase = await createClient();
-
-  const { error } = await supabase
-    .from("resources")
-    .delete()
-    .eq("id", resourceId);
+  const { error } = await supabase.from("resources").delete().eq("id", id);
 
   if (error) {
     return { error: error.message };

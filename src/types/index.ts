@@ -65,4 +65,5 @@ export interface Video {
   is_published: boolean;
   created_at: string;
   subject?: Subject;
+  level?: Level;
 }

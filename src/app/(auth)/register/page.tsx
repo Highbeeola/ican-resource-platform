@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { registerUser } from "@/lib/actions/auth";
+import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { BookOpen, Loader2, AlertCircle } from "lucide-react";
 
@@ -13,11 +13,27 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
     const formData = new FormData(e.currentTarget);
+    const fullName = formData.get("fullName") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
     startTransition(async () => {
-      const res = await registerUser(formData);
-      if (res?.error) {
-        setError(res.error);
+      const supabase = createClient();
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+        },
+      });
+
+      if (signUpError) {
+        setError(signUpError.message);
+      } else {
+        // HARD REDIRECT ENSURES INSTANT AUTHENTICATION
+        window.location.href = "/resources";
       }
     });
   }
@@ -95,7 +111,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {isPending ? (
               <>

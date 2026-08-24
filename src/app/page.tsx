@@ -22,11 +22,10 @@ export default async function HomePage() {
       {/* HERO SECTION */}
       <section className="relative overflow-hidden py-16 lg:py-24 px-4 sm:px-6 bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800">
         <div className="max-w-5xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-xs font-semibold uppercase tracking-wider">
-            <GraduationCap className="w-4 h-4" />
-            <span>
-              Access ICAN study materials, Pathfinders, past questions and
-              revision resources — organised by level and subject.
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-3.5 rounded-full bg-slate-800/80 border border-slate-700 text-amber-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider max-w-full text-center">
+            <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="truncate sm:whitespace-normal">
+              ACCESS ICAN STUDY MATERIALS, PATHFINDERS & PAST QUESTIONS
             </span>
           </div>
 
@@ -253,9 +252,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* FOOTER */}
-      
     </div>
   );
 }

@@ -1,11 +1,20 @@
+import { createClient } from "@/lib/supabase/server";
 import { getLevels, getSubjects, getResources } from "@/lib/services/resources";
 import AdminDashboardTabs from "@/components/admin/AdminDashboardTabs";
 import { Shield } from "lucide-react";
 
 export default async function AdminResourcesPage() {
+  const supabase = await createClient();
+
   const levels = await getLevels();
   const subjects = await getSubjects();
   const { resources } = await getResources({ limit: 100 });
+
+  // FETCH ALL PUBLISHED VIDEOS
+  const { data: videos } = await supabase
+    .from("videos")
+    .select("*, subject:subjects(name), level:levels(name)")
+    .order("created_at", { ascending: false });
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-4 sm:p-6 md:p-10">
@@ -29,6 +38,7 @@ export default async function AdminResourcesPage() {
           levels={levels}
           subjects={subjects}
           resources={resources}
+          videos={videos || []}
         />
       </div>
     </div>

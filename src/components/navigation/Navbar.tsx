@@ -44,7 +44,11 @@ export default function Navbar() {
   }, []);
 
   // 2. HIDE NAVBAR ON LOGIN & REGISTER PAGES
-  if (pathname === "/login" || pathname === "/register") {
+  if (
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/admin/login"
+  ) {
     return null;
   }
 
@@ -59,16 +63,16 @@ export default function Navbar() {
 
   return (
     <header className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* BRAND LOGO */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        {/* BRAND LOGO - Prevents text wrapping on mobile */}
         <Link
           href="/"
-          className="flex items-center gap-2.5 font-bold text-lg text-white tracking-tight"
+          className="flex items-center gap-2 font-bold text-sm sm:text-lg text-white tracking-tight flex-shrink-0"
         >
-          <div className="bg-amber-500 p-1.5 rounded-lg text-slate-950">
-            <GraduationCap className="w-5 h-5" />
+          <div className="bg-amber-500 p-1.5 rounded-lg text-slate-950 flex-shrink-0">
+            <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <span>CA Prep Academy</span>
+          <span className="whitespace-nowrap">CA Prep Academy</span>
         </Link>
 
         {/* NAVIGATION LINKS */}
@@ -97,9 +101,24 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        {/* AUTH BUTTONS */}
-        <div className="flex items-center gap-3">
-          {user ? (
+        {/* AUTH BUTTONS - Scaled down for mobile */}
+        <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+          {!user ? (
+            <>
+              <Link
+                href="/login"
+                className="text-xs sm:text-sm font-semibold text-slate-300 hover:text-white px-2 py-1.5 transition"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="text-xs sm:text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition shadow-sm whitespace-nowrap"
+              >
+                Register Free
+              </Link>
+            </>
+          ) : (
             <div className="flex items-center gap-2 sm:gap-3">
               <span className="text-xs text-slate-400 hidden sm:inline">
                 {user.email}
@@ -109,7 +128,7 @@ export default function Navbar() {
               {isAdmin && (
                 <Link
                   href="/admin/resources"
-                  className="text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-lg border border-slate-700 flex items-center gap-1.5 transition"
+                  className="text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg border border-slate-700 flex items-center gap-1.5 transition"
                 >
                   <Shield className="w-3.5 h-3.5 text-amber-400" />
                   <span>Admin</span>
@@ -118,27 +137,12 @@ export default function Navbar() {
 
               <button
                 onClick={handleLogout}
-                className="text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-3 py-2 rounded-lg border border-rose-500/20 flex items-center gap-1.5 transition cursor-pointer"
+                className="text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg border border-rose-500/20 flex items-center gap-1.5 transition cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Logout</span>
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="text-sm font-semibold text-slate-300 hover:text-white px-3 py-2 transition"
-              >
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="text-sm font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2 rounded-lg transition shadow-sm"
-              >
-                Register Free
-              </Link>
-            </>
           )}
         </div>
       </div>

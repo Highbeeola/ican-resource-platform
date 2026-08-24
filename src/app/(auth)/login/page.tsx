@@ -2,12 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { GraduationCap, Loader2, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -28,8 +26,8 @@ export default function LoginPage() {
       if (signInError) {
         setError(signInError.message);
       } else {
-        router.push("/resources");
-        router.refresh();
+        // HARD REDIRECT ENSURES INSTANT AUTHENTICATION
+        window.location.href = "/resources";
       }
     });
   }
