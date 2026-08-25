@@ -31,28 +31,25 @@ export default function Footer() {
         </div>
 
         {/* NAVIGATION LINKS & ACCESS */}
-        <div className="flex flex-wrap items-center justify-center gap-6 text-slate-400">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-3 sm:gap-6 text-slate-400 text-center w-full max-w-sm sm:max-w-none">
           <Link
             href="/resources"
             className="hover:text-amber-400 transition-colors"
           >
             Study Materials
           </Link>
-          <span className="text-slate-800">•</span>
           <Link
             href="/resources?level=foundation"
             className="hover:text-amber-400 transition-colors"
           >
             Foundation Stage
           </Link>
-          <span className="text-slate-800">•</span>
           <Link
             href="/resources?level=skills"
             className="hover:text-amber-400 transition-colors"
           >
             Skills Stage
           </Link>
-          <span className="text-slate-800">•</span>
           <Link
             href="/resources?level=professional"
             className="hover:text-amber-400 transition-colors"
