@@ -27,7 +27,7 @@ export default function LoginPage() {
         setError(signInError.message);
       } else {
         // HARD REDIRECT ENSURES INSTANT AUTHENTICATION
-        window.location.href = "/resources";
+        window.location.href = "/";
       }
     });
   }

@@ -30,7 +30,7 @@ export async function registerUser(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/resources");
+  redirect("/");
 }
 
 export async function loginUser(formData: FormData) {
@@ -53,7 +53,7 @@ export async function loginUser(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/resources");
+  redirect("/");
 }
 
 export async function logoutUser() {

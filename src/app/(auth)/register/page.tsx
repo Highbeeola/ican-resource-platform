@@ -33,7 +33,7 @@ export default function RegisterPage() {
         setError(signUpError.message);
       } else {
         // HARD REDIRECT ENSURES INSTANT AUTHENTICATION
-        window.location.href = "/resources";
+        window.location.href = "/";
       }
     });
   }
