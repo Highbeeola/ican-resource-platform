@@ -9,6 +9,7 @@ import {
   FileText,
   Lightbulb,
   ExternalLink,
+  Video,
 } from "lucide-react";
 
 interface Props {
@@ -124,24 +125,34 @@ export default async function ResourceItemPage({
               )}
             </div>
 
-            {/* LESSON NOTES & DIRECT DOWNLOAD BUTTON */}
+            {/* DYNAMIC LESSON OVERVIEW CARD (DISTINGUISHES VIDEO VS DOCUMENT) */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-3">
               <h3 className="font-bold text-white text-base flex items-center gap-2">
-                <FileText className="w-5 h-5 text-amber-400" />
-                <span>Lesson Notes & Material Details</span>
+                {isVideo ? (
+                  <Video className="w-5 h-5 text-blue-400" />
+                ) : (
+                  <FileText className="w-5 h-5 text-amber-400" />
+                )}
+                <span>
+                  {isVideo
+                    ? "Video Lecture Overview"
+                    : "Document Details & Downloads"}
+                </span>
               </h3>
+
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                 {itemData.description ||
-                  "Download the document below for offline revision."}
+                  (isVideo
+                    ? "Watch the video lecture above to master key exam concepts for this topic."
+                    : "Download the PDF document below for offline study and revision.")}
               </p>
 
-              {itemData.file_url && (
-                <div className="pt-2">
-                  <DownloadButton
-                    fileUrl={itemData.file_url}
-                    fileName={itemData.title}
-                  />
-                </div>
+              {/* ONLY SHOW DOWNLOAD BUTTON FOR PDF DOCUMENTS WITH A FILE URL */}
+              {!isVideo && itemData.file_url && (
+                <DownloadButton
+                  fileUrl={itemData.file_url}
+                  fileName={itemData.title}
+                />
               )}
             </div>
 
