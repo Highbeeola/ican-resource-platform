@@ -22,7 +22,7 @@ export default function Footer() {
           </div>
           <div>
             <p className="text-white font-bold text-sm tracking-tight">
-              CA Prep Academy
+              KRL Academy
             </p>
             <p className="text-slate-500 text-[11px]">
               Empowering Future Chartered Accountants
@@ -72,7 +72,7 @@ export default function Footer() {
 
       {/* COPYRIGHT */}
       <div className="max-w-7xl mx-auto mt-8 pt-6 border-t border-slate-900/80 text-center sm:text-left text-slate-600 text-[11px]">
-        © {new Date().getFullYear()} CA Prep Academy. All rights reserved.
+        © {new Date().getFullYear()} KRL Academy. All rights reserved.
       </div>
     </footer>
   );

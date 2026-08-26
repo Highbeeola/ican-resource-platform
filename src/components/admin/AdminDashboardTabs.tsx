@@ -7,6 +7,7 @@ import VideoUploadForm from "@/components/admin/VideoUploadForm";
 import AddSubjectForm from "@/components/admin/AddSubjectForm";
 import AddAnnouncementForm from "@/components/admin/AddAnnouncementForm";
 import ManageFacultyForm from "@/components/admin/ManageFacultyForm";
+import AddQuestionForm from "@/components/admin/AddQuestionForm";
 import { deleteResource } from "@/lib/actions/resources";
 import { deleteVideo } from "@/lib/actions/videos";
 import {
@@ -19,6 +20,7 @@ import {
   ShieldCheck,
   Trash2,
   Loader2,
+  HelpCircle,
 } from "lucide-react";
 
 interface Props {
@@ -34,6 +36,7 @@ type TabType =
   | "subject"
   | "announcement"
   | "faculty"
+  | "question"
   | "list";
 
 export default function AdminDashboardTabs({
@@ -110,6 +113,18 @@ export default function AdminDashboardTabs({
         >
           <BookOpen className="w-4 h-4" />
           <span>Manage Subjects</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("question")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center ${
+            activeTab === "question"
+              ? "bg-amber-500 text-slate-950 shadow-md"
+              : "text-slate-400 hover:text-white"
+          }`}
+        >
+          <HelpCircle className="w-4 h-4" />
+          <span>Question Bank</span>
         </button>
 
         <button
@@ -210,7 +225,7 @@ export default function AdminDashboardTabs({
                     </p>
                     <p className="text-slate-400 text-xs mt-0.5">
                       {sub.level?.name} Stage •{" "}
-                      {sub.instructor_name || "CA Prep Academy"}
+                      {sub.instructor_name || "KRL Academy"}
                     </p>
                   </div>
                   <span className="px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full font-semibold uppercase text-[11px]">
@@ -223,13 +238,16 @@ export default function AdminDashboardTabs({
         </div>
       )}
 
-      {/* TAB 4: ANNOUNCEMENT COMPONENT */}
+      {/* TAB 4: QUESTION BANK */}
+      {activeTab === "question" && <AddQuestionForm subjects={subjects} />}
+
+      {/* TAB 5: ANNOUNCEMENT COMPONENT */}
       {activeTab === "announcement" && <AddAnnouncementForm />}
 
-      {/* TAB 5: FACULTY ACCESS MANAGEMENT */}
+      {/* TAB 6: FACULTY ACCESS MANAGEMENT */}
       {activeTab === "faculty" && <ManageFacultyForm />}
 
-      {/* TAB 6: ALL PUBLISHED MATERIALS TABLE (PDFs & VIDEOS WITH DELETE BUTTONS) */}
+      {/* TAB 7: ALL PUBLISHED MATERIALS TABLE (PDFs & VIDEOS WITH DELETE BUTTONS) */}
       {activeTab === "list" && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
           <div className="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between">

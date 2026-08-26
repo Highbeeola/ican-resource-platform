@@ -72,48 +72,44 @@ export default function Navbar() {
   };
 
   return (
-    <header className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-50">
+    <header className="bg-[#1e3a8a] border-b border-blue-800 text-white sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* BRAND LOGO */}
         <Link
           href="/"
-          className="flex items-center gap-2 font-bold text-sm sm:text-lg text-white tracking-tight flex-shrink-0"
+          className="flex items-center gap-2 font-bold text-sm sm:text-lg text-white tracking-tight flex-shrink-0 touch-manipulation active:opacity-80"
         >
-          <div className="bg-amber-500 p-1.5 rounded-lg text-slate-950 flex-shrink-0">
+          <div className="bg-[#f59e0b] p-1.5 rounded-lg text-white flex-shrink-0">
             <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <span className="whitespace-nowrap">CA Prep Academy</span>
+          <span className="whitespace-nowrap">KRL Academy</span>
         </Link>
 
         {/* DESKTOP NAVIGATION LINKS */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-          <Link href="/" className="hover:text-amber-400 transition">
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-blue-100">
+          <Link href="/" className="hover:text-white transition">
             Home
           </Link>
           {user && (
             <Link
               href="/dashboard"
-              className="hover:text-amber-400 transition font-bold text-amber-400"
+              className="hover:text-white transition font-bold text-amber-300"
             >
               Dashboard
             </Link>
           )}
-          <Link
-            href="/resources"
-            className="hover:text-amber-400 transition flex items-center gap-1"
-          >
-            <FileText className="w-4 h-4 text-slate-400" />
-            <span>Study Materials</span>
+          <Link href="/resources" className="hover:text-white transition">
+            Courses
           </Link>
           <Link
             href="/resources?type=pathfinder"
-            className="hover:text-amber-400 transition"
+            className="hover:text-white transition"
           >
             Pathfinders
           </Link>
           <Link
             href="/resources?type=past_question"
-            className="hover:text-amber-400 transition"
+            className="hover:text-white transition"
           >
             Past Questions
           </Link>
@@ -126,15 +122,15 @@ export default function Navbar() {
               {isAdmin && (
                 <Link
                   href="/admin/resources"
-                  className="text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-lg border border-slate-700 flex items-center gap-1.5"
+                  className="text-xs font-semibold bg-blue-900/60 hover:bg-blue-900 text-amber-300 px-3 py-2 rounded-md border border-blue-700 flex items-center gap-1.5 transition"
                 >
-                  <Shield className="w-3.5 h-3.5 text-amber-400" />
+                  <Shield className="w-3.5 h-3.5" />
                   <span>Admin</span>
                 </Link>
               )}
               <button
                 onClick={handleLogout}
-                className="text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 px-3 py-2 rounded-lg border border-rose-500/20 flex items-center gap-1.5 transition cursor-pointer"
+                className="text-xs font-semibold bg-blue-800/60 hover:bg-blue-700 text-blue-100 px-3 py-2 rounded-md border border-blue-600 flex items-center gap-1.5 transition cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Logout</span>
@@ -144,13 +140,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="text-sm font-semibold text-slate-300 hover:text-white px-3 py-2 transition"
+                className="text-sm font-bold bg-[#f59e0b] hover:bg-[#d97706] text-white px-6 py-2 rounded-md transition shadow-sm"
               >
                 Login
               </Link>
               <Link
                 href="/register"
-                className="text-sm font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2 rounded-lg transition shadow-sm"
+                className="hidden sm:inline-block text-sm font-semibold text-white border border-white hover:bg-white hover:text-[#1e3a8a] px-5 py-2 rounded-md transition"
               >
                 Register Free
               </Link>
@@ -162,7 +158,7 @@ export default function Navbar() {
         <div className="flex md:hidden items-center gap-2">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-slate-300 hover:text-white bg-slate-800 rounded-xl border border-slate-700 focus:outline-none cursor-pointer"
+            className="p-2 text-blue-100 hover:text-white active:bg-blue-800 bg-blue-900/50 rounded-xl border border-blue-700 focus:outline-none cursor-pointer touch-manipulation"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? (
@@ -176,11 +172,11 @@ export default function Navbar() {
 
       {/* MOBILE DROPDOWN MENU */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-slate-900 border-b border-slate-800 px-4 py-4 space-y-3">
-          <nav className="flex flex-col gap-1.5 text-sm font-semibold text-slate-300">
+        <div className="md:hidden bg-[#1e3a8a] border-b border-blue-800 px-4 py-4 space-y-3">
+          <nav className="flex flex-col gap-1.5 text-sm font-semibold text-blue-100">
             <Link
               href="/"
-              className="p-2.5 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 transition"
+              className="p-2.5 rounded-xl hover:bg-blue-800 active:bg-blue-800/80 flex items-center gap-2.5 transition touch-manipulation"
             >
               <Home className="w-4 h-4 text-amber-400" />
               <span>Home</span>
@@ -189,7 +185,7 @@ export default function Navbar() {
             {user && (
               <Link
                 href="/dashboard"
-                className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 flex items-center gap-2.5 font-bold border border-amber-500/20"
+                className="p-2.5 rounded-xl bg-amber-500/20 text-amber-300 active:bg-amber-500/30 flex items-center gap-2.5 font-bold border border-amber-500/30 touch-manipulation"
               >
                 <LayoutDashboard className="w-4 h-4" />
                 <span>Dashboard</span>
@@ -198,32 +194,32 @@ export default function Navbar() {
 
             <Link
               href="/resources"
-              className="p-2.5 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 transition"
+              className="p-2.5 rounded-xl hover:bg-blue-800 active:bg-blue-800/80 flex items-center gap-2.5 transition touch-manipulation"
             >
-              <BookOpen className="w-4 h-4 text-blue-400" />
-              <span>Study Materials</span>
+              <BookOpen className="w-4 h-4 text-amber-400" />
+              <span>Courses</span>
             </Link>
 
             <Link
               href="/resources?type=pathfinder"
-              className="p-2.5 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 transition"
+              className="p-2.5 rounded-xl hover:bg-blue-800 active:bg-blue-800/80 flex items-center gap-2.5 transition touch-manipulation"
             >
-              <FileText className="w-4 h-4 text-emerald-400" />
+              <FileText className="w-4 h-4 text-amber-400" />
               <span>Pathfinders</span>
             </Link>
 
             <Link
               href="/resources?type=past_question"
-              className="p-2.5 rounded-xl hover:bg-slate-800 flex items-center gap-2.5 transition"
+              className="p-2.5 rounded-xl hover:bg-blue-800 active:bg-blue-800/80 flex items-center gap-2.5 transition touch-manipulation"
             >
-              <FileText className="w-4 h-4 text-purple-400" />
+              <FileText className="w-4 h-4 text-amber-400" />
               <span>Past Questions</span>
             </Link>
 
             {user && isAdmin && (
               <Link
                 href="/admin/resources"
-                className="p-2.5 rounded-xl bg-slate-800 text-slate-200 flex items-center gap-2.5 border border-slate-700"
+                className="p-2.5 rounded-xl bg-blue-900/80 text-amber-300 active:bg-blue-900 flex items-center gap-2.5 border border-blue-700 touch-manipulation"
               >
                 <Shield className="w-4 h-4 text-amber-400" />
                 <span>Admin Command Center</span>
@@ -232,11 +228,11 @@ export default function Navbar() {
           </nav>
 
           {/* MOBILE AUTH BUTTONS */}
-          <div className="pt-2 border-t border-slate-800 flex flex-col gap-2">
+          <div className="pt-2 border-t border-blue-800 flex flex-col gap-2">
             {user ? (
               <button
                 onClick={handleLogout}
-                className="w-full p-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer"
+                className="w-full p-2.5 bg-blue-800/60 hover:bg-blue-700 active:bg-blue-800 text-blue-100 border border-blue-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer touch-manipulation"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>
@@ -245,13 +241,13 @@ export default function Navbar() {
               <div className="flex gap-2">
                 <Link
                   href="/login"
-                  className="flex-1 py-2.5 text-center bg-slate-800 text-slate-200 rounded-xl text-xs font-bold border border-slate-700"
+                  className="flex-1 py-2.5 text-center bg-[#f59e0b] active:bg-[#d97706] text-white rounded-xl text-xs font-bold shadow-md touch-manipulation"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  className="flex-1 py-2.5 text-center bg-amber-500 text-slate-950 rounded-xl text-xs font-bold shadow-md"
+                  className="flex-1 py-2.5 text-center bg-transparent border border-white text-white active:bg-white active:text-[#1e3a8a] rounded-xl text-xs font-bold touch-manipulation"
                 >
                   Register Free
                 </Link>

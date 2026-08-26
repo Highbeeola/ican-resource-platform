@@ -5,7 +5,7 @@ import { getLatestAnnouncement } from "@/lib/actions/announcements";
 import "./globals.css";
 
 export const metadata = {
-  title: "CA Prep Academy | ICAN Exam Preparation Platform",
+  title: "KRL Academy | ICAN Exam Preparation Platform",
   description:
     "Comprehensive study materials, pathfinders, and revision resources for ICAN students.",
 };

@@ -83,7 +83,7 @@ export default async function ResourceItemPage({
             {itemData.title}
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            {itemData.subject?.name} • CA Prep Academy Faculty
+            {itemData.subject?.name} • KRL Academy Faculty
           </p>
         </div>
 

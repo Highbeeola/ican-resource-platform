@@ -12,42 +12,37 @@ export interface ResourceFilters {
 }
 
 // 1. Fetch All ICAN Levels
-export async function getLevels(): Promise<Level[]> {
+export async function getLevels(progSlug: string = "ican"): Promise<Level[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("levels")
-    .select("*")
+    .select("*, programme:programmes!inner(slug)")
+    .eq("programme.slug", progSlug)
     .order("display_order", { ascending: true });
 
-  if (error) {
-    console.error("Error fetching levels:", error);
-    return [];
-  }
+  if (error) return [];
   return data || [];
 }
 
-// 2. Fetch Subjects (Filtered by Level & Sanitized Search Query)
+// 2. Fetch Subjects (Filtered by Level & Sanitized Search Query with Resource/Video Relations)
 export async function getSubjects(
   levelSlug?: string,
   searchQuery?: string,
+  progSlug: string = "ican",
 ): Promise<Subject[]> {
   const supabase = await createClient();
-  let query = supabase.from("subjects").select("*, level:levels(*)");
+  let query = supabase
+    .from("subjects")
+    .select(
+      "*, level:levels!inner(*, programme:programmes!inner(slug)), resources(id), videos(id)",
+    );
 
-  // 1. Filter by Level if slug provided
+  query = query.eq("level.programme.slug", progSlug);
+
   if (levelSlug) {
-    const { data: levelData } = await supabase
-      .from("levels")
-      .select("id")
-      .eq("slug", levelSlug)
-      .single();
-
-    if (levelData) {
-      query = query.eq("level_id", levelData.id);
-    }
+    query = query.eq("level.slug", levelSlug);
   }
 
-  // 2. Safe PostgREST Search Filter
   if (searchQuery && searchQuery.trim() !== "") {
     const clean = searchQuery.trim().replace(/[^a-zA-Z0-9 ]/g, "");
     if (clean) {
@@ -58,11 +53,7 @@ export async function getSubjects(
   const { data, error } = await query.order("display_order", {
     ascending: true,
   });
-
-  if (error) {
-    console.error("Error fetching subjects:", error.message || error);
-    return [];
-  }
+  if (error) return [];
   return data || [];
 }
 

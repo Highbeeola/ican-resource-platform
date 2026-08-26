@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { BookOpen, Loader2, AlertCircle } from "lucide-react";
+import { GraduationCap, Loader2, AlertCircle } from "lucide-react";
 
 export default function RegisterPage() {
   const [isPending, startTransition] = useTransition();
@@ -16,60 +16,56 @@ export default function RegisterPage() {
     const fullName = formData.get("fullName") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const levelId = formData.get("levelId") as string;
 
     startTransition(async () => {
       const supabase = createClient();
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
+        options: { data: { full_name: fullName, level_id: levelId || null } },
       });
 
       if (signUpError) {
         setError(signUpError.message);
       } else {
-        // HARD REDIRECT ENSURES INSTANT AUTHENTICATION
         window.location.href = "/";
       }
     });
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
-        {/* LOGO & TITLE */}
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 sm:p-6 py-12 overflow-y-auto">
+      <div className="w-full max-w-md bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-sm space-y-6 my-auto">
+        {/* BRANDING HEADER */}
         <div className="text-center space-y-2">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 font-bold text-lg text-white"
+            className="inline-flex items-center gap-2 font-bold text-lg text-[#1e3a8a]"
           >
-            <div className="bg-amber-500 p-1.5 rounded-lg text-slate-950">
-              <BookOpen className="w-5 h-5" />
+            <div className="bg-amber-500 p-1.5 rounded-lg text-white">
+              <GraduationCap className="w-5 h-5" />
             </div>
-            <span>CA Prep Academy</span>
+            <span>KRL Academy</span>
           </Link>
-          <h1 className="text-2xl font-bold text-white pt-2">
+          <h1 className="text-2xl font-bold text-[#1e3a8a] pt-2">
             Create Your Account
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Access official ICAN study texts, pathfinders, and past questions.
+          <p className="text-xs sm:text-sm text-slate-600">
+            Access ICAN study texts, pathfinders, and past questions.
           </p>
         </div>
 
         {error && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-lg text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Full Name *
             </label>
             <input
@@ -77,12 +73,12 @@ export default function RegisterPage() {
               name="fullName"
               required
               placeholder="e.g. Babatunde Adeleke"
-              className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Email Address *
             </label>
             <input
@@ -90,12 +86,12 @@ export default function RegisterPage() {
               name="email"
               required
               placeholder="student@example.com"
-              className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Password *
             </label>
             <input
@@ -104,14 +100,41 @@ export default function RegisterPage() {
               required
               minLength={6}
               placeholder="Minimum 6 characters"
-              className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Level (Optional)
+            </label>
+            <select
+              name="levelId"
+              defaultValue=""
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition cursor-pointer"
+            >
+              <option value="" disabled className="bg-white text-slate-400">
+                Select your current level...
+              </option>
+              <option value="foundation" className="bg-white text-slate-900">
+                ICAN Foundation
+              </option>
+              <option value="skills" className="bg-white text-slate-900">
+                ICAN Skills
+              </option>
+              <option value="professional" className="bg-white text-slate-900">
+                ICAN Professional
+              </option>
+              <option value="atswa" className="bg-white text-slate-900">
+                ATSWA Levels
+              </option>
+            </select>
           </div>
 
           <button
             type="submit"
             disabled={isPending}
-            className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg transition text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-sm"
           >
             {isPending ? (
               <>
@@ -124,13 +147,13 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="text-center text-xs text-slate-400">
+        <p className="text-center text-xs text-slate-600">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="text-amber-400 font-semibold hover:underline"
+            className="text-amber-600 font-bold hover:underline"
           >
-            Log in
+            Log in here
           </Link>
         </p>
       </div>

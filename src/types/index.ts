@@ -30,6 +30,8 @@ export interface Subject {
   estimated_hours?: number;
   avg_rating?: number | null;
   level?: Level;
+  resources?: { id: string }[];
+  videos?: { id: string }[];
 }
 
 export interface Resource {

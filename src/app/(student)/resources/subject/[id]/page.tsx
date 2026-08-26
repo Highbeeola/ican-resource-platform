@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Subject, Resource, Video } from "@/types";
+import BookmarkButton from "@/components/resources/BookmarkButton";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import RatingPrompt from "@/components/resources/RatingPrompt";
@@ -11,6 +12,7 @@ import {
   Clock,
   Star,
   CheckCircle,
+  Award,
 } from "lucide-react";
 
 interface Props {
@@ -100,9 +102,15 @@ export default async function SubjectDetailsPage({ params }: Props) {
             <span className="px-3 py-1 bg-blue-950/80 text-blue-400 border border-blue-800/50 text-xs font-semibold rounded-full uppercase">
               {subject.level?.name} Stage
             </span>
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-              {subject.name}
-            </h1>
+
+            {/* SUBJECT NAME & BOOKMARK BUTTON */}
+            <div className="flex justify-between items-start gap-4 mt-3">
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
+                {subject.name}
+              </h1>
+              <BookmarkButton resourceId={subject.id} />
+            </div>
+
             {subject.description && (
               <p className="text-slate-400 text-xs sm:text-sm mt-2 leading-relaxed">
                 {subject.description}
@@ -125,7 +133,7 @@ export default async function SubjectDetailsPage({ params }: Props) {
               </span>
             )}
 
-            {/* DYNAMIC RATING DISPLAY (Hides if 0 ratings exist) */}
+            {/* DYNAMIC RATING DISPLAY */}
             {avgRating !== null ? (
               <span className="flex items-center gap-1 text-amber-500 font-semibold">
                 <Star className="w-4 h-4 fill-amber-400" />
@@ -136,21 +144,34 @@ export default async function SubjectDetailsPage({ params }: Props) {
             )}
           </div>
 
-          {/* DYNAMIC PROGRESS BAR */}
+          {/* DYNAMIC PROGRESS BAR & PRACTICE TEST ACTION */}
           {user && (
-            <div className="space-y-2 pt-2 border-t border-slate-800">
-              <div className="flex justify-between text-xs font-bold text-slate-300">
-                <span>Your Progress</span>
-                <span>
-                  {progressPercentage}% Complete ({completedCount}/{totalItems}{" "}
-                  items)
-                </span>
+            <div className="space-y-4 pt-2 border-t border-slate-800">
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-bold text-slate-300">
+                  <span>Your Progress</span>
+                  <span>
+                    {progressPercentage}% Complete ({completedCount}/
+                    {totalItems} items)
+                  </span>
+                </div>
+                <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-amber-500 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${progressPercentage}%` }}
+                  ></div>
+                </div>
               </div>
-              <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                <div
-                  className="bg-amber-500 h-full rounded-full transition-all duration-500"
-                  style={{ width: `${progressPercentage}%` }}
-                ></div>
+
+              {/* TAKE PRACTICE TEST BUTTON */}
+              <div>
+                <Link
+                  href={`/practice/${subject.id}`}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs sm:text-sm shadow-md transition"
+                >
+                  <Award className="w-4 h-4" />
+                  <span>Take Practice Test</span>
+                </Link>
               </div>
             </div>
           )}
@@ -226,7 +247,7 @@ export default async function SubjectDetailsPage({ params }: Props) {
           </div>
         </div>
 
-        {/* STUDENT RATING PROMPT (MOVED TO BOTTOM) */}
+        {/* STUDENT RATING PROMPT */}
         {user && <RatingPrompt subjectId={id} />}
       </div>
     </div>

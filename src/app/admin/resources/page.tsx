@@ -24,7 +24,7 @@ export default async function AdminResourcesPage() {
           <div>
             <div className="flex items-center gap-2 text-amber-400 font-bold text-xl sm:text-2xl">
               <Shield className="w-6 h-6" />
-              <h1>CA Prep Academy Admin Portal</h1>
+              <h1>KRL Academy Admin Portal</h1>
             </div>
             <p className="text-slate-400 text-xs sm:text-sm mt-1">
               Centralized command center for managing ICAN study materials,
