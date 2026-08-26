@@ -17,16 +17,16 @@ export default async function AdminResourcesPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-4 sm:p-6 md:p-10">
+    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* DASHBOARD HEADER */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-6">
           <div>
-            <div className="flex items-center gap-2 text-amber-400 font-bold text-xl sm:text-2xl">
-              <Shield className="w-6 h-6" />
-              <h1>KRL Academy Admin Portal</h1>
+            <div className="flex items-center gap-2 text-[#1e3a8a] font-bold text-xl sm:text-2xl">
+              <Shield className="w-6 h-6 text-amber-500" />
+              <h1>ICAN Admin Portal</h1>
             </div>
-            <p className="text-slate-400 text-xs sm:text-sm mt-1">
+            <p className="text-slate-600 text-xs sm:text-sm mt-1">
               Centralized command center for managing ICAN study materials,
               video lectures, and subjects.
             </p>
@@ -34,12 +34,14 @@ export default async function AdminResourcesPage() {
         </div>
 
         {/* UNIFIED TABS */}
-        <AdminDashboardTabs
-          levels={levels}
-          subjects={subjects}
-          resources={resources}
-          videos={videos || []}
-        />
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <AdminDashboardTabs
+            levels={levels}
+            subjects={subjects}
+            resources={resources}
+            videos={videos || []}
+          />
+        </div>
       </div>
     </div>
   );

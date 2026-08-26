@@ -36,17 +36,17 @@ export default function ManageFacultyForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-4 text-white"
+      className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-4 text-slate-900 shadow-sm"
     >
-      <div className="border-b border-slate-800 pb-3">
-        <h2 className="font-bold text-white text-base flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-amber-400" />
+      <div className="border-b border-slate-100 pb-3">
+        <h2 className="font-bold text-slate-900 text-base flex items-center gap-2">
+          <ShieldCheck className="w-5 h-5 text-amber-500" />
           <span>Grant Faculty & Lecturer Privileges</span>
         </h2>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Promote a registered user account to Faculty/Admin status. Ask new
           lecturers to create an account at{" "}
-          <strong className="text-amber-400">/register</strong> first.
+          <strong className="text-amber-600">/register</strong> first.
         </p>
       </div>
 
@@ -54,21 +54,21 @@ export default function ManageFacultyForm() {
         <div
           className={`p-4 rounded-xl flex items-center gap-3 text-xs sm:text-sm font-medium ${
             message.type === "success"
-              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-              : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+              : "bg-rose-50 text-rose-700 border border-rose-200"
           }`}
         >
           {message.type === "success" ? (
-            <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+            <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
           ) : (
-            <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0" />
+            <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
           )}
           <span>{message.text}</span>
         </div>
       )}
 
       <div>
-        <label className="block text-xs font-semibold text-slate-300 mb-1">
+        <label className="block text-xs font-semibold text-slate-700 mb-1">
           Lecturer Registered Email Address *
         </label>
         <input
@@ -77,14 +77,14 @@ export default function ManageFacultyForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="e.g. newlecturer@caprep.com"
-          className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
         />
       </div>
 
       <button
         type="submit"
         disabled={isPending}
-        className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm transition cursor-pointer disabled:opacity-50 flex items-center gap-2"
+        className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition cursor-pointer disabled:opacity-50 flex items-center gap-2 shadow-sm"
       >
         {isPending ? (
           <>

@@ -36,16 +36,16 @@ export default function BookmarkButton({
       disabled={isPending}
       className={`p-2.5 rounded-xl border transition cursor-pointer flex items-center justify-center ${
         isBookmarked
-          ? "bg-amber-500/20 text-amber-400 border-amber-500/40"
-          : "bg-slate-800/80 text-slate-400 border-slate-700 hover:text-white hover:bg-slate-800"
+          ? "bg-amber-50 text-amber-600 border-amber-300"
+          : "bg-white text-slate-500 border-slate-200 hover:text-slate-900 hover:bg-slate-50 shadow-sm"
       }`}
       title={isBookmarked ? "Remove Bookmark" : "Save to Favorites"}
     >
       {isPending ? (
-        <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+        <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
       ) : (
         <Bookmark
-          className={`w-4 h-4 ${isBookmarked ? "fill-amber-400 text-amber-400" : ""}`}
+          className={`w-4 h-4 ${isBookmarked ? "fill-amber-500 text-amber-500" : ""}`}
         />
       )}
     </button>

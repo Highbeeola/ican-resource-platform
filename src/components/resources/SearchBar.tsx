@@ -41,15 +41,15 @@ export default function SearchBar() {
         value={query}
         onChange={(e) => handleInputChange(e.target.value)}
         placeholder="Search subjects, pathfinders, or past questions..."
-        className="w-full pl-10 pr-10 py-2.5 bg-slate-900 border border-slate-800 text-white placeholder:text-slate-500 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm"
+        className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white shadow-sm transition"
       />
       {isPending ? (
-        <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400 animate-spin" />
+        <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500 animate-spin" />
       ) : query ? (
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>

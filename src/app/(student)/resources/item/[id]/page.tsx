@@ -66,12 +66,12 @@ export default async function ResourceItemPage({
   const embedVideoUrl = isVideo ? getYouTubeEmbedUrl(itemData.video_url) : "";
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-4 sm:p-6 md:p-10">
+    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* BACK TO SUBJECT HUB */}
         <Link
           href={`/resources/subject/${itemData.subject_id}`}
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition bg-white px-3.5 py-2 rounded-lg border border-slate-200 shadow-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to {itemData.subject?.name} Course</span>
@@ -79,11 +79,11 @@ export default async function ResourceItemPage({
 
         {/* HEADER */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a]">
             {itemData.title}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            {itemData.subject?.name} • KRL Academy Faculty
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            {itemData.subject?.name} • ICAN Professional Syllabus
           </p>
         </div>
 
@@ -92,7 +92,7 @@ export default async function ResourceItemPage({
           {/* MAIN PLAYER / EMBEDDED PDF VIEWER */}
           <div className="lg:col-span-2 space-y-6">
             {/* EMBEDDED VIEWER FRAME WITH POP-OUT ICON */}
-            <div className="relative bg-slate-900 rounded-2xl overflow-hidden shadow-2xl aspect-video flex items-center justify-center border border-slate-800 group">
+            <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm aspect-video flex items-center justify-center border border-slate-200 group">
               {isVideo ? (
                 <iframe
                   src={embedVideoUrl}
@@ -114,7 +114,7 @@ export default async function ResourceItemPage({
                       href={itemData.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="absolute top-3 right-3 p-2.5 bg-slate-950/90 hover:bg-amber-500 hover:text-slate-950 text-white rounded-xl border border-slate-700 transition shadow-lg flex items-center gap-1.5 text-xs font-bold"
+                      className="absolute top-3 right-3 p-2.5 bg-slate-900/90 hover:bg-amber-500 hover:text-white text-white rounded-xl border border-slate-700 transition shadow-lg flex items-center gap-1.5 text-xs font-bold"
                       title="Open PDF in full tab"
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -126,12 +126,12 @@ export default async function ResourceItemPage({
             </div>
 
             {/* DYNAMIC LESSON OVERVIEW CARD (DISTINGUISHES VIDEO VS DOCUMENT) */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-3">
-              <h3 className="font-bold text-white text-base flex items-center gap-2">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3">
+              <h3 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
                 {isVideo ? (
-                  <Video className="w-5 h-5 text-blue-400" />
+                  <Video className="w-5 h-5 text-amber-500" />
                 ) : (
-                  <FileText className="w-5 h-5 text-amber-400" />
+                  <FileText className="w-5 h-5 text-amber-500" />
                 )}
                 <span>
                   {isVideo
@@ -140,7 +140,7 @@ export default async function ResourceItemPage({
                 </span>
               </h3>
 
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 {itemData.description ||
                   (isVideo
                     ? "Watch the video lecture above to master key exam concepts for this topic."
@@ -157,12 +157,12 @@ export default async function ResourceItemPage({
             </div>
 
             {/* KEY LEARNING POINTS */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-3">
-              <h3 className="font-bold text-white text-base flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-amber-400" />
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3">
+              <h3 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-amber-500" />
                 <span>Key Learning Points</span>
               </h3>
-              <ul className="text-xs sm:text-sm text-slate-400 space-y-2 list-disc pl-5">
+              <ul className="text-xs sm:text-sm text-slate-600 space-y-2 list-disc pl-5">
                 <li>
                   Study the document thoroughly before attempting practice
                   questions.
@@ -179,15 +179,15 @@ export default async function ResourceItemPage({
             </div>
 
             {/* MARK AS COMPLETED BUTTON */}
-            <button className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+            <button className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer">
               <CheckCircle className="w-5 h-5" />
               <span>Mark as Completed</span>
             </button>
           </div>
 
           {/* OTHER COURSE MODULES SIDEBAR */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm h-fit space-y-4">
-            <h3 className="font-bold text-white text-base border-b border-slate-800 pb-3">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-fit space-y-4">
+            <h3 className="font-bold text-[#1e3a8a] text-base border-b border-slate-100 pb-3">
               Other Course Modules
             </h3>
 
@@ -197,7 +197,7 @@ export default async function ResourceItemPage({
                 <Link
                   key={vid.id}
                   href={`/resources/item/${vid.id}?type=video`}
-                  className="p-3 rounded-xl block text-xs font-semibold text-slate-300 hover:bg-slate-800 transition"
+                  className="p-3 rounded-xl block text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
                 >
                   🎥 {vid.title}
                 </Link>
@@ -208,7 +208,7 @@ export default async function ResourceItemPage({
                 <Link
                   key={res.id}
                   href={`/resources/item/${res.id}?type=doc`}
-                  className="p-3 rounded-xl block text-xs font-semibold text-slate-300 hover:bg-slate-800 transition"
+                  className="p-3 rounded-xl block text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
                 >
                   📄 {res.title}
                 </Link>
@@ -216,7 +216,7 @@ export default async function ResourceItemPage({
 
               {(!otherVideos || otherVideos.length === 0) &&
                 (!otherResources || otherResources.length === 0) && (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-400">
                     No other modules in this subject yet.
                   </p>
                 )}

@@ -85,43 +85,43 @@ export default async function SubjectDetailsPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-4 sm:p-6 md:p-10">
+    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* BACK TO COURSES */}
         <Link
           href="/resources"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition bg-slate-900 px-3.5 py-2 rounded-lg border border-slate-800 shadow-sm"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition bg-white px-3.5 py-2 rounded-lg border border-slate-200 shadow-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Courses</span>
         </Link>
 
         {/* COURSE HEADER CARD */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
           <div>
-            <span className="px-3 py-1 bg-blue-950/80 text-blue-400 border border-blue-800/50 text-xs font-semibold rounded-full uppercase">
+            <span className="px-3 py-1 bg-blue-50 text-[#1e3a8a] border border-blue-200 text-xs font-semibold rounded-full uppercase">
               {subject.level?.name} Stage
             </span>
 
             {/* SUBJECT NAME & BOOKMARK BUTTON */}
             <div className="flex justify-between items-start gap-4 mt-3">
-              <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-[#1e3a8a]">
                 {subject.name}
               </h1>
               <BookmarkButton resourceId={subject.id} />
             </div>
 
             {subject.description && (
-              <p className="text-slate-400 text-xs sm:text-sm mt-2 leading-relaxed">
+              <p className="text-slate-600 text-xs sm:text-sm mt-2 leading-relaxed">
                 {subject.description}
               </p>
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 border-t border-slate-800 pt-4">
+          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 border-t border-slate-100 pt-4">
             {subject.instructor_name && (
-              <span className="flex items-center gap-1 font-semibold text-white">
-                <User className="w-4 h-4 text-amber-400" />
+              <span className="flex items-center gap-1 font-semibold text-slate-900">
+                <User className="w-4 h-4 text-amber-500" />
                 {subject.instructor_name}
               </span>
             )}
@@ -135,27 +135,27 @@ export default async function SubjectDetailsPage({ params }: Props) {
 
             {/* DYNAMIC RATING DISPLAY */}
             {avgRating !== null ? (
-              <span className="flex items-center gap-1 text-amber-500 font-semibold">
-                <Star className="w-4 h-4 fill-amber-400" />
+              <span className="flex items-center gap-1 text-amber-600 font-semibold">
+                <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
                 {avgRating} / 5.0 ({ratings?.length} student reviews)
               </span>
             ) : (
-              <span className="text-slate-500 font-medium">No reviews yet</span>
+              <span className="text-slate-400 font-medium">No reviews yet</span>
             )}
           </div>
 
           {/* DYNAMIC PROGRESS BAR & PRACTICE TEST ACTION */}
           {user && (
-            <div className="space-y-4 pt-2 border-t border-slate-800">
+            <div className="space-y-4 pt-2 border-t border-slate-100">
               <div className="space-y-2">
-                <div className="flex justify-between text-xs font-bold text-slate-300">
+                <div className="flex justify-between text-xs font-bold text-slate-700">
                   <span>Your Progress</span>
                   <span>
                     {progressPercentage}% Complete ({completedCount}/
                     {totalItems} items)
                   </span>
                 </div>
-                <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                   <div
                     className="bg-amber-500 h-full rounded-full transition-all duration-500"
                     style={{ width: `${progressPercentage}%` }}
@@ -167,7 +167,7 @@ export default async function SubjectDetailsPage({ params }: Props) {
               <div>
                 <Link
                   href={`/practice/${subject.id}`}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs sm:text-sm shadow-md transition"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs sm:text-sm shadow-sm transition"
                 >
                   <Award className="w-4 h-4" />
                   <span>Take Practice Test</span>
@@ -179,7 +179,7 @@ export default async function SubjectDetailsPage({ params }: Props) {
 
         {/* COURSE CONTENT BREAKDOWN */}
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-[#1e3a8a]">
             Course Content & Modules ({totalItems})
           </h2>
 
@@ -188,17 +188,17 @@ export default async function SubjectDetailsPage({ params }: Props) {
             {videos?.map((vid: Video, index: number) => (
               <div
                 key={vid.id}
-                className="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 flex items-center justify-between gap-4 hover:border-amber-400 transition shadow-sm"
+                className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 flex items-center justify-between gap-4 hover:border-amber-500 transition shadow-sm"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="bg-slate-800 text-amber-400 p-2.5 rounded-lg flex-shrink-0">
+                  <div className="bg-amber-50 text-amber-600 p-2.5 rounded-lg flex-shrink-0">
                     <PlayCircle className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white text-sm sm:text-base">
+                    <h3 className="font-semibold text-slate-900 text-sm sm:text-base">
                       {index + 1}. {vid.title}
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                       {vid.duration_minutes
                         ? `${vid.duration_minutes} mins`
                         : "Video Lecture"}
@@ -208,7 +208,7 @@ export default async function SubjectDetailsPage({ params }: Props) {
 
                 <Link
                   href={`/resources/item/${vid.id}?type=video`}
-                  className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg transition whitespace-nowrap shadow-sm"
+                  className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition whitespace-nowrap shadow-sm"
                 >
                   Start Video →
                 </Link>
@@ -219,17 +219,17 @@ export default async function SubjectDetailsPage({ params }: Props) {
             {resources?.map((res: Resource, index: number) => (
               <div
                 key={res.id}
-                className="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 flex items-center justify-between gap-4 hover:border-amber-400 transition shadow-sm"
+                className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 flex items-center justify-between gap-4 hover:border-amber-500 transition shadow-sm"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="bg-slate-800 text-amber-400 p-2.5 rounded-lg flex-shrink-0">
+                  <div className="bg-amber-50 text-amber-600 p-2.5 rounded-lg flex-shrink-0">
                     <FileText className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white text-sm sm:text-base">
+                    <h3 className="font-semibold text-slate-900 text-sm sm:text-base">
                       {(videos?.length || 0) + index + 1}. {res.title}
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5 capitalize">
+                    <p className="text-xs text-slate-500 mt-0.5 capitalize">
                       {res.resource_type.replace("_", " ")} • {res.exam_diet}{" "}
                       {res.exam_year}
                     </p>
@@ -238,7 +238,7 @@ export default async function SubjectDetailsPage({ params }: Props) {
 
                 <Link
                   href={`/resources/item/${res.id}?type=doc`}
-                  className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg transition whitespace-nowrap shadow-sm"
+                  className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition whitespace-nowrap shadow-sm"
                 >
                   View Material →
                 </Link>
