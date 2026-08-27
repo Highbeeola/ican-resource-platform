@@ -11,33 +11,51 @@ export interface ResourceFilters {
   limit?: number;
 }
 
-// 1. Fetch All ICAN Levels
+// 1. Fetch Levels (Filtered by Programme or 'all')
 export async function getLevels(progSlug: string = "ican"): Promise<Level[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+
+  let query = supabase
     .from("levels")
-    .select("*, programme:programmes!inner(slug)")
-    .eq("programme.slug", progSlug)
-    .order("display_order", { ascending: true });
+    .select("*, programme:programmes(name, slug)");
+
+  if (progSlug && progSlug !== "all") {
+    query = supabase
+      .from("levels")
+      .select("*, programme:programmes!inner(name, slug)")
+      .eq("programme.slug", progSlug);
+  }
+
+  const { data, error } = await query.order("display_order", {
+    ascending: true,
+  });
 
   if (error) return [];
   return data || [];
 }
 
-// 2. Fetch Subjects (Filtered by Level & Sanitized Search Query with Resource/Video Relations)
+// 2. Fetch Subjects (Filtered by Level & Programme, includes resource/video relations)
 export async function getSubjects(
   levelSlug?: string,
   searchQuery?: string,
   progSlug: string = "ican",
 ): Promise<Subject[]> {
   const supabase = await createClient();
+
   let query = supabase
     .from("subjects")
     .select(
-      "*, level:levels!inner(*, programme:programmes!inner(slug)), resources(id), videos(id)",
+      "*, level:levels(*, programme:programmes(name, slug)), resources(id), videos(id)",
     );
 
-  query = query.eq("level.programme.slug", progSlug);
+  if (progSlug && progSlug !== "all") {
+    query = supabase
+      .from("subjects")
+      .select(
+        "*, level:levels!inner(*, programme:programmes!inner(name, slug)), resources(id), videos(id)",
+      )
+      .eq("level.programme.slug", progSlug);
+  }
 
   if (levelSlug) {
     query = query.eq("level.slug", levelSlug);
@@ -53,6 +71,7 @@ export async function getSubjects(
   const { data, error } = await query.order("display_order", {
     ascending: true,
   });
+
   if (error) return [];
   return data || [];
 }

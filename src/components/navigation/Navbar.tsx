@@ -13,6 +13,8 @@ import {
   Home,
   LayoutDashboard,
   BookOpen,
+  LineChart,
+  Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -71,45 +73,60 @@ export default function Navbar() {
     window.location.href = "/";
   };
 
+  // Helper to check dynamic route activity
+  const isActive = (path: string) => pathname === path;
+
+  const linkClass = (path: string) =>
+    `transition ${
+      isActive(path)
+        ? "text-amber-600 font-bold"
+        : "text-slate-600 hover:text-amber-600 font-medium"
+    }`;
+
   return (
-    <header className="bg-[#1e3a8a] border-b border-blue-800 text-white sticky top-0 z-50">
+    <header className="bg-white border-b border-slate-200 text-slate-900 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* BRAND LOGO */}
         <Link
           href="/"
-          className="flex items-center gap-2 font-bold text-sm sm:text-lg text-white tracking-tight flex-shrink-0 touch-manipulation active:opacity-80"
+          className="flex items-center gap-2 font-bold text-sm sm:text-lg text-slate-900 tracking-tight flex-shrink-0 touch-manipulation active:opacity-80"
         >
-          <div className="bg-[#f59e0b] p-1.5 rounded-lg text-white flex-shrink-0">
+          <div className="bg-amber-500 p-1.5 rounded-lg text-white flex-shrink-0">
             <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <span className="whitespace-nowrap">KRL Academy</span>
         </Link>
 
         {/* DESKTOP NAVIGATION LINKS */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-blue-100">
-          <Link href="/" className="hover:text-white transition">
+        <nav className="hidden md:flex items-center gap-8 text-sm">
+          <Link href="/" className={linkClass("/")}>
             Home
           </Link>
           {user && (
-            <Link
-              href="/dashboard"
-              className="hover:text-white transition font-bold text-amber-300"
-            >
-              Dashboard
-            </Link>
+            <>
+              <Link href="/dashboard" className={linkClass("/dashboard")}>
+                Dashboard
+              </Link>
+              <Link href="/performance" className={linkClass("/performance")}>
+                Performance Analytics
+              </Link>
+            </>
           )}
-          <Link href="/resources" className="hover:text-white transition">
+          <Link href="/resources" className={linkClass("/resources")}>
             Courses
+          </Link>
+          <Link href="/lecturers" className={linkClass("/lecturers")}>
+            Faculty
           </Link>
           <Link
             href="/resources?type=pathfinder"
-            className="hover:text-white transition"
+            className="text-slate-600 hover:text-amber-600 font-medium transition"
           >
             Pathfinders
           </Link>
           <Link
             href="/resources?type=past_question"
-            className="hover:text-white transition"
+            className="text-slate-600 hover:text-amber-600 font-medium transition"
           >
             Past Questions
           </Link>
@@ -122,7 +139,11 @@ export default function Navbar() {
               {isAdmin && (
                 <Link
                   href="/admin/resources"
-                  className="text-xs font-semibold bg-blue-900/60 hover:bg-blue-900 text-amber-300 px-3 py-2 rounded-md border border-blue-700 flex items-center gap-1.5 transition"
+                  className={`text-xs font-semibold px-3 py-2 rounded-lg border flex items-center gap-1.5 transition ${
+                    pathname.startsWith("/admin")
+                      ? "bg-amber-500 text-white border-amber-600 shadow-xs"
+                      : "bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200"
+                  }`}
                 >
                   <Shield className="w-3.5 h-3.5" />
                   <span>Admin</span>
@@ -130,7 +151,7 @@ export default function Navbar() {
               )}
               <button
                 onClick={handleLogout}
-                className="text-xs font-semibold bg-blue-800/60 hover:bg-blue-700 text-blue-100 px-3 py-2 rounded-md border border-blue-600 flex items-center gap-1.5 transition cursor-pointer"
+                className="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg border border-slate-200 flex items-center gap-1.5 transition cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Logout</span>
@@ -140,13 +161,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="text-sm font-bold bg-[#f59e0b] hover:bg-[#d97706] text-white px-6 py-2 rounded-md transition shadow-sm"
+                className="text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-lg transition shadow-xs"
               >
                 Login
               </Link>
               <Link
                 href="/register"
-                className="hidden sm:inline-block text-sm font-semibold text-white border border-white hover:bg-white hover:text-[#1e3a8a] px-5 py-2 rounded-md transition"
+                className="hidden sm:inline-block text-sm font-semibold text-slate-700 border border-slate-300 hover:bg-slate-50 px-5 py-2 rounded-lg transition"
               >
                 Register Free
               </Link>
@@ -158,7 +179,7 @@ export default function Navbar() {
         <div className="flex md:hidden items-center gap-2">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-blue-100 hover:text-white active:bg-blue-800 bg-blue-900/50 rounded-xl border border-blue-700 focus:outline-none cursor-pointer touch-manipulation"
+            className="p-2 text-slate-600 hover:text-slate-900 active:bg-slate-100 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none cursor-pointer touch-manipulation"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? (
@@ -172,67 +193,109 @@ export default function Navbar() {
 
       {/* MOBILE DROPDOWN MENU */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#1e3a8a] border-b border-blue-800 px-4 py-4 space-y-3">
-          <nav className="flex flex-col gap-1.5 text-sm font-semibold text-blue-100">
+        <div className="md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-3">
+          <nav className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             <Link
               href="/"
-              className="p-2.5 rounded-xl hover:bg-blue-800 active:bg-blue-800/80 flex items-center gap-2.5 transition touch-manipulation"
+              className={`p-2.5 rounded-xl flex items-center gap-2.5 transition touch-manipulation ${
+                isActive("/")
+                  ? "bg-amber-50 text-amber-700 font-bold border border-amber-200"
+                  : "hover:bg-slate-50 active:bg-slate-100"
+              }`}
             >
-              <Home className="w-4 h-4 text-amber-400" />
+              <Home className="w-4 h-4 text-amber-500" />
               <span>Home</span>
             </Link>
 
             {user && (
-              <Link
-                href="/dashboard"
-                className="p-2.5 rounded-xl bg-amber-500/20 text-amber-300 active:bg-amber-500/30 flex items-center gap-2.5 font-bold border border-amber-500/30 touch-manipulation"
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                <span>Dashboard</span>
-              </Link>
+              <>
+                <Link
+                  href="/dashboard"
+                  className={`p-2.5 rounded-xl flex items-center gap-2.5 transition touch-manipulation ${
+                    isActive("/dashboard")
+                      ? "bg-amber-50 text-amber-700 font-bold border border-amber-200"
+                      : "hover:bg-slate-50 active:bg-slate-100"
+                  }`}
+                >
+                  <LayoutDashboard className="w-4 h-4 text-amber-600" />
+                  <span>Dashboard</span>
+                </Link>
+
+                <Link
+                  href="/performance"
+                  className={`p-2.5 rounded-xl flex items-center gap-2.5 transition touch-manipulation ${
+                    isActive("/performance")
+                      ? "bg-amber-50 text-amber-700 font-bold border border-amber-200"
+                      : "hover:bg-slate-50 active:bg-slate-100"
+                  }`}
+                >
+                  <LineChart className="w-4 h-4 text-amber-500" />
+                  <span>Performance Analytics</span>
+                </Link>
+              </>
             )}
 
             <Link
               href="/resources"
-              className="p-2.5 rounded-xl hover:bg-blue-800 active:bg-blue-800/80 flex items-center gap-2.5 transition touch-manipulation"
+              className={`p-2.5 rounded-xl flex items-center gap-2.5 transition touch-manipulation ${
+                isActive("/resources")
+                  ? "bg-amber-50 text-amber-700 font-bold border border-amber-200"
+                  : "hover:bg-slate-50 active:bg-slate-100"
+              }`}
             >
-              <BookOpen className="w-4 h-4 text-amber-400" />
+              <BookOpen className="w-4 h-4 text-amber-500" />
               <span>Courses</span>
             </Link>
 
             <Link
-              href="/resources?type=pathfinder"
-              className="p-2.5 rounded-xl hover:bg-blue-800 active:bg-blue-800/80 flex items-center gap-2.5 transition touch-manipulation"
+              href="/lecturers"
+              className={`p-2.5 rounded-xl flex items-center gap-2.5 transition touch-manipulation ${
+                isActive("/lecturers")
+                  ? "bg-amber-50 text-amber-700 font-bold border border-amber-200"
+                  : "hover:bg-slate-50 active:bg-slate-100"
+              }`}
             >
-              <FileText className="w-4 h-4 text-amber-400" />
+              <Users className="w-4 h-4 text-amber-500" />
+              <span>Faculty</span>
+            </Link>
+
+            <Link
+              href="/resources?type=pathfinder"
+              className="p-2.5 rounded-xl hover:bg-slate-50 active:bg-slate-100 flex items-center gap-2.5 transition touch-manipulation"
+            >
+              <FileText className="w-4 h-4 text-amber-500" />
               <span>Pathfinders</span>
             </Link>
 
             <Link
               href="/resources?type=past_question"
-              className="p-2.5 rounded-xl hover:bg-blue-800 active:bg-blue-800/80 flex items-center gap-2.5 transition touch-manipulation"
+              className="p-2.5 rounded-xl hover:bg-slate-50 active:bg-slate-100 flex items-center gap-2.5 transition touch-manipulation"
             >
-              <FileText className="w-4 h-4 text-amber-400" />
+              <FileText className="w-4 h-4 text-amber-500" />
               <span>Past Questions</span>
             </Link>
 
             {user && isAdmin && (
               <Link
                 href="/admin/resources"
-                className="p-2.5 rounded-xl bg-blue-900/80 text-amber-300 active:bg-blue-900 flex items-center gap-2.5 border border-blue-700 touch-manipulation"
+                className={`p-2.5 rounded-xl flex items-center gap-2.5 border touch-manipulation ${
+                  pathname.startsWith("/admin")
+                    ? "bg-amber-50 text-amber-700 font-bold border-amber-200"
+                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                }`}
               >
-                <Shield className="w-4 h-4 text-amber-400" />
+                <Shield className="w-4 h-4 text-amber-600" />
                 <span>Admin Command Center</span>
               </Link>
             )}
           </nav>
 
           {/* MOBILE AUTH BUTTONS */}
-          <div className="pt-2 border-t border-blue-800 flex flex-col gap-2">
+          <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
             {user ? (
               <button
                 onClick={handleLogout}
-                className="w-full p-2.5 bg-blue-800/60 hover:bg-blue-700 active:bg-blue-800 text-blue-100 border border-blue-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer touch-manipulation"
+                className="w-full p-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer touch-manipulation"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>
@@ -241,13 +304,13 @@ export default function Navbar() {
               <div className="flex gap-2">
                 <Link
                   href="/login"
-                  className="flex-1 py-2.5 text-center bg-[#f59e0b] active:bg-[#d97706] text-white rounded-xl text-xs font-bold shadow-md touch-manipulation"
+                  className="flex-1 py-2.5 text-center bg-amber-500 active:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-xs touch-manipulation"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  className="flex-1 py-2.5 text-center bg-transparent border border-white text-white active:bg-white active:text-[#1e3a8a] rounded-xl text-xs font-bold touch-manipulation"
+                  className="flex-1 py-2.5 text-center bg-transparent border border-slate-300 text-slate-700 active:bg-slate-100 rounded-xl text-xs font-bold touch-manipulation"
                 >
                   Register Free
                 </Link>

@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { Level, Subject, ResourceType } from "@/types";
-import { uploadResource } from "@/lib/actions/resources";
+import { saveResourceMetadata } from "@/lib/actions/resources";
+import { createClient } from "@/lib/supabase/client";
 import { Upload, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 interface FormProps {
@@ -13,12 +14,13 @@ interface FormProps {
 export default function ResourceUploadForm({ levels, subjects }: FormProps) {
   const [selectedLevelId, setSelectedLevelId] = useState<string>("");
   const [isPending, startTransition] = useTransition();
+  const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
 
-  // Filter subjects dynamically based on selected ICAN level
+  // Filter subjects dynamically based on selected level
   const filteredSubjects = subjects.filter(
     (sub: Subject) => sub.level_id === selectedLevelId,
   );
@@ -29,9 +31,58 @@ export default function ResourceUploadForm({ levels, subjects }: FormProps) {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
+    const file = formData.get("file") as File;
 
+    if (!file || file.size === 0) {
+      setMessage({
+        type: "error",
+        text: "Please select a valid PDF file to upload.",
+      });
+      return;
+    }
+
+    // 1. UPLOAD DIRECTLY TO SUPABASE STORAGE FROM BROWSER
+    setIsUploading(true);
+    const supabase = createClient();
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `resources/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("ican-resources")
+      .upload(filePath, file, { upsert: false });
+
+    if (uploadError) {
+      setIsUploading(false);
+      setMessage({
+        type: "error",
+        text: `Storage Upload Error: ${uploadError.message}`,
+      });
+      return;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from("ican-resources")
+      .getPublicUrl(filePath);
+
+    setIsUploading(false);
+
+    // 2. SAVE METADATA TO DATABASE VIA SERVER ACTION
     startTransition(async () => {
-      const result = await uploadResource(formData);
+      const result = await saveResourceMetadata({
+        title: formData.get("title") as string,
+        description: formData.get("description") as string,
+        levelId: formData.get("level_id") as string,
+        subjectId: formData.get("subject_id") as string,
+        resourceType: formData.get("resource_type") as ResourceType,
+        examYear: formData.get("exam_year")
+          ? parseInt(formData.get("exam_year") as string)
+          : null,
+        examDiet: formData.get("exam_diet") as string,
+        fileUrl: publicUrlData.publicUrl,
+        fileSizeBytes: file.size,
+      });
+
       if (result.error) {
         setMessage({ type: "error", text: result.error });
       } else {
@@ -39,11 +90,26 @@ export default function ResourceUploadForm({ levels, subjects }: FormProps) {
           type: "success",
           text: "PDF resource uploaded and published successfully!",
         });
-        form.reset();
-        setSelectedLevelId("");
+
+        // Reset file and title inputs while preserving selected Level & Subject
+        const titleInput = form.querySelector(
+          'input[name="title"]',
+        ) as HTMLInputElement;
+        const fileInput = form.querySelector(
+          'input[name="file"]',
+        ) as HTMLInputElement;
+        const descInput = form.querySelector(
+          'textarea[name="description"]',
+        ) as HTMLTextAreaElement;
+
+        if (titleInput) titleInput.value = "";
+        if (fileInput) fileInput.value = "";
+        if (descInput) descInput.value = "";
       }
     });
   }
+
+  const isLoading = isPending || isUploading;
 
   return (
     <form
@@ -85,7 +151,7 @@ export default function ResourceUploadForm({ levels, subjects }: FormProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
-            ICAN Level *
+            Level *
           </label>
           <select
             name="level_id"
@@ -97,6 +163,7 @@ export default function ResourceUploadForm({ levels, subjects }: FormProps) {
             <option value="">Select Level</option>
             {levels.map((lvl: Level) => (
               <option key={lvl.id} value={lvl.id}>
+                {lvl.programme?.name ? `${lvl.programme.name} - ` : ""}
                 {lvl.name}
               </option>
             ))}
@@ -206,13 +273,17 @@ export default function ResourceUploadForm({ levels, subjects }: FormProps) {
       {/* SUBMIT BUTTON */}
       <button
         type="submit"
-        disabled={isPending}
+        disabled={isLoading}
         className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-sm transition disabled:opacity-50 cursor-pointer text-sm"
       >
-        {isPending ? (
+        {isLoading ? (
           <>
             <Loader2 className="w-5 h-5 animate-spin" />
-            <span>Uploading PDF to Supabase...</span>
+            <span>
+              {isUploading
+                ? "Uploading PDF to Cloud..."
+                : "Saving to Database..."}
+            </span>
           </>
         ) : (
           <>

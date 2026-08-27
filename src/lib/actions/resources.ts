@@ -83,3 +83,46 @@ export async function deleteResource(id: string) {
   revalidatePath("/admin/resources");
   return { success: true };
 }
+export async function saveResourceMetadata(data: {
+  title: string;
+  description: string;
+  levelId: string;
+  subjectId: string;
+  resourceType: ResourceType;
+  examYear: number | null;
+  examDiet: string;
+  fileUrl: string;
+  fileSizeBytes: number;
+}) {
+  const supabase = await createClient();
+
+  // Verify Admin Status
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized." };
+
+  // Insert metadata record into Database
+  const { error: dbError } = await supabase.from("resources").insert({
+    title: data.title,
+    description: data.description,
+    level_id: data.levelId,
+    subject_id: data.subjectId,
+    resource_type: data.resourceType,
+    exam_year: data.examYear,
+    exam_diet: data.examDiet,
+    file_url: data.fileUrl,
+    file_size_bytes: data.fileSizeBytes,
+    is_published: true,
+  });
+
+  if (dbError) {
+    console.error("Database Insert Error:", dbError);
+    return { error: `Failed to save resource record: ${dbError.message}` };
+  }
+
+  revalidatePath("/resources");
+  revalidatePath("/admin/resources");
+
+  return { success: true };
+}

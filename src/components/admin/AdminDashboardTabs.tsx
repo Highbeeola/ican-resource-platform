@@ -8,6 +8,7 @@ import AddSubjectForm from "@/components/admin/AddSubjectForm";
 import AddAnnouncementForm from "@/components/admin/AddAnnouncementForm";
 import ManageFacultyForm from "@/components/admin/ManageFacultyForm";
 import AddQuestionForm from "@/components/admin/AddQuestionForm";
+import AddLecturerForm from "@/components/admin/AddLecturerForm";
 import { deleteResource } from "@/lib/actions/resources";
 import { deleteVideo } from "@/lib/actions/videos";
 import {
@@ -16,36 +17,53 @@ import {
   BookOpen,
   Layers,
   Download,
-  Megaphone,
-  ShieldCheck,
   Trash2,
-  Loader2,
+  ShieldCheck,
+  Megaphone,
   HelpCircle,
+  BarChart3,
+  Users,
+  PlayCircle,
+  Award,
+  Loader2,
+  UserPlus,
 } from "lucide-react";
+
+interface AnalyticsData {
+  totalStudents: number;
+  totalResources: number;
+  totalVideos: number;
+  totalQuizAttempts: number;
+  totalSubjects: number;
+}
 
 interface Props {
   levels: Level[];
   subjects: Subject[];
   resources: Resource[];
   videos?: Video[];
+  analytics: AnalyticsData;
 }
 
 type TabType =
+  | "analytics"
   | "pdf"
   | "video"
   | "subject"
+  | "question"
   | "announcement"
   | "faculty"
-  | "question"
+  | "lecturer_profile"
   | "list";
 
 export default function AdminDashboardTabs({
   levels,
   subjects,
-  resources: initialResources,
+  resources: initialResources = [],
   videos: initialVideos = [],
+  analytics,
 }: Props) {
-  const [activeTab, setActiveTab] = useState<TabType>("pdf");
+  const [activeTab, setActiveTab] = useState<TabType>("analytics");
   const [resourcesList, setResourcesList] =
     useState<Resource[]>(initialResources);
   const [videosList, setVideosList] = useState<Video[]>(initialVideos);
@@ -75,29 +93,35 @@ export default function AdminDashboardTabs({
 
   const totalPublishedCount = resourcesList.length + videosList.length;
 
+  const tabClass = (tab: TabType) => `
+    flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center
+    ${
+      activeTab === tab
+        ? "bg-[#1e3a8a] text-white shadow-md"
+        : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+    }
+  `;
+
   return (
     <div className="space-y-6">
       {/* TAB NAVIGATION BAR */}
       <div className="flex bg-slate-100 border border-slate-200 p-1.5 rounded-2xl w-full overflow-x-auto">
         <button
-          onClick={() => setActiveTab("pdf")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center ${
-            activeTab === "pdf"
-              ? "bg-[#1e3a8a] text-white shadow-md"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
+          onClick={() => setActiveTab("analytics")}
+          className={tabClass("analytics")}
         >
+          <BarChart3 className="w-4 h-4" />
+          <span>Analytics</span>
+        </button>
+
+        <button onClick={() => setActiveTab("pdf")} className={tabClass("pdf")}>
           <FileText className="w-4 h-4" />
           <span>Upload PDF</span>
         </button>
 
         <button
           onClick={() => setActiveTab("video")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center ${
-            activeTab === "video"
-              ? "bg-[#1e3a8a] text-white shadow-md"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
+          className={tabClass("video")}
         >
           <VideoIcon className="w-4 h-4" />
           <span>Add Video</span>
@@ -105,11 +129,7 @@ export default function AdminDashboardTabs({
 
         <button
           onClick={() => setActiveTab("subject")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center ${
-            activeTab === "subject"
-              ? "bg-[#1e3a8a] text-white shadow-md"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
+          className={tabClass("subject")}
         >
           <BookOpen className="w-4 h-4" />
           <span>Manage Subjects</span>
@@ -117,11 +137,7 @@ export default function AdminDashboardTabs({
 
         <button
           onClick={() => setActiveTab("question")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center ${
-            activeTab === "question"
-              ? "bg-[#1e3a8a] text-white shadow-md"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
+          className={tabClass("question")}
         >
           <HelpCircle className="w-4 h-4" />
           <span>Question Bank</span>
@@ -129,11 +145,7 @@ export default function AdminDashboardTabs({
 
         <button
           onClick={() => setActiveTab("announcement")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center ${
-            activeTab === "announcement"
-              ? "bg-[#1e3a8a] text-white shadow-md"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
+          className={tabClass("announcement")}
         >
           <Megaphone className="w-4 h-4" />
           <span>Broadcast</span>
@@ -141,28 +153,88 @@ export default function AdminDashboardTabs({
 
         <button
           onClick={() => setActiveTab("faculty")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center ${
-            activeTab === "faculty"
-              ? "bg-[#1e3a8a] text-white shadow-md"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
+          className={tabClass("faculty")}
         >
           <ShieldCheck className="w-4 h-4" />
           <span>Faculty Access</span>
         </button>
 
         <button
+          onClick={() => setActiveTab("lecturer_profile")}
+          className={tabClass("lecturer_profile")}
+        >
+          <UserPlus className="w-4 h-4" />
+          <span>Lecturer Profiles</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab("list")}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center ${
-            activeTab === "list"
-              ? "bg-[#1e3a8a] text-white shadow-md"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
+          className={tabClass("list")}
         >
           <Layers className="w-4 h-4" />
           <span>All Published ({totalPublishedCount})</span>
         </button>
       </div>
+
+      {/* TAB 0: ANALYTICS OVERVIEW */}
+      {activeTab === "analytics" && (
+        <div className="space-y-6">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <h2 className="font-bold text-[#1e3a8a] text-lg border-b border-slate-100 pb-3 mb-4">
+              Platform Overview
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
+                <div className="flex justify-between items-center text-slate-500 mb-2">
+                  <span className="text-xs font-semibold uppercase">
+                    Total Students
+                  </span>
+                  <Users className="w-4 h-4 text-blue-500" />
+                </div>
+                <p className="text-3xl font-extrabold text-[#1e3a8a]">
+                  {analytics.totalStudents}
+                </p>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
+                <div className="flex justify-between items-center text-slate-500 mb-2">
+                  <span className="text-xs font-semibold uppercase">
+                    PDF Materials
+                  </span>
+                  <FileText className="w-4 h-4 text-emerald-500" />
+                </div>
+                <p className="text-3xl font-extrabold text-[#1e3a8a]">
+                  {analytics.totalResources}
+                </p>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
+                <div className="flex justify-between items-center text-slate-500 mb-2">
+                  <span className="text-xs font-semibold uppercase">
+                    Video Lectures
+                  </span>
+                  <PlayCircle className="w-4 h-4 text-rose-500" />
+                </div>
+                <p className="text-3xl font-extrabold text-[#1e3a8a]">
+                  {analytics.totalVideos}
+                </p>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
+                <div className="flex justify-between items-center text-slate-500 mb-2">
+                  <span className="text-xs font-semibold uppercase">
+                    Quizzes Taken
+                  </span>
+                  <Award className="w-4 h-4 text-amber-500" />
+                </div>
+                <p className="text-3xl font-extrabold text-[#1e3a8a]">
+                  {analytics.totalQuizAttempts}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TAB 1: PDF UPLOADER */}
       {activeTab === "pdf" && (
@@ -205,7 +277,6 @@ export default function AdminDashboardTabs({
         <div className="space-y-6">
           <AddSubjectForm levels={levels} />
 
-          {/* EXISTING SUBJECTS LIST */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm text-slate-900">
             <h3 className="font-bold text-[#1e3a8a] text-base border-b border-slate-100 pb-3">
               Existing ICAN Subjects ({subjects.length})
@@ -247,7 +318,10 @@ export default function AdminDashboardTabs({
       {/* TAB 6: FACULTY ACCESS MANAGEMENT */}
       {activeTab === "faculty" && <ManageFacultyForm />}
 
-      {/* TAB 7: ALL PUBLISHED MATERIALS TABLE (PDFs & VIDEOS WITH DELETE BUTTONS) */}
+      {/* TAB 7: LECTURER PROFILES */}
+      {activeTab === "lecturer_profile" && <AddLecturerForm />}
+
+      {/* TAB 8: ALL PUBLISHED MATERIALS TABLE */}
       {activeTab === "list" && (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm text-slate-900">
           <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between">
@@ -300,18 +374,20 @@ export default function AdminDashboardTabs({
                         </td>
                         <td className="p-3 sm:p-4">
                           <span className="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200/60 text-[10px] font-bold rounded-full uppercase whitespace-nowrap">
-                            {res.resource_type.replace("_", " ")}
+                            {res.resource_type?.replace("_", " ")}
                           </span>
                         </td>
                         <td className="p-3 sm:p-4 text-right flex items-center justify-end gap-3">
-                          <a
-                            href={res.file_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-[#1e3a8a] font-semibold hover:underline flex items-center gap-1"
-                          >
-                            <Download className="w-3.5 h-3.5" /> PDF
-                          </a>
+                          {res.file_url && (
+                            <a
+                              href={res.file_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-[#1e3a8a] font-semibold hover:underline flex items-center gap-1"
+                            >
+                              <Download className="w-3.5 h-3.5" /> PDF
+                            </a>
+                          )}
                           <button
                             onClick={() =>
                               handleDeleteResource(res.id, res.title)
@@ -360,6 +436,32 @@ export default function AdminDashboardTabs({
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* GENTLE NUDGE TO CREATE LECTURER PROFILES */}
+      {activeTab !== "lecturer_profile" && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="bg-[#1e3a8a] text-white p-2 rounded-lg">
+              <UserPlus className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-bold text-[#1e3a8a] text-sm">
+                Update Faculty Directory
+              </h3>
+              <p className="text-xs text-slate-600">
+                Don't forget to create public profiles for your lecturers so
+                students can see their qualifications!
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setActiveTab("lecturer_profile")}
+            className="px-4 py-2 bg-white border border-blue-200 text-[#1e3a8a] text-xs font-bold rounded-lg hover:bg-blue-100 transition whitespace-nowrap"
+          >
+            Create Profile
+          </button>
         </div>
       )}
     </div>

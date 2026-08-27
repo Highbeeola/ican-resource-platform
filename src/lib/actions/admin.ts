@@ -6,23 +6,21 @@ import { revalidatePath } from "next/cache";
 export async function promoteUserToAdmin(email: string) {
   const supabase = await createClient();
 
-  // 1. Verify that the current user performing this action is an admin
+  // 1. Verify that the current user performing this action is logged in
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: "Unauthorized action." };
 
-  const { data: currentProfile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (currentProfile?.role !== "admin") {
-    return { error: "Only existing admins can promote faculty members." };
+  // 2. SUPER ADMIN STRICT CHECK: Only YOU can add new lecturers!
+  if (user.email !== "ibrahimoladehinde1@gmail.com") {
+    return {
+      error:
+        "Security Alert: Only the Academy Director (Super Admin) can grant faculty access.",
+    };
   }
 
-  // 2. Find the target user profile by email
+  // 3. Find the target user profile by email
   const cleanEmail = email.trim().toLowerCase();
   const { data: targetProfile, error: findError } = await supabase
     .from("profiles")
@@ -36,7 +34,7 @@ export async function promoteUserToAdmin(email: string) {
     };
   }
 
-  // 3. Promote target user to admin role
+  // 4. Promote target user to admin role
   const { error: updateError } = await supabase
     .from("profiles")
     .update({ role: "admin" })

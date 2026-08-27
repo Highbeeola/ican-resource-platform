@@ -77,6 +77,7 @@ export default function AddSubjectForm({ levels }: Props) {
             <option value="">Select Level</option>
             {levels.map((lvl: Level) => (
               <option key={lvl.id} value={lvl.id}>
+                {lvl.programme?.name ? `${lvl.programme.name} - ` : ""}
                 {lvl.name}
               </option>
             ))}
