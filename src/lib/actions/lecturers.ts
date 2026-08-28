@@ -6,6 +6,23 @@ import { revalidatePath } from "next/cache";
 export async function createLecturer(formData: FormData) {
   const supabase = await createClient();
 
+  // 1. Check user authentication
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized action." };
+
+  // 2. Check super admin permission
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_super_admin")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile?.is_super_admin) {
+    return { error: "Only Super Admins can create lecturer profiles." };
+  }
+
   const fullName = formData.get("full_name") as string;
   const qualifications = formData.get("qualifications") as string;
   const experienceYears =
@@ -44,6 +61,24 @@ export async function getLecturers() {
 export async function deleteLecturer(id: string) {
   const supabase = await createClient();
 
+  // 1. Check user authentication
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  // 2. Check super admin permission
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_super_admin")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile?.is_super_admin) {
+    return { error: "Only Super Admins can remove lecturer profiles." };
+  }
+
+  // 3. Delete lecturer
   const { error } = await supabase.from("lecturers").delete().eq("id", id);
 
   if (error) {

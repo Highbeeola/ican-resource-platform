@@ -43,6 +43,7 @@ interface Props {
   resources: Resource[];
   videos?: Video[];
   analytics: AnalyticsData;
+  isSuperAdmin: boolean;
 }
 
 type TabType =
@@ -62,8 +63,12 @@ export default function AdminDashboardTabs({
   resources: initialResources = [],
   videos: initialVideos = [],
   analytics,
+  isSuperAdmin = false,
 }: Props) {
-  const [activeTab, setActiveTab] = useState<TabType>("analytics");
+  // Super Admins land on Analytics, Normal Lecturers land on PDF upload
+  const [activeTab, setActiveTab] = useState<TabType>(
+    isSuperAdmin ? "analytics" : "pdf",
+  );
   const [resourcesList, setResourcesList] =
     useState<Resource[]>(initialResources);
   const [videosList, setVideosList] = useState<Video[]>(initialVideos);
@@ -106,13 +111,16 @@ export default function AdminDashboardTabs({
     <div className="space-y-6">
       {/* TAB NAVIGATION BAR */}
       <div className="flex bg-slate-100 border border-slate-200 p-1.5 rounded-2xl w-full overflow-x-auto">
-        <button
-          onClick={() => setActiveTab("analytics")}
-          className={tabClass("analytics")}
-        >
-          <BarChart3 className="w-4 h-4" />
-          <span>Analytics</span>
-        </button>
+        {/* ONLY SUPER ADMINS SEE ANALYTICS TAB */}
+        {isSuperAdmin && (
+          <button
+            onClick={() => setActiveTab("analytics")}
+            className={tabClass("analytics")}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Analytics</span>
+          </button>
+        )}
 
         <button onClick={() => setActiveTab("pdf")} className={tabClass("pdf")}>
           <FileText className="w-4 h-4" />
@@ -151,21 +159,26 @@ export default function AdminDashboardTabs({
           <span>Broadcast</span>
         </button>
 
-        <button
-          onClick={() => setActiveTab("faculty")}
-          className={tabClass("faculty")}
-        >
-          <ShieldCheck className="w-4 h-4" />
-          <span>Faculty Access</span>
-        </button>
+        {/* ONLY SUPER ADMINS SEE FACULTY & LECTURER PROFILE TABS */}
+        {isSuperAdmin && (
+          <>
+            <button
+              onClick={() => setActiveTab("faculty")}
+              className={tabClass("faculty")}
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Faculty Access</span>
+            </button>
 
-        <button
-          onClick={() => setActiveTab("lecturer_profile")}
-          className={tabClass("lecturer_profile")}
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Lecturer Profiles</span>
-        </button>
+            <button
+              onClick={() => setActiveTab("lecturer_profile")}
+              className={tabClass("lecturer_profile")}
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Lecturer Profiles</span>
+            </button>
+          </>
+        )}
 
         <button
           onClick={() => setActiveTab("list")}
@@ -177,7 +190,7 @@ export default function AdminDashboardTabs({
       </div>
 
       {/* TAB 0: ANALYTICS OVERVIEW */}
-      {activeTab === "analytics" && (
+      {isSuperAdmin && activeTab === "analytics" && (
         <div className="space-y-6">
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <h2 className="font-bold text-[#1e3a8a] text-lg border-b border-slate-100 pb-3 mb-4">
@@ -316,10 +329,10 @@ export default function AdminDashboardTabs({
       {activeTab === "announcement" && <AddAnnouncementForm />}
 
       {/* TAB 6: FACULTY ACCESS MANAGEMENT */}
-      {activeTab === "faculty" && <ManageFacultyForm />}
+      {isSuperAdmin && activeTab === "faculty" && <ManageFacultyForm />}
 
       {/* TAB 7: LECTURER PROFILES */}
-      {activeTab === "lecturer_profile" && <AddLecturerForm />}
+      {isSuperAdmin && activeTab === "lecturer_profile" && <AddLecturerForm />}
 
       {/* TAB 8: ALL PUBLISHED MATERIALS TABLE */}
       {activeTab === "list" && (
@@ -439,8 +452,8 @@ export default function AdminDashboardTabs({
         </div>
       )}
 
-      {/* GENTLE NUDGE TO CREATE LECTURER PROFILES */}
-      {activeTab !== "lecturer_profile" && (
+      {/* GENTLE NUDGE TO CREATE LECTURER PROFILES (ONLY FOR SUPER ADMINS) */}
+      {isSuperAdmin && activeTab !== "lecturer_profile" && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-3">
             <div className="bg-[#1e3a8a] text-white p-2 rounded-lg">

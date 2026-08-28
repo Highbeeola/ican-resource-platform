@@ -12,11 +12,16 @@ export async function promoteUserToAdmin(email: string) {
   } = await supabase.auth.getUser();
   if (!user) return { error: "Unauthorized action." };
 
-  // 2. SUPER ADMIN STRICT CHECK: Only YOU can add new lecturers!
-  if (user.email !== "ibrahimoladehinde1@gmail.com") {
+  // 2. SUPER ADMIN STRICT CHECK: Verify super admin status from database profile
+  const { data: currentProfile } = await supabase
+    .from("profiles")
+    .select("role, is_super_admin")
+    .eq("id", user.id)
+    .single();
+
+  if (!currentProfile?.is_super_admin) {
     return {
-      error:
-        "Security Alert: Only the Academy Director (Super Admin) can grant faculty access.",
+      error: "Security Alert: Only Super Admins can grant faculty access.",
     };
   }
 

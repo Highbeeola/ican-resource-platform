@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
+import MarkCompletedButton from "@/components/resources/MarkCompletedButton";
 import { getYouTubeEmbedUrl } from "@/lib/utils";
 import Link from "next/link";
 import DownloadButton from "@/components/resources/DownloadButton";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
-  CheckCircle,
   FileText,
   Lightbulb,
   ExternalLink,
@@ -46,6 +46,23 @@ export default async function ResourceItemPage({
 
   if (!itemData) {
     notFound();
+  }
+
+  // Check user auth and completion status
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let isCompleted = false;
+
+  if (user) {
+    const { data: progress } = await supabase
+      .from("user_progress")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq(isVideo ? "video_id" : "resource_id", id)
+      .maybeSingle();
+
+    isCompleted = !!progress;
   }
 
   // Query other PDF resources (excluding current item)
@@ -178,11 +195,22 @@ export default async function ResourceItemPage({
               </ul>
             </div>
 
-            {/* MARK AS COMPLETED BUTTON */}
-            <button className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-              <CheckCircle className="w-5 h-5" />
-              <span>Mark as Completed</span>
-            </button>
+            {/* INTERACTIVE MARK AS COMPLETED BUTTON */}
+            {user ? (
+              <MarkCompletedButton
+                subjectId={itemData.subject_id}
+                resourceId={!isVideo ? id : undefined}
+                videoId={isVideo ? id : undefined}
+                initialIsCompleted={isCompleted}
+              />
+            ) : (
+              <Link
+                href="/login"
+                className="w-full py-3.5 bg-slate-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition font-bold rounded-xl text-sm flex items-center justify-center gap-2 border border-slate-200"
+              >
+                Login to track your progress
+              </Link>
+            )}
           </div>
 
           {/* OTHER COURSE MODULES SIDEBAR */}

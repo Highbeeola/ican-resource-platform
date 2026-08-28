@@ -7,8 +7,22 @@ import { Shield } from "lucide-react";
 export default async function AdminResourcesPage() {
   const supabase = await createClient();
 
-  const levels = await getLevels('all');
-  const subjects = await getSubjects(undefined, undefined, 'all');
+  // 1. Fetch authenticated user and check super admin status from profiles
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_super_admin")
+    .eq("id", user?.id)
+    .single();
+
+  const isSuperAdmin = profile?.is_super_admin || false;
+
+  // 2. Fetch resources and analytics data
+  const levels = await getLevels("all");
+  const subjects = await getSubjects(undefined, undefined, "all");
   const { resources } = await getResources({ limit: 100 });
   const analytics = await getAdminAnalytics();
 
@@ -41,6 +55,7 @@ export default async function AdminResourcesPage() {
           resources={resources}
           videos={videos || []}
           analytics={analytics}
+          isSuperAdmin={isSuperAdmin}
         />
       </div>
     </div>

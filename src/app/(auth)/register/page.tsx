@@ -35,7 +35,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 sm:p-6 py-12 overflow-y-auto">
+    <div className="min-h-dvh flex-1 bg-slate-50 flex flex-col justify-center items-center p-4 sm:p-6 py-12 overflow-y-auto">
       <div className="w-full max-w-md bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-sm space-y-6 my-auto">
         {/* BRANDING HEADER */}
         <div className="text-center space-y-2">
