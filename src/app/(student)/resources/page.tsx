@@ -7,7 +7,6 @@ import Link from "next/link";
 import {
   BookOpen,
   FileText,
-  Download,
   User,
   Star,
   ArrowRight,
@@ -142,15 +141,14 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
                     </p>
                   </div>
 
-                  <a
-                    href={res.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-center transition text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                  {/* DOCUMENT STUDY LINK */}
+                  <Link
+                    href={`/resources/item/${res.id}?type=doc`}
+                    className="w-full py-3 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-center transition text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm"
                   >
-                    <Download className="w-4 h-4" />
-                    <span>Download PDF</span>
-                  </a>
+                    <BookOpen className="w-4 h-4" />
+                    <span>View & Study Document</span>
+                  </Link>
                 </div>
               ))}
             </div>

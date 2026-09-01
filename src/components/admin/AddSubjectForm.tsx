@@ -132,6 +132,31 @@ export default function AddSubjectForm({ levels }: Props) {
             className="w-full px-4 py-2.5 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
           />
         </div>
+
+        {/* GOOGLE MEET & SCHEDULE FIELDS */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Google Meet Link (Optional)
+          </label>
+          <input
+            type="url"
+            name="meet_url"
+            placeholder="https://meet.google.com/xxx-xxxx-xxx"
+            className="w-full px-4 py-2.5 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Live Class Schedule (Optional)
+          </label>
+          <input
+            type="text"
+            name="meet_time"
+            placeholder="e.g. Every Saturday at 10:00 AM"
+            className="w-full px-4 py-2.5 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+          />
+        </div>
       </div>
 
       <div>

@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 
 export async function createSubject(formData: FormData) {
   const supabase = await createClient();
+  const meetUrl = formData.get("meet_url") as string;
+  const meetTime = formData.get("meet_time") as string;
 
   const levelId = formData.get("level_id") as string;
   const name = formData.get("name") as string;
@@ -26,6 +28,8 @@ export async function createSubject(formData: FormData) {
     instructor_name: instructorName || null,
     estimated_hours: estimatedHours,
     description: description || null,
+    meet_url: meetUrl || null,
+    meet_time: meetTime || null,
   });
 
   if (error) {
