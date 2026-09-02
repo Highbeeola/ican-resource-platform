@@ -53,6 +53,7 @@ export interface Resource {
   updated_at: string;
   subject?: Subject;
   level?: Level;
+  article_content?: string;
 }
 
 export interface Video {

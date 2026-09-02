@@ -1,15 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import MarkCompletedButton from "@/components/resources/MarkCompletedButton";
+import BackButton from "@/components/navigation/BackButton";
 import { getYouTubeEmbedUrl } from "@/lib/utils";
 import Link from "next/link";
 import DownloadButton from "@/components/resources/DownloadButton";
 import { notFound } from "next/navigation";
 import {
-  ArrowLeft,
   FileText,
   Lightbulb,
   ExternalLink,
   Video,
+  BookOpen,
 } from "lucide-react";
 
 interface Props {
@@ -82,17 +83,14 @@ export default async function ResourceItemPage({
   // Format YouTube URL safely
   const embedVideoUrl = isVideo ? getYouTubeEmbedUrl(itemData.video_url) : "";
 
+  // Helper check for Rich Text Article vs standard PDF
+  const isArticle = !isVideo && !!itemData.article_content;
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* BACK TO SUBJECT HUB */}
-        <Link
-          href={`/resources/subject/${itemData.subject_id}`}
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition bg-white px-3.5 py-2 rounded-lg border border-slate-200 shadow-sm"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to {itemData.subject?.name} Course</span>
-        </Link>
+        {/* BACK BUTTON */}
+        <BackButton text="Go Back" />
 
         {/* HEADER */}
         <div>
@@ -106,54 +104,67 @@ export default async function ResourceItemPage({
 
         {/* MAIN VIEWER & SIDEBAR GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* MAIN PLAYER / EMBEDDED PDF VIEWER */}
+          {/* MAIN CONTENT DISPLAY */}
           <div className="lg:col-span-2 space-y-6">
-            {/* EMBEDDED VIEWER FRAME WITH POP-OUT ICON */}
-            <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm aspect-video flex items-center justify-center border border-slate-200 group">
-              {isVideo ? (
-                <iframe
-                  src={embedVideoUrl}
-                  title={itemData.title}
-                  className="w-full h-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              ) : (
-                <>
+            {/* DISPLAY CONTAINER: VIDEO, RICH TEXT ARTICLE, OR PDF */}
+            {itemData.article_content ? (
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-sm overflow-hidden">
+                <div
+                  className="prose prose-blue max-w-none text-slate-700 leading-relaxed break-words"
+                  dangerouslySetInnerHTML={{ __html: itemData.article_content }}
+                />
+              </div>
+            ) : (
+              <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm aspect-video flex items-center justify-center border border-slate-200 group">
+                {isVideo ? (
                   <iframe
-                    src={`${itemData.file_url}#toolbar=0`}
+                    src={embedVideoUrl}
                     title={itemData.title}
                     className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
                   ></iframe>
-                  {/* POP-OUT TO NEW TAB ICON BUTTON */}
-                  {itemData.file_url && (
-                    <a
-                      href={itemData.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute top-3 right-3 p-2.5 bg-slate-900/90 hover:bg-amber-500 hover:text-white text-white rounded-xl border border-slate-700 transition shadow-lg flex items-center gap-1.5 text-xs font-bold"
-                      title="Open PDF in full tab"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      <span className="hidden sm:inline">Pop Out Viewer</span>
-                    </a>
-                  )}
-                </>
-              )}
-            </div>
+                ) : (
+                  <>
+                    <iframe
+                      src={`${itemData.file_url}#toolbar=0`}
+                      title={itemData.title}
+                      className="w-full h-full border-0"
+                    ></iframe>
+                    {/* POP-OUT TO NEW TAB ICON BUTTON */}
+                    {itemData.file_url && (
+                      <a
+                        href={itemData.file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute top-3 right-3 p-2.5 bg-slate-900/90 hover:bg-amber-500 hover:text-white text-white rounded-xl border border-slate-700 transition shadow-lg flex items-center gap-1.5 text-xs font-bold"
+                        title="Open PDF in full tab"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        <span className="hidden sm:inline">Pop Out Viewer</span>
+                      </a>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
 
-            {/* DYNAMIC LESSON OVERVIEW CARD (DISTINGUISHES VIDEO VS DOCUMENT) */}
+            {/* DYNAMIC LESSON OVERVIEW CARD */}
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3">
               <h3 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
                 {isVideo ? (
                   <Video className="w-5 h-5 text-amber-500" />
+                ) : isArticle ? (
+                  <BookOpen className="w-5 h-5 text-amber-500" />
                 ) : (
                   <FileText className="w-5 h-5 text-amber-500" />
                 )}
                 <span>
                   {isVideo
                     ? "Video Lecture Overview"
-                    : "Document Details & Downloads"}
+                    : isArticle
+                      ? "Typed Lecture Overview"
+                      : "Document Details & Downloads"}
                 </span>
               </h3>
 
@@ -161,11 +172,13 @@ export default async function ResourceItemPage({
                 {itemData.description ||
                   (isVideo
                     ? "Watch the video lecture above to master key exam concepts for this topic."
-                    : "Download the PDF document below for offline study and revision.")}
+                    : isArticle
+                      ? "Read through these detailed study notes carefully to prepare for your exams."
+                      : "Download the PDF document below for offline study and revision.")}
               </p>
 
               {/* ONLY SHOW DOWNLOAD BUTTON FOR PDF DOCUMENTS WITH A FILE URL */}
-              {!isVideo && itemData.file_url && (
+              {!isVideo && !isArticle && itemData.file_url && (
                 <DownloadButton
                   fileUrl={itemData.file_url}
                   fileName={itemData.title}
@@ -181,7 +194,7 @@ export default async function ResourceItemPage({
               </h3>
               <ul className="text-xs sm:text-sm text-slate-600 space-y-2 list-disc pl-5">
                 <li>
-                  Study the document thoroughly before attempting practice
+                  Study the content thoroughly before attempting practice
                   questions.
                 </li>
                 <li>
@@ -231,7 +244,7 @@ export default async function ResourceItemPage({
                 </Link>
               ))}
 
-              {/* LIST OTHER DOCUMENTS */}
+              {/* LIST OTHER DOCUMENTS / ARTICLES */}
               {otherResources?.map((res: any) => (
                 <Link
                   key={res.id}

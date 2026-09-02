@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Level, Subject, Resource, Video } from "@/types";
 import ResourceUploadForm from "@/components/admin/ResourceUploadForm";
 import VideoUploadForm from "@/components/admin/VideoUploadForm";
+import AddArticleForm from "@/components/admin/AddArticleForm";
 import AddSubjectForm from "@/components/admin/AddSubjectForm";
 import AddAnnouncementForm from "@/components/admin/AddAnnouncementForm";
 import ManageFacultyForm from "@/components/admin/ManageFacultyForm";
@@ -27,6 +28,7 @@ import {
   Award,
   Loader2,
   UserPlus,
+  PenTool,
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -50,6 +52,7 @@ type TabType =
   | "analytics"
   | "pdf"
   | "video"
+  | "article"
   | "subject"
   | "question"
   | "announcement"
@@ -133,6 +136,14 @@ export default function AdminDashboardTabs({
         >
           <VideoIcon className="w-4 h-4" />
           <span>Add Video</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("article")}
+          className={tabClass("article")}
+        >
+          <PenTool className="w-4 h-4" />
+          <span>Write Article</span>
         </button>
 
         <button
@@ -285,7 +296,25 @@ export default function AdminDashboardTabs({
         </div>
       )}
 
-      {/* TAB 3: SUBJECT MANAGEMENT */}
+      {/* TAB 3: ARTICLE EDITOR */}
+      {activeTab === "article" && (
+        <div className="space-y-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 text-xs sm:text-sm text-slate-600 flex items-center justify-between shadow-sm">
+            <div>
+              <h2 className="font-bold text-[#1e3a8a] text-base">
+                Publish Article or Typed Lesson
+              </h2>
+              <p className="mt-1">
+                Compose rich text study materials and lecture notes directly for
+                students.
+              </p>
+            </div>
+          </div>
+          <AddArticleForm levels={levels} subjects={subjects} />
+        </div>
+      )}
+
+      {/* TAB 4: SUBJECT MANAGEMENT */}
       {activeTab === "subject" && (
         <div className="space-y-6">
           <AddSubjectForm levels={levels} />
@@ -322,19 +351,19 @@ export default function AdminDashboardTabs({
         </div>
       )}
 
-      {/* TAB 4: QUESTION BANK */}
+      {/* TAB 5: QUESTION BANK */}
       {activeTab === "question" && <AddQuestionForm subjects={subjects} />}
 
-      {/* TAB 5: ANNOUNCEMENT COMPONENT */}
+      {/* TAB 6: ANNOUNCEMENT COMPONENT */}
       {activeTab === "announcement" && <AddAnnouncementForm />}
 
-      {/* TAB 6: FACULTY ACCESS MANAGEMENT */}
+      {/* TAB 7: FACULTY ACCESS MANAGEMENT */}
       {isSuperAdmin && activeTab === "faculty" && <ManageFacultyForm />}
 
-      {/* TAB 7: LECTURER PROFILES */}
+      {/* TAB 8: LECTURER PROFILES */}
       {isSuperAdmin && activeTab === "lecturer_profile" && <AddLecturerForm />}
 
-      {/* TAB 8: ALL PUBLISHED MATERIALS TABLE */}
+      {/* TAB 9: ALL PUBLISHED MATERIALS TABLE */}
       {activeTab === "list" && (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm text-slate-900">
           <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between">
@@ -373,11 +402,11 @@ export default function AdminDashboardTabs({
                   </tr>
                 ) : (
                   <>
-                    {/* LIST PDF DOCUMENTS */}
+                    {/* LIST PDF DOCUMENTS & ARTICLES */}
                     {resourcesList.map((res: Resource) => (
                       <tr key={res.id} className="hover:bg-slate-50 transition">
                         <td className="p-3 sm:p-4 font-semibold text-slate-900">
-                          📄 {res.title}
+                          {res.article_content ? "📝" : "📄"} {res.title}
                         </td>
                         <td className="p-3 sm:p-4 text-slate-500">
                           {res.subject?.name || "—"}
@@ -407,7 +436,7 @@ export default function AdminDashboardTabs({
                             }
                             disabled={isPending}
                             className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg transition cursor-pointer disabled:opacity-50"
-                            title="Delete PDF"
+                            title="Delete Material"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>

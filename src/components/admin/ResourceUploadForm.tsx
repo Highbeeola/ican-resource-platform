@@ -207,9 +207,7 @@ export default function ResourceUploadForm({ levels, subjects }: FormProps) {
             <option value="study_text">Study Text</option>
             <option value="past_question">Past Question</option>
             <option value="mock_question">Mock Question</option>
-            <option value="solution">Solution / Answer</option>
             <option value="notes">Lecture Notes</option>
-            <option value="other">Other</option>
           </select>
         </div>
 

@@ -1,1 +1,31 @@
 @import "tailwindcss";
+/* AUTO-GROWING QUILL EDITOR */
+.quill {
+  display: flex;
+  flex-direction: column;
+}
+.ql-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px; /* Starts at a good size */
+  height: auto !important; /* Forces it to stretch infinitely */
+}
+.ql-editor {
+  min-height: 300px;
+  height: auto !important;
+  overflow-y: hidden; /* Removes the internal scrollbar so the page itself scrolls */
+}
+
+/* GLOBAL IMAGE RESTRAINTS FOR BOTH EDITOR AND STUDENT VIEWER */
+.ql-editor img,
+.prose img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 0.5rem;
+  margin-left: auto;
+  margin-right: auto; /* Centers images by default */
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
