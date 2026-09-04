@@ -10,8 +10,10 @@ import AddAnnouncementForm from "@/components/admin/AddAnnouncementForm";
 import ManageFacultyForm from "@/components/admin/ManageFacultyForm";
 import AddQuestionForm from "@/components/admin/AddQuestionForm";
 import AddLecturerForm from "@/components/admin/AddLecturerForm";
+import AddModuleForm from "@/components/admin/AddModuleForm";
 import { deleteResource } from "@/lib/actions/resources";
 import { deleteVideo } from "@/lib/actions/videos";
+import { deleteQuestion } from "@/lib/actions/quiz";
 import {
   FileText,
   Video as VideoIcon,
@@ -29,6 +31,7 @@ import {
   Loader2,
   UserPlus,
   PenTool,
+  FolderPlus,
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -46,6 +49,8 @@ interface Props {
   videos?: Video[];
   analytics: AnalyticsData;
   isSuperAdmin: boolean;
+  modules: any[];
+  questions?: any[];
 }
 
 type TabType =
@@ -53,6 +58,7 @@ type TabType =
   | "pdf"
   | "video"
   | "article"
+  | "module"
   | "subject"
   | "question"
   | "announcement"
@@ -63,18 +69,20 @@ type TabType =
 export default function AdminDashboardTabs({
   levels,
   subjects,
+  modules,
   resources: initialResources = [],
   videos: initialVideos = [],
+  questions: initialQuestions = [],
   analytics,
   isSuperAdmin = false,
 }: Props) {
-  // Super Admins land on Analytics, Normal Lecturers land on PDF upload
   const [activeTab, setActiveTab] = useState<TabType>(
     isSuperAdmin ? "analytics" : "pdf",
   );
   const [resourcesList, setResourcesList] =
     useState<Resource[]>(initialResources);
   const [videosList, setVideosList] = useState<Video[]>(initialVideos);
+  const [questionsList, setQuestionsList] = useState<any[]>(initialQuestions);
   const [isPending, startTransition] = useTransition();
 
   const handleDeleteResource = (id: string, title: string) => {
@@ -84,6 +92,8 @@ export default function AdminDashboardTabs({
       const res = await deleteResource(id);
       if (!res?.error) {
         setResourcesList((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        alert(res.error);
       }
     });
   };
@@ -95,11 +105,27 @@ export default function AdminDashboardTabs({
       const res = await deleteVideo(id);
       if (!res?.error) {
         setVideosList((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        alert(res.error);
       }
     });
   };
 
-  const totalPublishedCount = resourcesList.length + videosList.length;
+  const handleDeleteQuestion = (id: string) => {
+    if (!confirm("Delete this practice question?")) return;
+
+    startTransition(async () => {
+      const res = await deleteQuestion(id);
+      if (res?.success) {
+        setQuestionsList((prev) => prev.filter((q) => q.id !== id));
+      } else {
+        alert(res?.error || "Failed to delete question");
+      }
+    });
+  };
+
+  const totalPublishedCount =
+    resourcesList.length + videosList.length + questionsList.length;
 
   const tabClass = (tab: TabType) => `
     flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center
@@ -114,7 +140,6 @@ export default function AdminDashboardTabs({
     <div className="space-y-6">
       {/* TAB NAVIGATION BAR */}
       <div className="flex bg-slate-100 border border-slate-200 p-1.5 rounded-2xl w-full overflow-x-auto">
-        {/* ONLY SUPER ADMINS SEE ANALYTICS TAB */}
         {isSuperAdmin && (
           <button
             onClick={() => setActiveTab("analytics")}
@@ -147,6 +172,14 @@ export default function AdminDashboardTabs({
         </button>
 
         <button
+          onClick={() => setActiveTab("module")}
+          className={tabClass("module")}
+        >
+          <FolderPlus className="w-4 h-4" />
+          <span>Curriculum</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab("subject")}
           className={tabClass("subject")}
         >
@@ -170,7 +203,6 @@ export default function AdminDashboardTabs({
           <span>Broadcast</span>
         </button>
 
-        {/* ONLY SUPER ADMINS SEE FACULTY & LECTURER PROFILE TABS */}
         {isSuperAdmin && (
           <>
             <button
@@ -200,7 +232,7 @@ export default function AdminDashboardTabs({
         </button>
       </div>
 
-      {/* TAB 0: ANALYTICS OVERVIEW */}
+      {/* ANALYTICS TAB */}
       {isSuperAdmin && activeTab === "analytics" && (
         <div className="space-y-6">
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
@@ -260,7 +292,7 @@ export default function AdminDashboardTabs({
         </div>
       )}
 
-      {/* TAB 1: PDF UPLOADER */}
+      {/* PDF UPLOADER */}
       {activeTab === "pdf" && (
         <div className="space-y-4">
           <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 text-xs sm:text-sm text-slate-600 flex items-center justify-between shadow-sm">
@@ -274,11 +306,15 @@ export default function AdminDashboardTabs({
               </p>
             </div>
           </div>
-          <ResourceUploadForm levels={levels} subjects={subjects} />
+          <ResourceUploadForm
+            levels={levels}
+            subjects={subjects}
+            modules={modules}
+          />
         </div>
       )}
 
-      {/* TAB 2: VIDEO UPLOADER */}
+      {/* VIDEO UPLOADER */}
       {activeTab === "video" && (
         <div className="space-y-4">
           <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 text-xs sm:text-sm text-slate-600 flex items-center justify-between shadow-sm">
@@ -292,11 +328,15 @@ export default function AdminDashboardTabs({
               </p>
             </div>
           </div>
-          <VideoUploadForm levels={levels} subjects={subjects} />
+          <VideoUploadForm
+            levels={levels}
+            subjects={subjects}
+            modules={modules}
+          />
         </div>
       )}
 
-      {/* TAB 3: ARTICLE EDITOR */}
+      {/* ARTICLE EDITOR */}
       {activeTab === "article" && (
         <div className="space-y-4">
           <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 text-xs sm:text-sm text-slate-600 flex items-center justify-between shadow-sm">
@@ -310,11 +350,22 @@ export default function AdminDashboardTabs({
               </p>
             </div>
           </div>
-          <AddArticleForm levels={levels} subjects={subjects} />
+          <AddArticleForm
+            levels={levels}
+            subjects={subjects}
+            modules={modules}
+          />
         </div>
       )}
 
-      {/* TAB 4: SUBJECT MANAGEMENT */}
+      {/* CURRICULUM TAB */}
+      {activeTab === "module" && (
+        <div className="space-y-4">
+          <AddModuleForm subjects={subjects} />
+        </div>
+      )}
+
+      {/* SUBJECT MANAGEMENT */}
       {activeTab === "subject" && (
         <div className="space-y-6">
           <AddSubjectForm levels={levels} />
@@ -351,19 +402,19 @@ export default function AdminDashboardTabs({
         </div>
       )}
 
-      {/* TAB 5: QUESTION BANK */}
+      {/* QUESTION BANK */}
       {activeTab === "question" && <AddQuestionForm subjects={subjects} />}
 
-      {/* TAB 6: ANNOUNCEMENT COMPONENT */}
+      {/* ANNOUNCEMENT */}
       {activeTab === "announcement" && <AddAnnouncementForm />}
 
-      {/* TAB 7: FACULTY ACCESS MANAGEMENT */}
+      {/* FACULTY ACCESS */}
       {isSuperAdmin && activeTab === "faculty" && <ManageFacultyForm />}
 
-      {/* TAB 8: LECTURER PROFILES */}
+      {/* LECTURER PROFILES */}
       {isSuperAdmin && activeTab === "lecturer_profile" && <AddLecturerForm />}
 
-      {/* TAB 9: ALL PUBLISHED MATERIALS TABLE */}
+      {/* ALL PUBLISHED MATERIALS TABLE */}
       {activeTab === "list" && (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm text-slate-900">
           <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between">
@@ -372,8 +423,8 @@ export default function AdminDashboardTabs({
                 Published Resources Library ({totalPublishedCount})
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                View and manage all uploaded PDF documents and embedded video
-                lectures.
+                View and manage all uploaded PDF documents, embedded video
+                lectures, and practice questions.
               </p>
             </div>
             {isPending && (
@@ -385,7 +436,7 @@ export default function AdminDashboardTabs({
             <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[600px]">
               <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] sm:text-[11px] font-semibold border-b border-slate-200">
                 <tr>
-                  <th className="p-3 sm:p-4">Title</th>
+                  <th className="p-3 sm:p-4">Title / Question</th>
                   <th className="p-3 sm:p-4">Subject</th>
                   <th className="p-3 sm:p-4">Stage</th>
                   <th className="p-3 sm:p-4">Type</th>
@@ -393,16 +444,18 @@ export default function AdminDashboardTabs({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
-                {resourcesList.length === 0 && videosList.length === 0 ? (
+                {resourcesList.length === 0 &&
+                videosList.length === 0 &&
+                questionsList.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="p-8 text-center text-slate-400">
-                      No materials published yet. Use the tabs above to upload
-                      your first PDF or video!
+                      No materials or questions published yet. Use the tabs
+                      above to create your first content!
                     </td>
                   </tr>
                 ) : (
                   <>
-                    {/* LIST PDF DOCUMENTS & ARTICLES */}
+                    {/* PDF / ARTICLES LIST */}
                     {resourcesList.map((res: Resource) => (
                       <tr key={res.id} className="hover:bg-slate-50 transition">
                         <td className="p-3 sm:p-4 font-semibold text-slate-900">
@@ -444,7 +497,7 @@ export default function AdminDashboardTabs({
                       </tr>
                     ))}
 
-                    {/* LIST VIDEO LECTURES */}
+                    {/* VIDEOS LIST */}
                     {videosList.map((vid: Video) => (
                       <tr key={vid.id} className="hover:bg-slate-50 transition">
                         <td className="p-3 sm:p-4 font-semibold text-slate-900">
@@ -473,6 +526,34 @@ export default function AdminDashboardTabs({
                         </td>
                       </tr>
                     ))}
+
+                    {/* PRACTICE QUESTIONS LIST */}
+                    {questionsList.map((q: any) => (
+                      <tr key={q.id} className="hover:bg-slate-50 transition">
+                        <td className="p-3 sm:p-4 font-semibold text-slate-900 truncate max-w-xs">
+                          ❓ {q.question_text}
+                        </td>
+                        <td className="p-3 sm:p-4 text-slate-600">
+                          {q.subject?.name || "—"}
+                        </td>
+                        <td className="p-3 sm:p-4 text-slate-500">—</td>
+                        <td className="p-3 sm:p-4">
+                          <span className="px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-200/60 text-[10px] font-bold rounded-full uppercase whitespace-nowrap">
+                            PRACTICE QUESTION
+                          </span>
+                        </td>
+                        <td className="p-3 sm:p-4 text-right">
+                          <button
+                            onClick={() => handleDeleteQuestion(q.id)}
+                            disabled={isPending}
+                            className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg transition cursor-pointer disabled:opacity-50"
+                            title="Delete Question"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                   </>
                 )}
               </tbody>
@@ -481,7 +562,7 @@ export default function AdminDashboardTabs({
         </div>
       )}
 
-      {/* GENTLE NUDGE TO CREATE LECTURER PROFILES (ONLY FOR SUPER ADMINS) */}
+      {/* LECTURER DIRECTORY NUDGE */}
       {isSuperAdmin && activeTab !== "lecturer_profile" && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-3">

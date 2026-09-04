@@ -1,12 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { Subject, Resource, Video } from "@/types";
+import { redirect, notFound } from "next/navigation";
+import { Resource, Video } from "@/types";
 import BookmarkButton from "@/components/resources/BookmarkButton";
 import BackButton from "@/components/navigation/BackButton";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import RatingPrompt from "@/components/resources/RatingPrompt";
-import { PlayCircle, FileText, User, Clock, Star, Award } from "lucide-react";
+import {
+  PlayCircle,
+  FileText,
+  User,
+  Clock,
+  Star,
+  Award,
+  FolderOpen,
+} from "lucide-react";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -15,9 +22,11 @@ interface Props {
 export default async function SubjectDetailsPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   if (!user) {
     redirect("/register");
   }
@@ -33,7 +42,14 @@ export default async function SubjectDetailsPage({ params }: Props) {
     notFound();
   }
 
-  // 2. Fetch Resources and Videos
+  // 2. Fetch Modules for this Subject
+  const { data: modules } = await supabase
+    .from("modules")
+    .select("*")
+    .eq("subject_id", id)
+    .order("display_order", { ascending: true });
+
+  // 3. Fetch Resources and Videos
   const { data: resources } = await supabase
     .from("resources")
     .select("*")
@@ -48,7 +64,7 @@ export default async function SubjectDetailsPage({ params }: Props) {
 
   const totalItems = (resources?.length || 0) + (videos?.length || 0);
 
-  // 3. Fetch User Progress (Calculate real progress %)
+  // 4. Fetch User Progress
   let completedCount = 0;
   if (user && totalItems > 0) {
     const resourceIds = resources?.map((r) => r.id) || [];
@@ -68,7 +84,7 @@ export default async function SubjectDetailsPage({ params }: Props) {
   const progressPercentage =
     totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0;
 
-  // 4. Calculate Dynamic Rating
+  // 5. Calculate Dynamic Rating
   const { data: ratings } = await supabase
     .from("course_ratings")
     .select("rating")
@@ -79,6 +95,12 @@ export default async function SubjectDetailsPage({ params }: Props) {
     const sum = ratings.reduce((acc, curr) => acc + curr.rating, 0);
     avgRating = parseFloat((sum / ratings.length).toFixed(1));
   }
+
+  // Unassigned Content (Items without module_id assigned)
+  const unassignedVideos = videos?.filter((v) => !v.module_id) || [];
+  const unassignedResources = resources?.filter((r) => !r.module_id) || [];
+  const hasUnassignedContent =
+    unassignedVideos.length > 0 || unassignedResources.length > 0;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
@@ -194,100 +216,176 @@ export default async function SubjectDetailsPage({ params }: Props) {
           </div>
         )}
 
-        {/* COURSE CONTENT BREAKDOWN (SIDE-BY-SIDE ON DESKTOP) */}
+        {/* COURSE CONTENT BREAKDOWN (LMS CLASSROOM VIEW) */}
         <div className="space-y-6 pt-4">
           <h2 className="text-xl font-bold text-[#1e3a8a] border-b border-slate-200 pb-2">
-            Course Content & Modules ({totalItems})
+            Course Curriculum ({totalItems} Materials)
           </h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* LEFT COLUMN: VIDEO LECTURES */}
-            <div className="space-y-4">
-              <h3 className="font-bold text-slate-700 flex items-center gap-2">
-                <PlayCircle className="w-5 h-5 text-rose-500" />
-                <span>Video Lectures ({videos?.length || 0})</span>
-              </h3>
+          <div className="space-y-6">
+            {/* LOOP THROUGH EACH MODULE */}
+            {!modules || modules.length === 0 ? (
+              <p className="text-sm text-slate-500 italic p-6 bg-white border border-slate-200 rounded-2xl">
+                Course modules are currently being updated by the faculty.
+              </p>
+            ) : (
+              modules.map((mod, index) => {
+                const modVideos =
+                  videos?.filter((v) => v.module_id === mod.id) || [];
+                const modResources =
+                  resources?.filter((r) => r.module_id === mod.id) || [];
+                const hasContent =
+                  modVideos.length > 0 || modResources.length > 0;
 
-              <div className="space-y-3">
-                {!videos || videos.length === 0 ? (
-                  <p className="text-sm text-slate-500 italic p-4 border border-dashed border-slate-200 rounded-xl">
-                    No video lectures uploaded yet.
-                  </p>
-                ) : (
-                  videos.map((vid: Video, index: number) => (
+                return (
+                  <div
+                    key={mod.id}
+                    className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm"
+                  >
+                    {/* MODULE HEADER */}
+                    <div className="bg-slate-50 border-b border-slate-200 p-5 sm:p-6">
+                      <h3 className="text-lg font-bold text-[#1e3a8a]">
+                        Module {index + 1}: {mod.title}
+                      </h3>
+                      {mod.description && (
+                        <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                          {mod.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* MODULE CONTENT LIST */}
+                    <div className="divide-y divide-slate-100">
+                      {!hasContent ? (
+                        <div className="p-5 text-xs text-slate-400 italic">
+                          No content uploaded to this module yet.
+                        </div>
+                      ) : (
+                        <>
+                          {/* VIDEOS IN MODULE */}
+                          {modVideos.map((vid: Video, vIdx: number) => (
+                            <div
+                              key={vid.id}
+                              className="p-4 sm:p-5 flex items-center justify-between hover:bg-blue-50/50 transition"
+                            >
+                              <div className="flex items-center gap-3.5">
+                                <PlayCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
+                                <div>
+                                  <h4 className="font-semibold text-slate-900 text-sm">
+                                    {vIdx + 1}. {vid.title}
+                                  </h4>
+                                  <span className="text-[10px] uppercase font-bold text-slate-400">
+                                    Video Lesson
+                                  </span>
+                                </div>
+                              </div>
+                              <Link
+                                href={`/resources/item/${vid.id}?type=video`}
+                                className="px-4 py-2 bg-blue-50 text-[#1e3a8a] text-xs font-bold rounded-lg hover:bg-[#1e3a8a] hover:text-white transition whitespace-nowrap"
+                              >
+                                Watch →
+                              </Link>
+                            </div>
+                          ))}
+
+                          {/* PDFs/NOTES IN MODULE */}
+                          {modResources.map((res: Resource, rIdx: number) => (
+                            <div
+                              key={res.id}
+                              className="p-4 sm:p-5 flex items-center justify-between hover:bg-amber-50/50 transition"
+                            >
+                              <div className="flex items-center gap-3.5">
+                                <FileText className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                                <div>
+                                  <h4 className="font-semibold text-slate-900 text-sm">
+                                    {modVideos.length + rIdx + 1}. {res.title}
+                                  </h4>
+                                  <span className="text-[10px] uppercase font-bold text-slate-400">
+                                    {res.resource_type.replace("_", " ")}
+                                  </span>
+                                </div>
+                              </div>
+                              <Link
+                                href={`/resources/item/${res.id}?type=doc`}
+                                className="px-4 py-2 bg-amber-50 text-[#d97706] text-xs font-bold rounded-lg hover:bg-[#f59e0b] hover:text-white transition whitespace-nowrap"
+                              >
+                                Read →
+                              </Link>
+                            </div>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+
+            {/* UNASSIGNED CONTENT (General Course Resources, Past Papers & Pathfinders) */}
+            {hasUnassignedContent && (
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm mt-8">
+                <div className="bg-slate-100 border-b border-slate-200 p-5 sm:p-6 flex items-center gap-2">
+                  <FolderOpen className="w-5 h-5 text-[#1e3a8a]" />
+                  <h3 className="text-lg font-bold text-[#1e3a8a]">
+                    General Course Materials & Past Questions
+                  </h3>
+                </div>
+
+                <div className="divide-y divide-slate-100">
+                  {/* UNASSIGNED VIDEOS */}
+                  {unassignedVideos.map((vid: Video, vIdx: number) => (
                     <div
                       key={vid.id}
-                      className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-blue-400 transition shadow-sm"
+                      className="p-4 sm:p-5 flex items-center justify-between hover:bg-blue-50/50 transition"
                     >
-                      <div className="flex items-start sm:items-center gap-3.5">
-                        <div className="bg-blue-50 text-blue-600 p-2.5 rounded-lg flex-shrink-0">
-                          <PlayCircle className="w-6 h-6" />
-                        </div>
+                      <div className="flex items-center gap-3.5">
+                        <PlayCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
                         <div>
-                          <h3 className="font-semibold text-slate-900 text-sm">
-                            {index + 1}. {vid.title}
-                          </h3>
-                          <p className="text-xs text-slate-500 mt-0.5">
-                            {vid.duration_minutes
-                              ? `${vid.duration_minutes} mins`
-                              : "Video Lecture"}
-                          </p>
+                          <h4 className="font-semibold text-slate-900 text-sm">
+                            {vIdx + 1}. {vid.title}
+                          </h4>
+                          <span className="text-[10px] uppercase font-bold text-slate-400">
+                            Video Lesson
+                          </span>
                         </div>
                       </div>
                       <Link
                         href={`/resources/item/${vid.id}?type=video`}
-                        className="w-full sm:w-auto px-4 py-2 bg-[#f59e0b] hover:bg-[#d97706] text-white text-xs font-bold rounded-lg transition text-center whitespace-nowrap"
+                        className="px-4 py-2 bg-blue-50 text-[#1e3a8a] text-xs font-bold rounded-lg hover:bg-[#1e3a8a] hover:text-white transition whitespace-nowrap"
                       >
-                        Start Video →
+                        Watch →
                       </Link>
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
+                  ))}
 
-            {/* RIGHT COLUMN: PDF STUDY MATERIALS */}
-            <div className="space-y-4">
-              <h3 className="font-bold text-slate-700 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-emerald-500" />
-                <span>Study Documents ({resources?.length || 0})</span>
-              </h3>
-
-              <div className="space-y-3">
-                {!resources || resources.length === 0 ? (
-                  <p className="text-sm text-slate-500 italic p-4 border border-dashed border-slate-200 rounded-xl">
-                    No documents uploaded yet.
-                  </p>
-                ) : (
-                  resources.map((res: Resource, index: number) => (
+                  {/* UNASSIGNED RESOURCES */}
+                  {unassignedResources.map((res: Resource, rIdx: number) => (
                     <div
                       key={res.id}
-                      className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-amber-400 transition shadow-sm"
+                      className="p-4 sm:p-5 flex items-center justify-between hover:bg-amber-50/50 transition"
                     >
-                      <div className="flex items-start sm:items-center gap-3.5">
-                        <div className="bg-amber-50 text-amber-700 p-2.5 rounded-lg flex-shrink-0">
-                          <FileText className="w-6 h-6" />
-                        </div>
+                      <div className="flex items-center gap-3.5">
+                        <FileText className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                         <div>
-                          <h3 className="font-semibold text-slate-900 text-sm">
-                            {index + 1}. {res.title}
-                          </h3>
-                          <p className="text-xs text-slate-500 mt-0.5 capitalize">
+                          <h4 className="font-semibold text-slate-900 text-sm">
+                            {unassignedVideos.length + rIdx + 1}. {res.title}
+                          </h4>
+                          <span className="text-[10px] uppercase font-bold text-slate-400">
                             {res.resource_type.replace("_", " ")}
-                          </p>
+                          </span>
                         </div>
                       </div>
                       <Link
                         href={`/resources/item/${res.id}?type=doc`}
-                        className="w-full sm:w-auto px-4 py-2 bg-[#f59e0b] hover:bg-[#d97706] text-white text-xs font-bold rounded-lg transition text-center whitespace-nowrap"
+                        className="px-4 py-2 bg-amber-50 text-[#d97706] text-xs font-bold rounded-lg hover:bg-[#f59e0b] hover:text-white transition whitespace-nowrap"
                       >
-                        View Material →
+                        Read →
                       </Link>
                     </div>
-                  ))
-                )}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 

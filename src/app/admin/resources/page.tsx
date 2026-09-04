@@ -20,15 +20,25 @@ export default async function AdminResourcesPage() {
 
   const isSuperAdmin = profile?.is_super_admin || false;
 
-  // 2. Fetch resources and analytics data
+  // 2. Fetch resources, modules, and analytics data
   const levels = await getLevels("all");
   const subjects = await getSubjects(undefined, undefined, "all");
   const { resources } = await getResources({ limit: 100 });
   const analytics = await getAdminAnalytics();
 
+  // Fetch modules for the forms
+  const { data: modules } = await supabase
+    .from("modules")
+    .select("*")
+    .order("title", { ascending: true });
+
   const { data: videos } = await supabase
     .from("videos")
     .select("*, subject:subjects(name), level:levels(name)")
+    .order("created_at", { ascending: false });
+  const { data: questions } = await supabase
+    .from("questions")
+    .select("*, subject:subjects(name, level_id)")
     .order("created_at", { ascending: false });
 
   return (
@@ -52,10 +62,12 @@ export default async function AdminResourcesPage() {
         <AdminDashboardTabs
           levels={levels}
           subjects={subjects}
+          modules={modules || []}
           resources={resources}
           videos={videos || []}
           analytics={analytics}
           isSuperAdmin={isSuperAdmin}
+          questions={questions || []}
         />
       </div>
     </div>

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { Level } from "@/types";
 import { createSubject } from "@/lib/actions/subjects";
-import { Plus, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface Props {
   levels: Level[];
@@ -11,14 +12,9 @@ interface Props {
 
 export default function AddSubjectForm({ levels }: Props) {
   const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setMessage(null);
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -26,12 +22,9 @@ export default function AddSubjectForm({ levels }: Props) {
     startTransition(async () => {
       const res = await createSubject(formData);
       if (res?.error) {
-        setMessage({ type: "error", text: res.error });
+        toast.error(res.error);
       } else {
-        setMessage({
-          type: "success",
-          text: "Subject & Lecturer details saved successfully!",
-        });
+        toast.success("Subject & Lecturer details saved successfully!");
         form.reset();
       }
     });
@@ -45,23 +38,6 @@ export default function AddSubjectForm({ levels }: Props) {
       <h2 className="text-base sm:text-lg font-bold text-[#1e3a8a] border-b border-slate-100 pb-3">
         Add New Course / Subject
       </h2>
-
-      {message && (
-        <div
-          className={`p-4 rounded-xl flex items-center gap-3 text-xs sm:text-sm font-medium ${
-            message.type === "success"
-              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-              : "bg-rose-50 text-rose-700 border border-rose-200"
-          }`}
-        >
-          {message.type === "success" ? (
-            <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-          ) : (
-            <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
-          )}
-          <span>{message.text}</span>
-        </div>
-      )}
 
       {/* INPUT GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

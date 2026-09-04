@@ -22,7 +22,7 @@ export async function getAdminAnalytics() {
   // 4. Total Quiz Attempts
   const { count: quizCount } = await supabase
     .from("quiz_attempts")
-    .select("*", { count: "exact", head: true });
+    .select("id", { count: "exact", head: true });
 
   // 5. Total Subjects
   const { count: subjectCount } = await supabase

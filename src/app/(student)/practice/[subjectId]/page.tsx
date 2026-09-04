@@ -9,9 +9,9 @@ import {
   ArrowLeft,
   CheckCircle2,
   Award,
-  RefreshCw,
   Loader2,
   Lightbulb,
+  HelpCircle,
 } from "lucide-react";
 
 export default function PracticeQuizPage() {
@@ -21,6 +21,7 @@ export default function PracticeQuizPage() {
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
@@ -38,8 +39,12 @@ export default function PracticeQuizPage() {
       .from("questions")
       .select("*, question_options(*)")
       .eq("subject_id", subjectId)
-      .limit(10)
-      .then(({ data }) => setQuestions(data || []));
+      .limit(20)
+      .then(({ data, error }) => {
+        if (error) console.error("Error fetching questions:", error);
+        setQuestions(data || []);
+        setIsLoading(false);
+      });
   }, [subjectId]);
 
   function handleOptionSelect(questionId: string, optionId: string) {
@@ -56,117 +61,188 @@ export default function PracticeQuizPage() {
       );
       if (res.success) {
         setResult(res);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     });
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-4 sm:p-6 md:p-10">
+    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* BACK BUTTON */}
         <Link
           href={`/resources/subject/${subjectId}`}
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-500 hover:text-[#1e3a8a] transition bg-white px-3.5 py-2 rounded-lg border border-slate-200 shadow-sm w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to {subject?.name || "Subject"}</span>
+          <span>Back to {subject?.name || "Course"}</span>
         </Link>
 
+        {/* HEADER */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-            {subject?.name} Practice Test
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a]">
+            {subject?.name || "Subject"} Practice Test
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Answer practice questions and receive automatic scoring with
             solution explanations.
           </p>
         </div>
 
         {/* RESULTS BANNER */}
+        {/* RESULTS BANNER (Dynamic Colors) */}
         {result && (
-          <div className="bg-slate-900 border border-amber-500/30 rounded-2xl p-6 text-center space-y-3 shadow-xl">
-            <Award className="w-12 h-12 text-amber-400 mx-auto" />
-            <h2 className="text-2xl font-extrabold text-white">
-              Quiz Completed!
-            </h2>
-            <p className="text-amber-400 font-bold text-3xl">
-              {result.scorePercentage}% Score
+          <div
+            className={`border-2 rounded-2xl p-6 sm:p-8 text-center space-y-3 shadow-sm transition-colors ${
+              result.scorePercentage >= 70
+                ? "bg-emerald-50 border-emerald-500 text-emerald-900"
+                : result.scorePercentage >= 50
+                  ? "bg-amber-50 border-amber-500 text-amber-900"
+                  : "bg-rose-50 border-rose-500 text-rose-900"
+            }`}
+          >
+            <Award
+              className={`w-16 h-16 mx-auto ${
+                result.scorePercentage >= 70
+                  ? "text-emerald-500"
+                  : result.scorePercentage >= 50
+                    ? "text-amber-500"
+                    : "text-rose-500"
+              }`}
+            />
+            <h2 className="text-2xl font-extrabold">Quiz Completed!</h2>
+            <p
+              className={`font-black text-5xl ${
+                result.scorePercentage >= 70
+                  ? "text-emerald-600"
+                  : result.scorePercentage >= 50
+                    ? "text-amber-600"
+                    : "text-rose-600"
+              }`}
+            >
+              {result.scorePercentage}%
             </p>
-            <p className="text-slate-400 text-xs sm:text-sm">
+            <p className="text-sm font-medium opacity-80">
               You answered {result.correctCount} out of {result.totalQuestions}{" "}
               questions correctly.
             </p>
           </div>
         )}
+        {/* LOADING STATE */}
+        {isLoading ? (
+          <div className="bg-white border border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center space-y-3 shadow-sm">
+            <Loader2 className="w-8 h-8 text-[#f59e0b] animate-spin" />
+            <p className="text-slate-500 font-medium">
+              Loading practice questions...
+            </p>
+          </div>
+        ) : questions.length === 0 ? (
+          /* EMPTY STATE */
+          <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-12 text-center space-y-3 shadow-sm">
+            <div className="w-12 h-12 bg-blue-50 text-[#1e3a8a] rounded-xl flex items-center justify-center mx-auto">
+              <HelpCircle className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">
+              No questions available yet!
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
+              The faculty has not added any practice questions to this subject's
+              question bank. Please check back later.
+            </p>
+          </div>
+        ) : (
+          /* QUESTIONS LIST */
+          <div className="space-y-6">
+            {questions.map((q, qIdx) => (
+              <div
+                key={q.id}
+                className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4"
+              >
+                <div className="flex justify-between items-start gap-4 border-b border-slate-100 pb-3">
+                  <span className="text-xs font-bold uppercase text-[#1e3a8a] px-3 py-1 bg-blue-50 rounded-md">
+                    Question {qIdx + 1}
+                  </span>
+                  {q.topic_name && (
+                    <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                      {q.topic_name}
+                    </span>
+                  )}
+                </div>
 
-        {/* QUESTIONS LIST */}
-        <div className="space-y-6">
-          {questions.map((q, qIdx) => (
-            <div
-              key={q.id}
-              className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4"
-            >
-              <div className="flex justify-between items-start gap-4">
-                <span className="text-xs font-bold uppercase text-amber-400 px-2.5 py-1 bg-amber-500/10 rounded-full">
-                  Question {qIdx + 1}
-                </span>
-                {q.topic_name && (
-                  <span className="text-xs text-slate-500">{q.topic_name}</span>
+                <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug">
+                  {q.question_text}
+                </h3>
+
+                {/* OPTIONS */}
+                <div className="space-y-2 pt-2">
+                  {q.question_options?.map((opt: any) => {
+                    const isSelected = userAnswers[q.id] === opt.id;
+                    const isCorrect = opt.is_correct;
+
+                    // STYLING LOGIC FOR LIGHT THEME
+                    let optionStyle =
+                      "bg-slate-50 border-slate-200 text-slate-700 hover:border-[#1e3a8a] hover:bg-blue-50";
+
+                    if (isSelected) {
+                      optionStyle =
+                        "bg-blue-50 border-[#1e3a8a] text-[#1e3a8a] font-bold shadow-sm";
+                    }
+
+                    // REVEAL ANSWERS AFTER SUBMISSION
+                    if (result) {
+                      if (isCorrect) {
+                        optionStyle =
+                          "bg-emerald-50 border-emerald-500 text-emerald-700 font-bold";
+                      } else if (isSelected && !isCorrect) {
+                        optionStyle =
+                          "bg-rose-50 border-rose-500 text-rose-700 font-bold";
+                      } else {
+                        optionStyle =
+                          "bg-slate-50 border-slate-200 text-slate-400 opacity-60 cursor-not-allowed";
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={opt.id}
+                        onClick={() => handleOptionSelect(q.id, opt.id)}
+                        disabled={!!result} // Disable clicks after submission
+                        className={`w-full text-left p-3.5 rounded-xl border text-xs sm:text-sm transition flex items-center justify-between ${!result ? "cursor-pointer" : ""} ${optionStyle}`}
+                      >
+                        <span>{opt.option_text}</span>
+                        {isSelected && !result && (
+                          <CheckCircle2 className="w-5 h-5 text-[#1e3a8a] flex-shrink-0" />
+                        )}
+                        {result && isCorrect && (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* EXPLANATION WHEN SUBMITTED */}
+                {result && q.explanation && (
+                  <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs sm:text-sm text-slate-700 space-y-1">
+                    <span className="font-bold text-amber-600 flex items-center gap-1.5 mb-1">
+                      <Lightbulb className="w-4 h-4" /> Solution Explanation:
+                    </span>
+                    <p className="leading-relaxed font-medium">
+                      {q.explanation}
+                    </p>
+                  </div>
                 )}
               </div>
-
-              <h3 className="font-semibold text-white text-sm sm:text-base leading-snug">
-                {q.question_text}
-              </h3>
-
-              {/* OPTIONS */}
-              <div className="space-y-2 pt-2">
-                {q.question_options?.map((opt: any) => {
-                  const isSelected = userAnswers[q.id] === opt.id;
-                  const isCorrect = opt.is_correct;
-
-                  let optionStyle =
-                    "bg-slate-800/80 border-slate-700 text-slate-300 hover:border-amber-500/40";
-                  if (isSelected)
-                    optionStyle =
-                      "bg-amber-500/20 border-amber-500 text-amber-400 font-bold";
-                  if (result && isCorrect)
-                    optionStyle =
-                      "bg-emerald-500/20 border-emerald-500 text-emerald-400 font-bold";
-
-                  return (
-                    <button
-                      key={opt.id}
-                      onClick={() => handleOptionSelect(q.id, opt.id)}
-                      className={`w-full text-left p-3.5 rounded-xl border text-xs sm:text-sm transition flex items-center justify-between cursor-pointer ${optionStyle}`}
-                    >
-                      <span>{opt.option_text}</span>
-                      {isSelected && (
-                        <CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* EXPLANATION WHEN SUBMITTED */}
-              {result && q.explanation && (
-                <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-400 space-y-1">
-                  <span className="font-bold text-amber-400 flex items-center gap-1">
-                    <Lightbulb className="w-3.5 h-3.5" /> Solution Explanation:
-                  </span>
-                  <p>{q.explanation}</p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* SUBMIT BUTTON */}
         {!result && questions.length > 0 && (
           <button
             onClick={handleSubmitQuiz}
             disabled={isPending || Object.keys(userAnswers).length === 0}
-            className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full py-4 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {isPending ? (
               <Loader2 className="w-5 h-5 animate-spin" />

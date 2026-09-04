@@ -1,6 +1,7 @@
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import AnnouncementBanner from "@/components/navigation/AnnouncementBanner";
+import { Toaster } from "react-hot-toast"; //
 import { getLatestAnnouncement } from "@/lib/actions/announcements";
 import "./globals.css";
 
@@ -22,6 +23,7 @@ export default async function RootLayout({
       {/* 1. Updated min-h-screen -> min-h-dvh */}
       <body className="bg-slate-50 text-slate-900 min-h-dvh flex flex-col antialiased">
         <AnnouncementBanner announcement={announcement} />
+        <Toaster position="top-center" />
         <Navbar />
         {/* 2. Added flex flex-col flex-1 */}
         <main className="flex-1 flex flex-col">{children}</main>

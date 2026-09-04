@@ -1,4 +1,5 @@
 import { getLevels, getSubjects } from "@/lib/services/resources";
+import { getModules } from "@/lib/actions/modules";
 import ResourceUploadForm from "@/components/admin/ResourceUploadForm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -6,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 export default async function AdminNewResourcePage() {
   const levels = await getLevels();
   const subjects = await getSubjects();
+  const modules = await getModules();
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
@@ -32,7 +34,11 @@ export default async function AdminNewResourcePage() {
 
         {/* FORM CONTAINER */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-          <ResourceUploadForm levels={levels} subjects={subjects} />
+          <ResourceUploadForm
+            levels={levels}
+            subjects={subjects}
+            modules={modules}
+          />
         </div>
       </div>
     </div>

@@ -6,30 +6,20 @@ import {
   deleteAnnouncement,
   getAllAnnouncements,
 } from "@/lib/actions/announcements";
-import {
-  Megaphone,
-  Loader2,
-  CheckCircle,
-  AlertCircle,
-  Trash2,
-} from "lucide-react";
+import { Megaphone, Loader2, Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function AddAnnouncementForm() {
   const [isPending, startTransition] = useTransition();
   const [announcements, setAnnouncements] = useState<any[]>([]);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
 
   // Fetch active announcements list
   useEffect(() => {
     getAllAnnouncements().then(setAnnouncements);
-  }, [message]);
+  }, []);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setMessage(null);
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -37,13 +27,12 @@ export default function AddAnnouncementForm() {
     startTransition(async () => {
       const res = await createAnnouncement(formData);
       if (res?.error) {
-        setMessage({ type: "error", text: res.error });
+        toast.error(res.error);
       } else {
-        setMessage({
-          type: "success",
-          text: "Announcement banner published live!",
-        });
+        toast.success("Announcement banner published live!");
         form.reset();
+        const updated = await getAllAnnouncements();
+        setAnnouncements(updated);
       }
     });
   }
@@ -51,11 +40,12 @@ export default function AddAnnouncementForm() {
   function handleDelete(id: string) {
     startTransition(async () => {
       const res = await deleteAnnouncement(id);
-      if (res.success) {
-        setMessage({
-          type: "success",
-          text: "Announcement banner removed from website!",
-        });
+      if (res?.success) {
+        toast.success("Announcement banner removed from website!");
+        const updated = await getAllAnnouncements();
+        setAnnouncements(updated);
+      } else if (res?.error) {
+        toast.error(res.error);
       }
     });
   }
@@ -71,23 +61,6 @@ export default function AddAnnouncementForm() {
           <Megaphone className="w-5 h-5 text-amber-500" />
           <span>Post Exam Broadcast Announcement</span>
         </h2>
-
-        {message && (
-          <div
-            className={`p-4 rounded-xl flex items-center gap-3 text-xs sm:text-sm font-medium ${
-              message.type === "success"
-                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                : "bg-rose-50 text-rose-700 border border-rose-200"
-            }`}
-          >
-            {message.type === "success" ? (
-              <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-            ) : (
-              <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
-            )}
-            <span>{message.text}</span>
-          </div>
-        )}
 
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
@@ -158,7 +131,8 @@ export default function AddAnnouncementForm() {
                 </div>
                 <button
                   onClick={() => handleDelete(item.id)}
-                  className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                  disabled={isPending}
+                  className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-xs font-semibold flex items-center gap-1 transition cursor-pointer disabled:opacity-50"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Remove Banner</span>

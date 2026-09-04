@@ -1,16 +1,24 @@
 "use client";
 
-import { useState, useTransition, useRef, useMemo, forwardRef } from "react";
+import {
+  useState,
+  useTransition,
+  useRef,
+  useMemo,
+  useCallback,
+  forwardRef,
+} from "react";
 import dynamic from "next/dynamic";
 import imageCompression from "browser-image-compression";
 import { Level, Subject } from "@/types";
 import { createArticleLesson } from "@/lib/actions/articles";
 import { createClient } from "@/lib/supabase/client";
-import { Edit3, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Edit3, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 import "react-quill-new/dist/quill.snow.css";
 
-// Dynamic import for ReactQuill supporting forwardRef
+// Dynamic import for ReactQuill with forwardRef
 const ReactQuill = dynamic(
   async () => {
     const { default: RQ } = await import("react-quill-new");
@@ -22,20 +30,41 @@ const ReactQuill = dynamic(
   },
 );
 
+// Register Quill imageResize ONCE outside the render loop
+let isImageResizeRegistered = false;
+function registerQuillImageResize() {
+  if (typeof window !== "undefined" && !isImageResizeRegistered) {
+    try {
+      const { Quill } = require("react-quill-new");
+      const ImageResize =
+        require("quill-image-resize-module-react").default ||
+        require("quill-image-resize-module-react");
+      Quill.register("modules/imageResize", ImageResize);
+      isImageResizeRegistered = true;
+    } catch (e) {
+      console.warn("Quill imageResize registration warning:", e);
+    }
+  }
+}
+
 interface Props {
   levels: Level[];
   subjects: Subject[];
+  modules: any[];
 }
 
-export default function AddArticleForm({ levels, subjects }: Props) {
+export default function AddArticleForm({
+  levels,
+  subjects,
+  modules = [],
+}: Props) {
   const [selectedLevelId, setSelectedLevelId] = useState<string>("");
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>("");
+  const [selectedModuleId, setSelectedModuleId] = useState<string>("");
+
   const [content, setContent] = useState("");
   const [isPending, startTransition] = useTransition();
   const [isImageUploading, setIsImageUploading] = useState(false);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
 
   const quillRef = useRef<any>(null);
 
@@ -43,8 +72,23 @@ export default function AddArticleForm({ levels, subjects }: Props) {
     (sub) => sub.level_id === selectedLevelId,
   );
 
-  // COMPRESSING MULTI-IMAGE HANDLER
-  const imageHandler = () => {
+  const filteredModules = modules.filter(
+    (m) => m.subject_id === selectedSubjectId,
+  );
+
+  const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedLevelId(e.target.value);
+    setSelectedSubjectId("");
+    setSelectedModuleId("");
+  };
+
+  const handleSubjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSubjectId(e.target.value);
+    setSelectedModuleId("");
+  };
+
+  // Image Upload Handler
+  const imageHandler = useCallback(() => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/png, image/jpeg, image/webp");
@@ -60,25 +104,23 @@ export default function AddArticleForm({ levels, subjects }: Props) {
       const editor = quillRef.current?.getEditor();
 
       const compressionOptions = {
-        maxSizeMB: 0.8, // Target size ~800KB max
-        maxWidthOrHeight: 1600, // Resize 4K photos down to a max width/height of 1600px
-        useWebWorker: true, // Run in background thread to keep UI smooth
+        maxSizeMB: 0.8,
+        maxWidthOrHeight: 1600,
+        useWebWorker: true,
       };
 
       try {
         for (const file of files) {
-          // 1. Compress Image Client-Side
           let fileToUpload: File | Blob = file;
           try {
             fileToUpload = await imageCompression(file, compressionOptions);
           } catch (compErr) {
             console.warn(
-              `Compression failed for ${file.name}, uploading original:`,
+              `Compression failed for ${file.name}, using original:`,
               compErr,
             );
           }
 
-          // 2. Upload to Supabase Storage
           const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
           const fileName = `lesson-images/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
 
@@ -87,11 +129,12 @@ export default function AddArticleForm({ levels, subjects }: Props) {
             .upload(fileName, fileToUpload, { upsert: false });
 
           if (uploadError) {
-            alert(`Upload failed for ${file.name}: ` + uploadError.message);
+            toast.error(
+              `Upload failed for ${file.name}: ${uploadError.message}`,
+            );
             continue;
           }
 
-          // 3. Get Public URL & Insert into Editor
           const { data } = supabase.storage
             .from("ican-resources")
             .getPublicUrl(fileName);
@@ -106,22 +149,15 @@ export default function AddArticleForm({ levels, subjects }: Props) {
         }
       } catch (error) {
         console.error("Image processing error:", error);
-        alert("An error occurred while processing your images.");
+        toast.error("An error occurred while processing your images.");
       } finally {
         setIsImageUploading(false);
       }
     };
-  };
+  }, []);
 
-  // REGISTER IMAGE RESIZE MODULE & SETUP TOOLBAR
-  const modules = useMemo(() => {
-    if (typeof window !== "undefined") {
-      const { Quill } = require("react-quill-new");
-      const ImageResize =
-        require("quill-image-resize-module-react").default ||
-        require("quill-image-resize-module-react");
-      Quill.register("modules/imageResize", ImageResize);
-    }
+  const editorModules = useMemo(() => {
+    registerQuillImageResize();
 
     return {
       toolbar: {
@@ -145,25 +181,24 @@ export default function AddArticleForm({ levels, subjects }: Props) {
         modules: ["Resize", "DisplaySize", "Toolbar"],
       },
     };
-  }, []);
+  }, [imageHandler]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setMessage(null);
     const form = e.currentTarget;
     const formData = new FormData(form);
 
     startTransition(async () => {
       const res = await createArticleLesson(formData, content);
       if (res?.error) {
-        setMessage({ type: "error", text: res.error });
+        toast.error(res.error);
       } else {
-        setMessage({
-          type: "success",
-          text: "Text Lesson published successfully!",
-        });
+        toast.success("Text Lesson published successfully!");
         form.reset();
         setContent("");
+        setSelectedLevelId("");
+        setSelectedSubjectId("");
+        setSelectedModuleId("");
       }
     });
   }
@@ -183,19 +218,6 @@ export default function AddArticleForm({ levels, subjects }: Props) {
         </p>
       </div>
 
-      {message && (
-        <div
-          className={`p-4 rounded-xl flex items-center gap-3 text-xs sm:text-sm font-medium ${message.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}
-        >
-          {message.type === "success" ? (
-            <CheckCircle className="w-5 h-5 flex-shrink-0" />
-          ) : (
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
-          )}
-          <span>{message.text}</span>
-        </div>
-      )}
-
       <div>
         <label className="block text-xs font-semibold text-slate-700 mb-1">
           Lesson Title *
@@ -209,7 +231,7 @@ export default function AddArticleForm({ levels, subjects }: Props) {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
             Level *
@@ -218,7 +240,7 @@ export default function AddArticleForm({ levels, subjects }: Props) {
             name="level_id"
             required
             value={selectedLevelId}
-            onChange={(e) => setSelectedLevelId(e.target.value)}
+            onChange={handleLevelChange}
             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
           >
             <option value="">Select Level</option>
@@ -229,6 +251,7 @@ export default function AddArticleForm({ levels, subjects }: Props) {
             ))}
           </select>
         </div>
+
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
             Subject *
@@ -237,6 +260,8 @@ export default function AddArticleForm({ levels, subjects }: Props) {
             name="subject_id"
             required
             disabled={!selectedLevelId}
+            value={selectedSubjectId}
+            onChange={handleSubjectChange}
             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none disabled:opacity-50"
           >
             <option value="">Select Subject</option>
@@ -247,6 +272,42 @@ export default function AddArticleForm({ levels, subjects }: Props) {
             ))}
           </select>
         </div>
+
+        {/* MODULE SELECTOR */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Assign to Module{" "}
+            <span className="text-slate-400 font-normal">(Optional)</span>
+          </label>
+          <select
+            name="module_id"
+            disabled={!selectedSubjectId}
+            value={selectedModuleId}
+            onChange={(e) => setSelectedModuleId(e.target.value)}
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+          >
+            <option value="">
+              {!selectedSubjectId
+                ? "Select a Subject First"
+                : filteredModules.length === 0
+                  ? "General / Unassigned (No Modules Found)"
+                  : "General / Unassigned"}
+            </option>
+            {filteredModules.map((m: any, index: number) => (
+              <option key={m.id} value={m.id}>
+                Module {m.display_order || index + 1}: {m.title}
+              </option>
+            ))}
+          </select>
+          {selectedSubjectId && filteredModules.length === 0 && (
+            <p className="text-[11px] text-slate-500 mt-1">
+              No modules created yet. Build syllabus structure in the{" "}
+              <span className="font-semibold text-[#1e3a8a]">Curriculum</span>{" "}
+              tab.
+            </p>
+          )}
+        </div>
+
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
             Category *
@@ -262,7 +323,6 @@ export default function AddArticleForm({ levels, subjects }: Props) {
         </div>
       </div>
 
-      {/* RICH TEXT EDITOR WRAPPER */}
       <div className="bg-white rounded-xl border border-slate-200 p-4 relative">
         <label className="block text-xs font-semibold text-slate-700 mb-2">
           Lesson Content *
@@ -279,13 +339,12 @@ export default function AddArticleForm({ levels, subjects }: Props) {
             theme="snow"
             value={content}
             onChange={setContent}
-            modules={modules}
+            modules={editorModules}
             className="border-none"
           />
         </div>
       </div>
 
-      {/* AUTO-EXPAND & RESPONSIVE STYLING */}
       <style jsx global>{`
         .quill-editor-wrapper .ql-container {
           min-height: 250px;
@@ -308,7 +367,7 @@ export default function AddArticleForm({ levels, subjects }: Props) {
       <button
         type="submit"
         disabled={isPending || isImageUploading}
-        className="w-full py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition disabled:opacity-50"
+        className="w-full py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer"
       >
         {isPending ? (
           <Loader2 className="w-5 h-5 animate-spin" />

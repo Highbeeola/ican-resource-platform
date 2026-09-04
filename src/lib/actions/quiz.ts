@@ -120,3 +120,115 @@ export async function submitQuizAttempt(
   revalidatePath("/dashboard");
   return { success: true, scorePercentage, correctCount, totalQuestions };
 }
+
+export async function uploadBulkQuestions(
+  subjectId: string,
+  questionsData: any[],
+) {
+  const supabase = await createClient();
+
+  const questionsToInsert = [];
+  const optionsToInsert = [];
+  const questionIds: string[] = []; // Store IDs for potential rollback
+
+  for (const row of questionsData) {
+    const normRow: Record<string, string> = {};
+    for (const key in row) {
+      if (key) {
+        const cleanKey = key.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        normRow[cleanKey] = row[key];
+      }
+    }
+
+    const qText = normRow["question"];
+    const optA = normRow["optiona"] || normRow["a"];
+    const optB = normRow["optionb"] || normRow["b"];
+    const optC = normRow["optionc"] || normRow["c"];
+    const optD = normRow["optiond"] || normRow["d"];
+    const topic = normRow["topic"] || null;
+    const explanation = normRow["explanation"] || null;
+
+    let correctOpt = String(
+      normRow["correctoption"] || normRow["correct"] || normRow["answer"] || "",
+    )
+      .trim()
+      .toUpperCase();
+    correctOpt = correctOpt.replace("OPTION ", "").replace("OPTION", "").trim();
+
+    if (!qText || !optA || !optB || !correctOpt) continue;
+
+    const questionId = crypto.randomUUID();
+    questionIds.push(questionId); // Track for rollback
+
+    questionsToInsert.push({
+      id: questionId,
+      subject_id: subjectId,
+      topic_name: topic,
+      question_text: qText,
+      explanation: explanation,
+    });
+
+    optionsToInsert.push({
+      question_id: questionId,
+      option_text: optA,
+      is_correct: correctOpt === "A",
+    });
+    optionsToInsert.push({
+      question_id: questionId,
+      option_text: optB,
+      is_correct: correctOpt === "B",
+    });
+
+    if (optC)
+      optionsToInsert.push({
+        question_id: questionId,
+        option_text: optC,
+        is_correct: correctOpt === "C",
+      });
+    if (optD)
+      optionsToInsert.push({
+        question_id: questionId,
+        option_text: optD,
+        is_correct: correctOpt === "D",
+      });
+  }
+
+  if (questionsToInsert.length === 0) {
+    return {
+      error:
+        "No valid questions found. Please check your Excel template headers.",
+    };
+  }
+
+  // 1. Insert Questions
+  const { error: qError } = await supabase
+    .from("questions")
+    .insert(questionsToInsert);
+  if (qError) return { error: `Failed to insert questions: ${qError.message}` };
+
+  // 2. Insert Options
+  const { error: optError } = await supabase
+    .from("question_options")
+    .insert(optionsToInsert);
+
+  // 3. 🚨 THE ROLLBACK (If options fail, delete the questions we just inserted)
+  if (optError) {
+    await supabase.from("questions").delete().in("id", questionIds);
+    return {
+      error: `Upload cancelled to prevent corrupted data. Options error: ${optError.message}`,
+    };
+  }
+
+  revalidatePath("/resources");
+  return { success: true, count: questionsToInsert.length };
+}
+export async function deleteQuestion(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("questions").delete().eq("id", id);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/resources");
+  revalidatePath("/admin/resources");
+  return { success: true };
+}

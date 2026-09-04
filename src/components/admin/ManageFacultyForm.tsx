@@ -2,32 +2,22 @@
 
 import { useState, useTransition } from "react";
 import { promoteUserToAdmin } from "@/lib/actions/admin";
-import {
-  ShieldCheck,
-  UserPlus,
-  Loader2,
-  CheckCircle,
-  AlertCircle,
-} from "lucide-react";
+import { ShieldCheck, UserPlus, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function ManageFacultyForm() {
   const [email, setEmail] = useState("");
   const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setMessage(null);
 
     startTransition(async () => {
       const res = await promoteUserToAdmin(email);
       if (res?.error) {
-        setMessage({ type: "error", text: res.error });
+        toast.error(res.error);
       } else if (res?.message) {
-        setMessage({ type: "success", text: res.message });
+        toast.success(res.message);
         setEmail("");
       }
     });
@@ -49,23 +39,6 @@ export default function ManageFacultyForm() {
           <strong className="text-amber-600">/register</strong> first.
         </p>
       </div>
-
-      {message && (
-        <div
-          className={`p-4 rounded-xl flex items-center gap-3 text-xs sm:text-sm font-medium ${
-            message.type === "success"
-              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-              : "bg-rose-50 text-rose-700 border border-rose-200"
-          }`}
-        >
-          {message.type === "success" ? (
-            <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-          ) : (
-            <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
-          )}
-          <span>{message.text}</span>
-        </div>
-      )}
 
       <div>
         <label className="block text-xs font-semibold text-slate-700 mb-1">
