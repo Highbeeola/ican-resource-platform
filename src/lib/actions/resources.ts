@@ -20,31 +20,25 @@ export async function createResource(formData: FormData) {
     return { error: "Please fill in all required fields and select a file." };
   }
 
-  // 1. Upload File to Supabase Storage
   const fileExt = file.name.split(".").pop();
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
   const filePath = `resources/${fileName}`;
 
+  // 1. Upload File
   const { error: uploadError } = await supabase.storage
     .from("ican-resources")
-    .upload(filePath, file, {
-      contentType: file.type,
-      upsert: false,
-    });
+    .upload(filePath, file, { contentType: file.type, upsert: false });
 
   if (uploadError) {
-    console.error("Storage Upload Error:", uploadError);
     return { error: `Failed to upload file: ${uploadError.message}` };
   }
 
-  // 2. Get Public URL for the uploaded file
+  // Synchronously compute public URL without extra server roundtrips
   const { data: publicUrlData } = supabase.storage
     .from("ican-resources")
     .getPublicUrl(filePath);
 
-  const fileUrl = publicUrlData.publicUrl;
-
-  // 3. Insert metadata record into Database
+  // 2. Insert metadata record
   const { error: dbError } = await supabase.from("resources").insert({
     title,
     description,
@@ -53,19 +47,17 @@ export async function createResource(formData: FormData) {
     module_id: moduleId,
     resource_type: resourceType,
     exam_diet: dietYear,
-    file_url: fileUrl,
+    file_url: publicUrlData.publicUrl,
     file_size_bytes: file.size,
     is_published: true,
   });
 
   if (dbError) {
-    console.error("Database Insert Error:", dbError);
     return { error: `Failed to save resource record: ${dbError.message}` };
   }
 
-  revalidatePath("/resources");
+  // Refresh routes instantly
   revalidatePath("/admin/resources");
-
   return { success: true };
 }
 
@@ -129,5 +121,35 @@ export async function saveResourceMetadata(data: {
   revalidatePath("/resources");
   revalidatePath("/admin/resources");
 
+  return { success: true };
+}
+
+export async function bulkDeleteItems(items: { id: string; type: string }[]) {
+  const supabase = await createClient();
+
+  const resourceIds = items
+    .filter((i) => i.type === "resource")
+    .map((i) => i.id);
+  const videoIds = items.filter((i) => i.type === "video").map((i) => i.id);
+  const questionIds = items
+    .filter((i) => i.type === "question")
+    .map((i) => i.id);
+
+  const deleteTasks = [];
+
+  if (resourceIds.length > 0) {
+    deleteTasks.push(supabase.from("resources").delete().in("id", resourceIds));
+  }
+  if (videoIds.length > 0) {
+    deleteTasks.push(supabase.from("videos").delete().in("id", videoIds));
+  }
+  if (questionIds.length > 0) {
+    deleteTasks.push(supabase.from("questions").delete().in("id", questionIds));
+  }
+
+  // Delete from all 3 tables simultaneously
+  await Promise.all(deleteTasks);
+
+  revalidatePath("/admin/resources");
   return { success: true };
 }

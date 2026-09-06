@@ -8,13 +8,13 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 300px; /* Starts at a good size */
-  height: auto !important; /* Forces it to stretch infinitely */
+  min-height: 300px; 
+  height: auto !important; 
 }
 .ql-editor {
   min-height: 300px;
   height: auto !important;
-  overflow-y: hidden; /* Removes the internal scrollbar so the page itself scrolls */
+  overflow-y: hidden;
 }
 
 /* GLOBAL IMAGE RESTRAINTS FOR BOTH EDITOR AND STUDENT VIEWER */

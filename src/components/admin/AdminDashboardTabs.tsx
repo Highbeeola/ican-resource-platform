@@ -12,10 +12,11 @@ import AddQuestionForm from "@/components/admin/AddQuestionForm";
 import AddLecturerForm from "@/components/admin/AddLecturerForm";
 import AddModuleForm from "@/components/admin/AddModuleForm";
 import UpdateLiveClassForm from "@/components/admin/UpdateLiveClassForm";
-import { deleteResource } from "@/lib/actions/resources";
+import { deleteResource, bulkDeleteItems } from "@/lib/actions/resources";
 import { deleteVideo } from "@/lib/actions/videos";
 import { deleteQuestion } from "@/lib/actions/quiz";
 import { deleteSubject } from "@/lib/actions/subjects";
+import toast from "react-hot-toast";
 import {
   FileText,
   Video as VideoIcon,
@@ -87,6 +88,97 @@ export default function AdminDashboardTabs({
   const [questionsList, setQuestionsList] = useState<any[]>(initialQuestions);
   const [isPending, startTransition] = useTransition();
 
+  // BULK DELETE STATE
+  const [selectedItems, setSelectedItems] = useState<
+    { id: string; type: string }[]
+  >([]);
+  const [isDeletingBulk, setIsDeletingBulk] = useState(false);
+
+  async function handleBulkDelete() {
+    if (
+      !confirm(
+        `Are you sure you want to delete ${selectedItems.length} selected item(s)?`,
+      )
+    )
+      return;
+
+    setIsDeletingBulk(true);
+    try {
+      const res = await bulkDeleteItems(selectedItems);
+
+      if (res?.success) {
+        toast.success(`${selectedItems.length} items deleted successfully!`);
+        // Update local state by filtering out deleted items
+        const resourceIdsToRemove = new Set(
+          selectedItems.filter((i) => i.type === "resource").map((i) => i.id),
+        );
+        const videoIdsToRemove = new Set(
+          selectedItems.filter((i) => i.type === "video").map((i) => i.id),
+        );
+        const questionIdsToRemove = new Set(
+          selectedItems.filter((i) => i.type === "question").map((i) => i.id),
+        );
+
+        if (resourceIdsToRemove.size > 0) {
+          setResourcesList((prev) =>
+            prev.filter((r) => !resourceIdsToRemove.has(r.id)),
+          );
+        }
+        if (videoIdsToRemove.size > 0) {
+          setVideosList((prev) =>
+            prev.filter((v) => !videoIdsToRemove.has(v.id)),
+          );
+        }
+        if (questionIdsToRemove.size > 0) {
+          setQuestionsList((prev) =>
+            prev.filter((q) => !questionIdsToRemove.has(q.id)),
+          );
+        }
+
+        setSelectedItems([]);
+      } else {
+        // Safely check if 'error' exists on the return object
+        const errorMessage =
+          res && "error" in res
+            ? (res as any).error
+            : "Failed to delete items.";
+        toast.error(errorMessage);
+      }
+    } catch (error) {
+      toast.error("An error occurred during bulk deletion.");
+    } finally {
+      setIsDeletingBulk(false);
+    }
+  }
+
+  // TOGGLE SINGLE CHECKBOX
+  function toggleSelection(id: string, type: string) {
+    setSelectedItems((prev) => {
+      const exists = prev.find((item) => item.id === id);
+      if (exists) return prev.filter((item) => item.id !== id);
+      return [...prev, { id, type }];
+    });
+  }
+
+  // TOGGLE SELECT ALL
+  const allCurrentItems = [
+    ...resourcesList.map((r) => ({ id: r.id, type: "resource" })),
+    ...videosList.map((v) => ({ id: v.id, type: "video" })),
+    ...questionsList.map((q) => ({ id: q.id, type: "question" })),
+  ];
+
+  const isAllSelected =
+    allCurrentItems.length > 0 &&
+    selectedItems.length === allCurrentItems.length;
+
+  function toggleSelectAll() {
+    if (isAllSelected) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(allCurrentItems);
+    }
+  }
+
   const handleDeleteResource = (id: string, title: string) => {
     if (!confirm(`Delete "${title}"?`)) return;
 
@@ -94,6 +186,7 @@ export default function AdminDashboardTabs({
       const res = await deleteResource(id);
       if (!res?.error) {
         setResourcesList((prev) => prev.filter((item) => item.id !== id));
+        setSelectedItems((prev) => prev.filter((item) => item.id !== id));
       } else {
         alert(res.error);
       }
@@ -107,6 +200,7 @@ export default function AdminDashboardTabs({
       const res = await deleteVideo(id);
       if (!res?.error) {
         setVideosList((prev) => prev.filter((item) => item.id !== id));
+        setSelectedItems((prev) => prev.filter((item) => item.id !== id));
       } else {
         alert(res.error);
       }
@@ -120,6 +214,7 @@ export default function AdminDashboardTabs({
       const res = await deleteQuestion(id);
       if (res?.success) {
         setQuestionsList((prev) => prev.filter((q) => q.id !== id));
+        setSelectedItems((prev) => prev.filter((item) => item.id !== id));
       } else {
         alert(res?.error || "Failed to delete question");
       }
@@ -373,7 +468,6 @@ export default function AdminDashboardTabs({
           <AddSubjectForm levels={levels} />
           <UpdateLiveClassForm subjects={subjects} />
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-            {/* FIXED TITLE: Removed "ICAN" since we support ATSWA and custom courses */}
             <h3 className="font-bold text-[#1e3a8a] text-base border-b border-slate-100 pb-3">
               Existing Courses ({subjects.length})
             </h3>
@@ -403,7 +497,6 @@ export default function AdminDashboardTabs({
                       {sub.level?.name}
                     </span>
 
-                    {/* NEW DELETE BUTTON */}
                     <button
                       onClick={async () => {
                         if (
@@ -411,7 +504,16 @@ export default function AdminDashboardTabs({
                             `Are you sure you want to delete the entire "${sub.name}" course? This will also delete all its PDFs, videos, and quizzes!`,
                           )
                         ) {
-                          await deleteSubject(sub.id);
+                          const res = await deleteSubject(sub.id);
+                          if (res?.success) {
+                            toast.success(
+                              "Course and all its contents deleted!",
+                            );
+                          } else {
+                            toast.error(
+                              res?.error || "Failed to delete course.",
+                            );
+                          }
                         }
                       }}
                       className="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-md transition cursor-pointer"
@@ -452,15 +554,40 @@ export default function AdminDashboardTabs({
                 lectures, and practice questions.
               </p>
             </div>
-            {isPending && (
-              <Loader2 className="w-5 h-5 text-amber-500 animate-spin flex-shrink-0" />
-            )}
+
+            <div className="flex items-center gap-3">
+              {isPending && (
+                <Loader2 className="w-5 h-5 text-amber-500 animate-spin flex-shrink-0" />
+              )}
+              {selectedItems.length > 0 && (
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={isDeletingBulk}
+                  className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm disabled:opacity-50 cursor-pointer"
+                >
+                  {isDeletingBulk ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                  Delete {selectedItems.length} Selected
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="overflow-x-auto w-full">
             <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[600px]">
               <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] sm:text-[11px] font-semibold border-b border-slate-200">
                 <tr>
+                  <th className="p-3 sm:p-4 w-10">
+                    <input
+                      type="checkbox"
+                      checked={isAllSelected}
+                      onChange={toggleSelectAll}
+                      className="w-4 h-4 text-blue-600 rounded border-slate-300 cursor-pointer"
+                    />
+                  </th>
                   <th className="p-3 sm:p-4">Title / Question</th>
                   <th className="p-3 sm:p-4">Subject</th>
                   <th className="p-3 sm:p-4">Stage</th>
@@ -473,7 +600,7 @@ export default function AdminDashboardTabs({
                 videosList.length === 0 &&
                 questionsList.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-slate-400">
+                    <td colSpan={6} className="p-8 text-center text-slate-400">
                       No materials or questions published yet. Use the tabs
                       above to create your first content!
                     </td>
@@ -483,6 +610,16 @@ export default function AdminDashboardTabs({
                     {/* PDF / ARTICLES LIST */}
                     {resourcesList.map((res: Resource) => (
                       <tr key={res.id} className="hover:bg-slate-50 transition">
+                        <td className="p-3 sm:p-4">
+                          <input
+                            type="checkbox"
+                            checked={
+                              !!selectedItems.find((i) => i.id === res.id)
+                            }
+                            onChange={() => toggleSelection(res.id, "resource")}
+                            className="w-4 h-4 text-blue-600 rounded border-slate-300 cursor-pointer"
+                          />
+                        </td>
                         <td className="p-3 sm:p-4 font-semibold text-slate-900">
                           {res.article_content ? "📝" : "📄"} {res.title}
                         </td>
@@ -525,6 +662,16 @@ export default function AdminDashboardTabs({
                     {/* VIDEOS LIST */}
                     {videosList.map((vid: Video) => (
                       <tr key={vid.id} className="hover:bg-slate-50 transition">
+                        <td className="p-3 sm:p-4">
+                          <input
+                            type="checkbox"
+                            checked={
+                              !!selectedItems.find((i) => i.id === vid.id)
+                            }
+                            onChange={() => toggleSelection(vid.id, "video")}
+                            className="w-4 h-4 text-blue-600 rounded border-slate-300 cursor-pointer"
+                          />
+                        </td>
                         <td className="p-3 sm:p-4 font-semibold text-slate-900">
                           🎥 {vid.title}
                         </td>
@@ -555,11 +702,19 @@ export default function AdminDashboardTabs({
                     {/* PRACTICE QUESTIONS LIST */}
                     {questionsList.map((q: any) => (
                       <tr key={q.id} className="hover:bg-slate-50 transition">
+                        <td className="p-3 sm:p-4">
+                          <input
+                            type="checkbox"
+                            checked={!!selectedItems.find((i) => i.id === q.id)}
+                            onChange={() => toggleSelection(q.id, "question")}
+                            className="w-4 h-4 text-blue-600 rounded border-slate-300 cursor-pointer"
+                          />
+                        </td>
                         <td className="p-3 sm:p-4 font-semibold text-slate-900 truncate max-w-xs">
                           ❓ {q.question_text}
                         </td>
-                        <td className="p-3 sm:p-4 text-slate-600">
-                          {q.subject?.name || "—"}
+                        <td className="p-3 sm:p-4 text-slate-500">
+                          {q.subject?.level?.name || "—"}
                         </td>
                         <td className="p-3 sm:p-4 text-slate-500">—</td>
                         <td className="p-3 sm:p-4">
@@ -606,7 +761,7 @@ export default function AdminDashboardTabs({
           </div>
           <button
             onClick={() => setActiveTab("lecturer_profile")}
-            className="px-4 py-2 bg-white border border-blue-200 text-[#1e3a8a] text-xs font-bold rounded-lg hover:bg-blue-100 transition whitespace-nowrap"
+            className="px-4 py-2 bg-white border border-blue-200 text-[#1e3a8a] text-xs font-bold rounded-lg hover:bg-blue-100 transition whitespace-nowrap cursor-pointer"
           >
             Create Profile
           </button>

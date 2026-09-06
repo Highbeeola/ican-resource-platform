@@ -1,5 +1,4 @@
 "use client";
-
 import {
   useState,
   useTransition,
@@ -15,7 +14,6 @@ import { createArticleLesson } from "@/lib/actions/articles";
 import { createClient } from "@/lib/supabase/client";
 import { Edit3, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
-
 import "react-quill-new/dist/quill.snow.css";
 
 // Dynamic import for ReactQuill with forwardRef

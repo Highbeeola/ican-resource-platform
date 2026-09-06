@@ -36,9 +36,10 @@ export default async function AdminResourcesPage() {
     .from("videos")
     .select("*, subject:subjects(name), level:levels(name)")
     .order("created_at", { ascending: false });
+
   const { data: questions } = await supabase
     .from("questions")
-    .select("*, subject:subjects(name, level_id)")
+    .select("*, subject:subjects(name, level:levels(name))")
     .order("created_at", { ascending: false });
 
   return (

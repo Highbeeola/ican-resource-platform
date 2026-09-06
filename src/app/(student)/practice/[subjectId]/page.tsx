@@ -89,7 +89,6 @@ export default function PracticeQuizPage() {
           </p>
         </div>
 
-        {/* RESULTS BANNER */}
         {/* RESULTS BANNER (Dynamic Colors) */}
         {result && (
           <div
@@ -179,7 +178,6 @@ export default function PracticeQuizPage() {
                     const isSelected = userAnswers[q.id] === opt.id;
                     const isCorrect = opt.is_correct;
 
-                    // STYLING LOGIC FOR LIGHT THEME
                     let optionStyle =
                       "bg-slate-50 border-slate-200 text-slate-700 hover:border-[#1e3a8a] hover:bg-blue-50";
 

@@ -20,12 +20,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      {/* 1. Updated min-h-screen -> min-h-dvh */}
+    
       <body className="bg-slate-50 text-slate-900 min-h-dvh flex flex-col antialiased">
         <AnnouncementBanner announcement={announcement} />
         <Toaster position="top-center" />
         <Navbar />
-        {/* 2. Added flex flex-col flex-1 */}
+        {/* Added flex flex-col flex-1 */}
         <main className="flex-1 flex flex-col">{children}</main>
         <Footer />
       </body>

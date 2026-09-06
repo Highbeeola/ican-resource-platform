@@ -77,7 +77,6 @@ export default async function SubjectDetailsPage({ params }: Props) {
       .or(
         `resource_id.in.(${resourceIds.join(",") || "00000000-0000-0000-0000-000000000000"}),video_id.in.(${videoIds.join(",") || "00000000-0000-0000-0000-000000000000"})`,
       );
-
     completedCount = count || 0;
   }
 
