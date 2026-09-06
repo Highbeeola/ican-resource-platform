@@ -11,6 +11,7 @@ import {
   Star,
   ArrowRight,
   Video,
+  Clock,
 } from "lucide-react";
 
 interface PageProps {
@@ -156,73 +157,96 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
         ) : (
           /* DEFAULT COURSES CATALOG GRID */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {subjects.map((sub: Subject) => (
-              <div
-                key={sub.id}
-                className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:border-amber-500 hover:shadow-md transition flex flex-col justify-between space-y-5"
-              >
-                <div className="space-y-3">
-                  <span className="px-3 py-1 bg-blue-50 text-blue-600 border border-blue-100 text-xs font-semibold rounded-full uppercase">
-                    {sub.level?.name || "ICAN"} Stage
-                  </span>
+            {subjects.map((sub: Subject) => {
+              const pdfCount = sub.resources?.length || 0;
+              const videoCount = sub.videos?.length || 0;
+              const totalContent = pdfCount + videoCount;
 
-                  <h3 className="text-xl font-bold text-[#1e3a8a] leading-snug">
-                    {sub.name}
-                  </h3>
-
-                  {/* DYNAMIC RESOURCE & VIDEO BADGES */}
-                  <div className="flex flex-wrap items-center gap-2 mt-2">
-                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-[#1e3a8a] border border-blue-100 rounded-md text-xs font-bold">
-                      <FileText className="w-3.5 h-3.5" />
-                      {sub.resources?.length || 0} PDFs
-                    </span>
-
-                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-600 border border-rose-100 rounded-md text-xs font-bold">
-                      <Video className="w-3.5 h-3.5" />
-                      {sub.videos?.length || 0} Videos
-                    </span>
-
-                    {(sub.resources?.length || 0) +
-                      (sub.videos?.length || 0) ===
-                      0 && (
-                      <span className="px-2.5 py-1 bg-slate-100 text-slate-500 border border-slate-200 rounded-md text-xs font-medium">
-                        Coming Soon
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="pt-2 flex flex-wrap items-center gap-3 text-xs border-t border-slate-100 text-slate-500">
-                    {sub.instructor_name ? (
-                      <span className="flex items-center gap-1 font-medium text-slate-700">
-                        <User className="w-3.5 h-3.5 text-amber-500" />
-                        {sub.instructor_name}
-                      </span>
-                    ) : (
-                      <span className="text-slate-500">KRL Academy</span>
-                    )}
-
-                    {sub.estimated_hours ? (
-                      <span>{sub.estimated_hours} Hours</span>
-                    ) : null}
-
-                    {sub.avg_rating ? (
-                      <span className="flex items-center gap-1 text-amber-500 font-semibold">
-                        <Star className="w-3.5 h-3.5 fill-amber-500" />
-                        {sub.avg_rating} / 5.0
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-
+              return (
                 <Link
                   href={`/resources/subject/${sub.id}`}
-                  className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-center transition text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm"
+                  key={sub.id}
+                  className="group flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300"
                 >
-                  <span>View Course & Materials</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {/* 1. VISUAL ANCHOR: Sleek top accent bar */}
+                  <div className="h-2 w-full bg-[#1e3a8a] group-hover:bg-[#f59e0b] transition-colors"></div>
+
+                  <div className="p-6 flex flex-col flex-1">
+                    {/* Top Badges */}
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="px-3 py-1 bg-blue-50 text-[#1e3a8a] text-[10px] font-bold uppercase tracking-wider rounded-md">
+                        {sub.level?.name || "ICAN"} Stage
+                      </span>
+                      {sub.avg_rating ? (
+                        <span className="flex items-center gap-1 text-amber-500 text-xs font-bold">
+                          <Star className="w-3.5 h-3.5 fill-amber-400" />
+                          {sub.avg_rating}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {/* Title & Description */}
+                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-[#1e3a8a] transition-colors leading-snug mb-2">
+                      {sub.name}
+                    </h3>
+                    <p className="text-sm text-slate-500 line-clamp-2 mb-6 flex-1">
+                      {sub.description ||
+                        `Comprehensive preparation covering key concepts, past questions, and lecture notes for ${sub.name}.`}
+                    </p>
+
+                    {/* 2 & 3. CLEAN BADGE LOGIC: Hide zeros, show "Coming Soon" if empty */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {totalContent === 0 ? (
+                        <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-md text-xs font-medium border border-slate-200">
+                          Coming Soon
+                        </span>
+                      ) : (
+                        <>
+                          {pdfCount > 0 && (
+                            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-md text-xs font-bold">
+                              <FileText className="w-3.5 h-3.5" />
+                              {pdfCount} PDFs
+                            </span>
+                          )}
+                          {videoCount > 0 && (
+                            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-100 rounded-md text-xs font-bold">
+                              <Video className="w-3.5 h-3.5" />
+                              {videoCount} Videos
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+
+                    {/* 4. METADATA FOOTER & SUBTLE CTA */}
+                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
+                      <div className="flex items-center gap-4 text-xs text-slate-500">
+                        <span className="flex items-center gap-1.5">
+                          <User className="w-3.5 h-3.5 text-slate-400" />
+                          <span
+                            className="truncate max-w-[120px]"
+                            title={sub.instructor_name || "KRL Academy"}
+                          >
+                            {sub.instructor_name || "KRL Academy"}
+                          </span>
+                        </span>
+                        {sub.estimated_hours ? (
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-slate-400" />
+                            {sub.estimated_hours}h
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {/* Subtle Hover CTA */}
+                      <div className="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-[#1e3a8a] text-slate-400 group-hover:text-white flex items-center justify-center transition-colors flex-shrink-0">
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </div>
                 </Link>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

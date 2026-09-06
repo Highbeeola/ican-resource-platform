@@ -11,9 +11,11 @@ import ManageFacultyForm from "@/components/admin/ManageFacultyForm";
 import AddQuestionForm from "@/components/admin/AddQuestionForm";
 import AddLecturerForm from "@/components/admin/AddLecturerForm";
 import AddModuleForm from "@/components/admin/AddModuleForm";
+import UpdateLiveClassForm from "@/components/admin/UpdateLiveClassForm";
 import { deleteResource } from "@/lib/actions/resources";
 import { deleteVideo } from "@/lib/actions/videos";
 import { deleteQuestion } from "@/lib/actions/quiz";
+import { deleteSubject } from "@/lib/actions/subjects";
 import {
   FileText,
   Video as VideoIcon,
@@ -365,15 +367,17 @@ export default function AdminDashboardTabs({
         </div>
       )}
 
-      {/* SUBJECT MANAGEMENT */}
+      {/* COURSE/SUBJECT MANAGEMENT */}
       {activeTab === "subject" && (
         <div className="space-y-6">
           <AddSubjectForm levels={levels} />
-
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm text-slate-900">
+          <UpdateLiveClassForm subjects={subjects} />
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            {/* FIXED TITLE: Removed "ICAN" since we support ATSWA and custom courses */}
             <h3 className="font-bold text-[#1e3a8a] text-base border-b border-slate-100 pb-3">
-              Existing ICAN Subjects ({subjects.length})
+              Existing Courses ({subjects.length})
             </h3>
+
             <div className="divide-y divide-slate-100">
               {subjects.map((sub: Subject) => (
                 <div
@@ -384,17 +388,38 @@ export default function AdminDashboardTabs({
                     <p className="font-semibold text-slate-900">
                       {sub.name}{" "}
                       {sub.code && (
-                        <span className="text-slate-400">({sub.code})</span>
+                        <span className="text-slate-500">({sub.code})</span>
                       )}
                     </p>
                     <p className="text-slate-500 text-xs mt-0.5">
+                      {sub.level?.programme?.name || "Programme"} •{" "}
                       {sub.level?.name} Stage •{" "}
                       {sub.instructor_name || "KRL Academy"}
                     </p>
                   </div>
-                  <span className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200/60 rounded-full font-semibold uppercase text-[11px]">
-                    {sub.level?.name}
-                  </span>
+
+                  <div className="flex items-center gap-3">
+                    <span className="px-3 py-1 bg-blue-50 text-[#1e3a8a] rounded-full font-bold uppercase text-[10px] hidden sm:block">
+                      {sub.level?.name}
+                    </span>
+
+                    {/* NEW DELETE BUTTON */}
+                    <button
+                      onClick={async () => {
+                        if (
+                          confirm(
+                            `Are you sure you want to delete the entire "${sub.name}" course? This will also delete all its PDFs, videos, and quizzes!`,
+                          )
+                        ) {
+                          await deleteSubject(sub.id);
+                        }
+                      }}
+                      className="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-md transition cursor-pointer"
+                      title="Delete Course"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

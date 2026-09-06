@@ -1,11 +1,16 @@
 import { getLevels, getSubjects } from "@/lib/services/resources";
+import { getModules } from "@/lib/actions/modules"; // Import your modules fetcher
 import VideoUploadForm from "@/components/admin/VideoUploadForm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export default async function AdminNewVideoPage() {
-  const levels = await getLevels();
-  const subjects = await getSubjects();
+  // Fetch levels, subjects, and modules concurrently
+  const [levels, subjects, modules] = await Promise.all([
+    getLevels(),
+    getSubjects(),
+    getModules(),
+  ]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
@@ -32,7 +37,7 @@ export default async function AdminNewVideoPage() {
 
         {/* FORM CONTAINER */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-          <VideoUploadForm levels={levels} subjects={subjects} />
+          <VideoUploadForm levels={levels} subjects={subjects} modules={modules} />
         </div>
       </div>
     </div>

@@ -33,6 +33,9 @@ export interface Subject {
   level?: Level;
   resources?: { id: string }[];
   videos?: { id: string }[];
+  meet_url?: string | null;
+  meet_time?: string | null;
+
 }
 
 export interface Resource {

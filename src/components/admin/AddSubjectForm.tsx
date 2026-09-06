@@ -122,7 +122,7 @@ export default function AddSubjectForm({ levels }: Props) {
           />
         </div>
 
-        <div>
+        <div className="sm:col-span-2 lg:col-span-3">
           <label className="block text-xs font-semibold text-slate-700 mb-1">
             Live Class Schedule (Optional)
           </label>
