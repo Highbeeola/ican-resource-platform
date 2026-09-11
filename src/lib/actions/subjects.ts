@@ -15,6 +15,8 @@ export async function createSubject(formData: FormData) {
     ? parseInt(formData.get("estimated_hours") as string)
     : 0;
   const description = formData.get("description") as string;
+  const startDate = formData.get("start_date") as string;
+  const endDate = formData.get("end_date") as string;
 
   if (!levelId || !name) {
     return { error: "Level and Subject Name are required." };
@@ -29,6 +31,8 @@ export async function createSubject(formData: FormData) {
     description: description || null,
     meet_url: meetUrl || null,
     meet_time: meetTime || null,
+    start_date: startDate || null,
+    end_date: endDate || null,
   });
 
   if (error) {
@@ -36,12 +40,13 @@ export async function createSubject(formData: FormData) {
   }
   revalidatePath("/resources");
   revalidatePath("/admin/subjects");
+  revalidatePath("/admin/resources");
   return { success: true };
 }
 
 export async function deleteSubject(id: string) {
   const supabase = await createClient();
-  // Since ON DELETE CASCADE  is in the database,
+  // Since ON DELETE CASCADE is in the database,
   // deleting a course will automatically clean up its modules, videos, and PDFs!
   const { error } = await supabase.from("subjects").delete().eq("id", id);
   if (error) {

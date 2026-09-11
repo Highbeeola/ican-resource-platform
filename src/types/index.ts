@@ -35,7 +35,8 @@ export interface Subject {
   videos?: { id: string }[];
   meet_url?: string | null;
   meet_time?: string | null;
-
+  start_date?: string | null;
+  end_date?: string | null;
 }
 
 export interface Resource {

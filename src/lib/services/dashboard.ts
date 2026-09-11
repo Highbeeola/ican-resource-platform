@@ -3,51 +3,93 @@ import { createClient } from "@/lib/supabase/server";
 export async function getStudentDashboardData(userId: string) {
   const supabase = await createClient();
 
-  // 1. Fetch User Profile
+  // 1. Profile & Basic Metrics
   const { data: profile } = await supabase
     .from("profiles")
-    .select("*, level:levels(*)")
+    .select("*, level:levels(*, programme:programmes(*))")
     .eq("id", userId)
     .single();
-
-  // 2. Fetch User Completed Items
-  const { data: progressItems, count: completedCount } = await supabase
+  const { count: completedCount } = await supabase
     .from("user_progress")
-    .select("*, resource:resources(*), video:videos(*)", { count: "exact" })
+    .select("*", { count: "exact", head: true })
     .eq("user_id", userId);
-
-  // 3. Fetch User Favorited Materials
-  const { data: favorites, count: favoritesCount } = await supabase
+  const { count: quizCount } = await supabase
+    .from("quiz_attempts")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
+  const { data: favorites } = await supabase
     .from("favorites")
     .select(
-      "*, resource:resources(*, subject:subjects(*)), video:videos(*, subject:subjects(*))",
-      { count: "exact" },
+      "*, resource:resources(*, subject:subjects(name)), video:videos(*, subject:subjects(name))",
     )
     .eq("user_id", userId);
 
-  // 4. Fetch User Quiz Attempts
-  const { data: quizAttempts, count: quizCount } = await supabase
+  // 2. Recent Activity ("Continue Learning")
+  const { data: recentActivity } = await supabase
+    .from("user_progress")
+    .select(
+      "*, resource:resources(*, subject:subjects(name)), video:videos(*, subject:subjects(name))",
+    )
+    .eq("user_id", userId)
+    .order("last_accessed_at", { ascending: false })
+    .limit(3);
+
+  // 3. Performance & Recommendations Engine
+  const { data: quizAttempts } = await supabase
     .from("quiz_attempts")
-    .select("*", { count: "exact" })
+    .select("score_percentage, quiz_id, subject:subjects(name)")
     .eq("user_id", userId);
 
-  // 5. Calculate Average Quiz Score
   let avgQuizScore = 0;
+  let weakSubjectIds: string[] = [];
+
   if (quizAttempts && quizAttempts.length > 0) {
     const totalScore = quizAttempts.reduce(
       (acc, curr) => acc + curr.score_percentage,
       0,
     );
     avgQuizScore = Math.round(totalScore / quizAttempts.length);
+
+    // Identify subjects where average is < 50%
+    const subScores: Record<string, { total: number; count: number }> = {};
+    quizAttempts.forEach((a) => {
+      if (!subScores[a.quiz_id]) subScores[a.quiz_id] = { total: 0, count: 0 };
+      subScores[a.quiz_id].total += a.score_percentage;
+      subScores[a.quiz_id].count += 1;
+    });
+    weakSubjectIds = Object.keys(subScores).filter(
+      (id) => subScores[id].total / subScores[id].count < 50,
+    );
   }
+
+  // Fetch Recommended Revision Materials for weak subjects
+  let recommendations: any[] = [];
+  if (weakSubjectIds.length > 0) {
+    const { data: recVideos } = await supabase
+      .from("videos")
+      .select("*, subject:subjects(name)")
+      .in("subject_id", weakSubjectIds)
+      .limit(3);
+    recommendations = recVideos || [];
+  }
+
+  // 4. Latest Announcement
+  const { data: announcement } = await supabase
+    .from("announcements")
+    .select("*")
+    .eq("is_published", true)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   return {
     profile,
     completedCount: completedCount || 0,
-    favoritesCount: favoritesCount || 0,
     quizCount: quizCount || 0,
     avgQuizScore,
     favorites: favorites || [],
-    recentProgress: progressItems || [],
+    recentActivity: recentActivity || [],
+    recommendations,
+    announcement,
   };
 }

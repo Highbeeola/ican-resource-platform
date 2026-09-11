@@ -8,8 +8,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 300px; 
-  height: auto !important; 
+  min-height: 300px;
+  height: auto !important;
 }
 .ql-editor {
   min-height: 300px;
@@ -28,4 +28,47 @@
   box-shadow:
     0 4px 6px -1px rgb(0 0 0 / 0.1),
     0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* FIX QUILL TOOLBAR ON MOBILE */
+.ql-toolbar.ql-snow {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px;
+}
+.ql-formats {
+  margin-right: 8px !important;
+  margin-bottom: 4px !important;
+}
+/*FIX MOBILE DOUBLE-TAP & DELAY ISSUES*/
+a,
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"] {
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* On touch devices, prevent "hover" styles from sticking and requiring a second tap */
+@media (hover: none) {
+  a:active,
+  button:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Style native HTML date placeholders to match Slate 400 */
+input[type="date"]::-webkit-datetime-edit,
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #94a3b8; /* slate-400 */
+}
+
+/* Switch to dark slate text once a value is picked */
+input[type="date"]:valid::-webkit-datetime-edit {
+  color: #0f172a; /* slate-900 */
 }

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { submitQuizAttempt } from "@/lib/actions/quiz";
 import Link from "next/link";
+import { toast } from "react-hot-toast";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -12,6 +13,7 @@ import {
   Loader2,
   Lightbulb,
   HelpCircle,
+  Timer,
 } from "lucide-react";
 
 export default function PracticeQuizPage() {
@@ -23,6 +25,17 @@ export default function PracticeQuizPage() {
   const [result, setResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Timer states
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  // Ref to hold current userAnswers for auto-submit
+  const userAnswersRef = useRef(userAnswers);
+  useEffect(() => {
+    userAnswersRef.current = userAnswers;
+  }, [userAnswers]);
+
+  // Fetch Subject and Practice Questions
   useEffect(() => {
     const supabase = createClient();
 
@@ -42,28 +55,70 @@ export default function PracticeQuizPage() {
       .limit(20)
       .then(({ data, error }) => {
         if (error) console.error("Error fetching questions:", error);
-        setQuestions(data || []);
+        const fetchedQuestions = data || [];
+        setQuestions(fetchedQuestions);
         setIsLoading(false);
+
+        // Start timer: 90 seconds (1.5 minutes) per question
+        if (fetchedQuestions.length > 0) {
+          setTimeLeft(fetchedQuestions.length * 90);
+          setIsTimerRunning(true);
+        }
       });
   }, [subjectId]);
 
-  function handleOptionSelect(questionId: string, optionId: string) {
-    if (result) return; // Disable changing answers after submission
-    setUserAnswers((prev) => ({ ...prev, [questionId]: optionId }));
-  }
-
-  function handleSubmitQuiz() {
+  // Submit Quiz Function
+  const handleSubmitQuiz = useCallback(() => {
+    setIsTimerRunning(false); // Stop timer
     startTransition(async () => {
       const res = await submitQuizAttempt(
         subjectId as string,
         questions.length,
-        userAnswers,
+        userAnswersRef.current,
       );
+
       if (res.success) {
         setResult(res);
+        toast.success("Practice Test Graded!");
         window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        toast.error("Failed to submit quiz.");
       }
     });
+  }, [subjectId, questions.length]);
+
+  // Timer Countdown Logic
+  useEffect(() => {
+    if (!isTimerRunning || timeLeft <= 0) return;
+
+    const timerId = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerId);
+          setIsTimerRunning(false);
+          toast.error("Time is up! Auto-submitting your quiz...");
+          handleSubmitQuiz(); // Auto-submit on expiration
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [isTimerRunning, timeLeft, handleSubmitQuiz]);
+
+  // Format seconds into MM:SS
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
+  function handleOptionSelect(questionId: string, optionId: string) {
+    if (result) return; // Disable changing answers after submission
+    setUserAnswers((prev) => ({ ...prev, [questionId]: optionId }));
   }
 
   return (
@@ -78,18 +133,34 @@ export default function PracticeQuizPage() {
           <span>Back to {subject?.name || "Course"}</span>
         </Link>
 
-        {/* HEADER */}
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a]">
-            {subject?.name || "Subject"} Practice Test
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Answer practice questions and receive automatic scoring with
-            solution explanations.
-          </p>
+        {/* HEADER & FLOATING TIMER */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a]">
+              {subject?.name || "Subject"} Practice Test
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Answer practice questions and receive automatic scoring with
+              solution explanations.
+            </p>
+          </div>
+
+          {/* EXAM TIMER */}
+          {!result && questions.length > 0 && !isLoading && (
+            <div
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 shadow-sm font-mono text-lg font-bold transition-colors ${
+                timeLeft <= 60
+                  ? "bg-rose-50 border-rose-500 text-rose-600 animate-pulse"
+                  : "bg-white border-slate-200 text-[#1e3a8a]"
+              }`}
+            >
+              <Timer className="w-5 h-5" />
+              <span>{formatTime(timeLeft)}</span>
+            </div>
+          )}
         </div>
 
-        {/* RESULTS BANNER (Dynamic Colors) */}
+        {/* RESULTS BANNER */}
         {result && (
           <div
             className={`border-2 rounded-2xl p-6 sm:p-8 text-center space-y-3 shadow-sm transition-colors ${
@@ -127,6 +198,7 @@ export default function PracticeQuizPage() {
             </p>
           </div>
         )}
+
         {/* LOADING STATE */}
         {isLoading ? (
           <div className="bg-white border border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center space-y-3 shadow-sm">
@@ -204,8 +276,10 @@ export default function PracticeQuizPage() {
                       <button
                         key={opt.id}
                         onClick={() => handleOptionSelect(q.id, opt.id)}
-                        disabled={!!result} // Disable clicks after submission
-                        className={`w-full text-left p-3.5 rounded-xl border text-xs sm:text-sm transition flex items-center justify-between ${!result ? "cursor-pointer" : ""} ${optionStyle}`}
+                        disabled={!!result}
+                        className={`w-full text-left p-3.5 rounded-xl border text-xs sm:text-sm transition flex items-center justify-between ${
+                          !result ? "cursor-pointer" : ""
+                        } ${optionStyle}`}
                       >
                         <span>{opt.option_text}</span>
                         {isSelected && !result && (
@@ -236,7 +310,7 @@ export default function PracticeQuizPage() {
         )}
 
         {/* SUBMIT BUTTON */}
-        {!result && questions.length > 0 && (
+        {!result && questions.length > 0 && !isLoading && (
           <button
             onClick={handleSubmitQuiz}
             disabled={isPending || Object.keys(userAnswers).length === 0}

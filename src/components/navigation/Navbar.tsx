@@ -18,6 +18,7 @@ import {
   FileText,
   Info,
   Mail,
+  Bell,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import BrandLogo from "@/components/BrandLogo";
@@ -26,13 +27,14 @@ export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState<boolean>(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 1. Prevent background scrolling when mobile menu is open
+  // Prevent background scrolling when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -44,6 +46,7 @@ export default function Navbar() {
     };
   }, [mobileMenuOpen]);
 
+  // Handle outside clicks for user dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -57,29 +60,53 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Fetch User, Role, and Unread Announcements Count
   useEffect(() => {
     const supabase = createClient();
-    async function checkUser(sessionUser: any) {
+
+    async function checkUserAndNotifications(sessionUser: any) {
       setUser(sessionUser);
+
       if (sessionUser) {
+        // Fetch Admin Status
         const { data: profile } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", sessionUser.id)
           .single();
         setIsAdmin(profile?.role === "admin");
+
+        // Fetch Total Published Announcements & Read Announcements
+        const { count: totalNotes } = await supabase
+          .from("announcements")
+          .select("id", { count: "exact", head: true })
+          .eq("is_published", true);
+
+        const { count: readNotes } = await supabase
+          .from("user_notification_reads")
+          .select("announcement_id", { count: "exact", head: true })
+          .eq("user_id", sessionUser.id);
+
+        const unread = (totalNotes || 0) - (readNotes || 0);
+        setUnreadCount(unread > 0 ? unread : 0);
       } else {
         setIsAdmin(false);
+        setUnreadCount(0);
       }
     }
-    supabase.auth.getUser().then(({ data }) => checkUser(data.user));
+
+    supabase.auth
+      .getUser()
+      .then(({ data }) => checkUserAndNotifications(data.user));
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) =>
-      checkUser(session?.user ?? null),
+      checkUserAndNotifications(session?.user ?? null),
     );
+
     return () => subscription.unsubscribe();
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -145,7 +172,7 @@ export default function Navbar() {
                   <button
                     onMouseEnter={() => setMoreDropdownOpen(true)}
                     onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
-                    className="flex items-center gap-1 hover:text-[#1e3a8a] transition py-2 focus:outline-none"
+                    className="flex items-center gap-1 hover:text-[#1e3a8a] transition py-2 focus:outline-none cursor-pointer"
                   >
                     <span>More</span>
                     <ChevronDown className="w-4 h-4" />
@@ -210,6 +237,18 @@ export default function Navbar() {
                   </Link>
                 )}
 
+                {/* DESKTOP NOTIFICATION BELL */}
+                <Link
+                  href="/notifications"
+                  className="relative p-2 text-slate-600 hover:text-[#1e3a8a] hover:bg-slate-100 rounded-full transition"
+                  title="Notifications"
+                >
+                  <Bell className="w-5 h-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse border-2 border-white" />
+                  )}
+                </Link>
+
                 {/* USER AVATAR DROPDOWN */}
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
@@ -235,6 +274,17 @@ export default function Navbar() {
                       <LayoutDashboard className="w-4 h-4" /> Dashboard
                     </Link>
                     <Link
+                      href="/notifications"
+                      className="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                    >
+                      <Bell className="w-4 h-4" /> Notifications
+                      {unreadCount > 0 && (
+                        <span className="ml-auto bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </Link>
+                    <Link
                       href="/performance"
                       className="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 hover:text-[#1e3a8a] transition"
                     >
@@ -249,7 +299,7 @@ export default function Navbar() {
                     <div className="border-t border-slate-100 mt-1 pt-1">
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-rose-50 text-rose-600 transition text-left font-medium"
+                        className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-rose-50 text-rose-600 transition text-left font-medium cursor-pointer"
                       >
                         <LogOut className="w-4 h-4" /> Logout
                       </button>
@@ -314,6 +364,22 @@ export default function Navbar() {
                   >
                     <LayoutDashboard className="w-5 h-5" /> Dashboard
                   </Link>
+
+                  {/* MOBILE DRAWER NOTIFICATION LINK */}
+                  <Link
+                    href="/notifications"
+                    className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Bell className="w-5 h-5 text-slate-400" /> Notifications
+                    </div>
+                    {unreadCount > 0 && (
+                      <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </Link>
+
                   <Link
                     href="/performance"
                     className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center gap-3"
@@ -348,7 +414,7 @@ export default function Navbar() {
               {user ? (
                 <button
                   onClick={handleLogout}
-                  className="w-full p-2.5 bg-rose-50 text-rose-600 rounded-lg text-sm font-bold flex items-center justify-center gap-2"
+                  className="w-full p-2.5 bg-rose-50 text-rose-600 rounded-lg text-sm font-bold flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" /> Logout
                 </button>
@@ -373,7 +439,7 @@ export default function Navbar() {
         )}
       </header>
 
-      {/* 2. BACKDROP OVERLAY FOR MOBILE MENU */}
+      {/* BACKDROP OVERLAY FOR MOBILE MENU */}
       {mobileMenuOpen && (
         <div
           onClick={() => setMobileMenuOpen(false)}

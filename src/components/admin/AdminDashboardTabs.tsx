@@ -23,6 +23,7 @@ import {
   BookOpen,
   Layers,
   Download,
+  X,
   Trash2,
   ShieldCheck,
   Megaphone,
@@ -88,6 +89,9 @@ export default function AdminDashboardTabs({
   const [questionsList, setQuestionsList] = useState<any[]>(initialQuestions);
   const [isPending, startTransition] = useTransition();
 
+  // NUDGE STATE
+  const [hideNudge, setHideNudge] = useState(false);
+
   // BULK DELETE STATE
   const [selectedItems, setSelectedItems] = useState<
     { id: string; type: string }[]
@@ -108,7 +112,6 @@ export default function AdminDashboardTabs({
 
       if (res?.success) {
         toast.success(`${selectedItems.length} items deleted successfully!`);
-        // Update local state by filtering out deleted items
         const resourceIdsToRemove = new Set(
           selectedItems.filter((i) => i.type === "resource").map((i) => i.id),
         );
@@ -137,7 +140,6 @@ export default function AdminDashboardTabs({
 
         setSelectedItems([]);
       } else {
-        // Safely check if 'error' exists on the return object
         const errorMessage =
           res && "error" in res
             ? (res as any).error
@@ -187,6 +189,7 @@ export default function AdminDashboardTabs({
       if (!res?.error) {
         setResourcesList((prev) => prev.filter((item) => item.id !== id));
         setSelectedItems((prev) => prev.filter((item) => item.id !== id));
+        toast.success("Resource deleted!");
       } else {
         alert(res.error);
       }
@@ -201,6 +204,7 @@ export default function AdminDashboardTabs({
       if (!res?.error) {
         setVideosList((prev) => prev.filter((item) => item.id !== id));
         setSelectedItems((prev) => prev.filter((item) => item.id !== id));
+        toast.success("Video deleted!");
       } else {
         alert(res.error);
       }
@@ -215,6 +219,7 @@ export default function AdminDashboardTabs({
       if (res?.success) {
         setQuestionsList((prev) => prev.filter((q) => q.id !== id));
         setSelectedItems((prev) => prev.filter((item) => item.id !== id));
+        toast.success("Question deleted!");
       } else {
         alert(res?.error || "Failed to delete question");
       }
@@ -541,17 +546,16 @@ export default function AdminDashboardTabs({
       {/* LECTURER PROFILES */}
       {isSuperAdmin && activeTab === "lecturer_profile" && <AddLecturerForm />}
 
-      {/* ALL PUBLISHED MATERIALS TABLE */}
+      {/* ALL PUBLISHED MATERIALS LIBRARY */}
       {activeTab === "list" && (
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm text-slate-900">
-          <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between">
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+          <div className="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center">
             <div>
               <h2 className="font-bold text-[#1e3a8a] text-base">
                 Published Resources Library ({totalPublishedCount})
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                View and manage all uploaded PDF documents, embedded video
-                lectures, and practice questions.
+                View and manage all uploaded documents, videos, and questions.
               </p>
             </div>
 
@@ -570,13 +574,160 @@ export default function AdminDashboardTabs({
                   ) : (
                     <Trash2 className="w-4 h-4" />
                   )}
-                  Delete {selectedItems.length} Selected
+                  <span className="hidden sm:inline">Delete Selected</span> (
+                  {selectedItems.length})
                 </button>
               )}
             </div>
           </div>
 
-          <div className="overflow-x-auto w-full">
+          {/* ====== MOBILE VIEW (STACKED CARDS) ====== */}
+          <div className="md:hidden flex flex-col p-4 gap-3 bg-slate-50">
+            {resourcesList.length === 0 &&
+            videosList.length === 0 &&
+            questionsList.length === 0 ? (
+              <p className="text-center text-slate-500 text-sm py-8">
+                No materials published yet.
+              </p>
+            ) : (
+              <>
+                {resourcesList.map((res: Resource) => (
+                  <div
+                    key={res.id}
+                    className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3"
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={!!selectedItems.find((i) => i.id === res.id)}
+                          onChange={() => toggleSelection(res.id, "resource")}
+                          className="w-4 h-4 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
+                        />
+                        <h4 className="font-bold text-slate-900 text-sm leading-snug">
+                          {res.article_content ? "📝" : "📄"} {res.title}
+                        </h4>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-end">
+                      <div>
+                        <p className="text-xs text-slate-600">
+                          {res.subject?.name || "No Subject"}
+                        </p>
+                        <span className="inline-block mt-1 px-2 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-bold rounded-full uppercase">
+                          {res.resource_type?.replace("_", " ")}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {res.file_url && (
+                          <a
+                            href={res.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 bg-blue-50 text-[#1e3a8a] rounded-lg text-xs font-semibold"
+                            title="View PDF"
+                          >
+                            <Download className="w-4 h-4" />
+                          </a>
+                        )}
+                        <button
+                          onClick={() =>
+                            handleDeleteResource(res.id, res.title)
+                          }
+                          disabled={isPending}
+                          className="p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition"
+                          title="Delete Resource"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {videosList.map((vid: Video) => (
+                  <div
+                    key={vid.id}
+                    className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3"
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={!!selectedItems.find((i) => i.id === vid.id)}
+                          onChange={() => toggleSelection(vid.id, "video")}
+                          className="w-4 h-4 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
+                        />
+                        <h4 className="font-bold text-slate-900 text-sm leading-snug">
+                          🎥 {vid.title}
+                        </h4>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-end">
+                      <div>
+                        <p className="text-xs text-slate-600">
+                          {vid.subject?.name || "No Subject"}
+                        </p>
+                        <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-[9px] font-bold rounded-full uppercase">
+                          VIDEO LECTURE
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteVideo(vid.id, vid.title)}
+                        disabled={isPending}
+                        className="p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition"
+                        title="Delete Video"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {questionsList.map((q: any) => (
+                  <div
+                    key={q.id}
+                    className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3"
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          checked={!!selectedItems.find((i) => i.id === q.id)}
+                          onChange={() => toggleSelection(q.id, "question")}
+                          className="w-4 h-4 mt-0.5 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
+                        />
+                        <h4 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2">
+                          ❓ {q.question_text}
+                        </h4>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-end">
+                      <div>
+                        <p className="text-xs text-slate-600">
+                          {q.subject?.level?.name || "No Subject"}
+                        </p>
+                        <span className="inline-block mt-1 px-2 py-0.5 bg-purple-100 text-purple-800 text-[9px] font-bold rounded-full uppercase">
+                          PRACTICE QUESTION
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteQuestion(q.id)}
+                        disabled={isPending}
+                        className="p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition"
+                        title="Delete Question"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+
+          {/* ====== DESKTOP VIEW (TRADITIONAL TABLE) ====== */}
+          <div className="hidden md:block overflow-x-auto w-full">
             <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[600px]">
               <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] sm:text-[11px] font-semibold border-b border-slate-200">
                 <tr>
@@ -742,11 +893,19 @@ export default function AdminDashboardTabs({
         </div>
       )}
 
-      {/* LECTURER DIRECTORY NUDGE */}
-      {isSuperAdmin && activeTab !== "lecturer_profile" && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="bg-[#1e3a8a] text-white p-2 rounded-lg">
+      {/* DISMISSIBLE LECTURER DIRECTORY NUDGE */}
+      {isSuperAdmin && !hideNudge && activeTab !== "lecturer_profile" && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm relative gap-4">
+          <button
+            onClick={() => setHideNudge(true)}
+            className="absolute top-2 right-2 p-1 text-blue-400 hover:text-blue-700 transition cursor-pointer"
+            title="Dismiss"
+          >
+            <X className="w-4 h-4" />
+          </button>
+
+          <div className="flex items-center gap-3 pr-6">
+            <div className="bg-[#1e3a8a] text-white p-2 rounded-lg flex-shrink-0">
               <UserPlus className="w-4 h-4" />
             </div>
             <div>
@@ -761,7 +920,7 @@ export default function AdminDashboardTabs({
           </div>
           <button
             onClick={() => setActiveTab("lecturer_profile")}
-            className="px-4 py-2 bg-white border border-blue-200 text-[#1e3a8a] text-xs font-bold rounded-lg hover:bg-blue-100 transition whitespace-nowrap cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2 bg-white border border-blue-200 text-[#1e3a8a] text-xs font-bold rounded-lg hover:bg-blue-100 transition whitespace-nowrap cursor-pointer"
           >
             Create Profile
           </button>
