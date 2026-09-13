@@ -104,26 +104,30 @@ export default function NotificationsPage() {
                   <div
                     key={note.id}
                     onClick={() => handleNotificationClick(note.id)}
-                    className={`border rounded-2xl p-5 cursor-pointer transition-all ${
+                    className={`border rounded-2xl p-4 sm:p-5 cursor-pointer transition-all relative ${
                       isRead
                         ? "bg-white border-slate-200 hover:border-slate-300"
                         : "bg-blue-50 border-blue-200 shadow-sm"
                     }`}
                   >
-                    <div className="flex gap-4 items-start">
+                    <div className="flex gap-3 sm:gap-4 items-start">
+                      {/* ICON */}
                       <div
-                        className={`p-2.5 rounded-lg flex-shrink-0 mt-1 ${
+                        className={`p-2 sm:p-2.5 rounded-lg flex-shrink-0 mt-0.5 ${
                           isRead
                             ? "bg-slate-100 text-slate-500"
                             : "bg-[#f59e0b] text-white"
                         }`}
                       >
-                        <Megaphone className="w-5 h-5" />
+                        <Megaphone className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
-                      <div className="flex-1 space-y-1">
-                        <div className="flex justify-between items-start gap-4">
+
+                      {/* TEXT CONTENT (min-w-0 prevents flexbox from squishing it!) */}
+                      <div className="flex-1 min-w-0 pr-6 sm:pr-8 space-y-1">
+                        {/* TITLE & DATE (Stacks on mobile, side-by-side on desktop) */}
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1.5 sm:gap-4">
                           <h3
-                            className={`text-base ${
+                            className={`text-sm sm:text-base leading-snug break-words pr-2 ${
                               isRead
                                 ? "font-semibold text-slate-700"
                                 : "font-bold text-[#1e3a8a]"
@@ -131,7 +135,8 @@ export default function NotificationsPage() {
                           >
                             {note.title}
                           </h3>
-                          <div className="flex items-center gap-2">
+
+                          <div className="flex items-center gap-2 flex-shrink-0">
                             {!isRead && (
                               <span className="bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
                                 New
@@ -159,7 +164,8 @@ export default function NotificationsPage() {
                         )}
                       </div>
 
-                      <div className="mt-1 text-slate-400">
+                      {/* CHEVRON (Positioned absolute so it never squishes text) */}
+                      <div className="absolute right-4 top-5 text-slate-400">
                         {isExpanded ? (
                           <ChevronUp className="w-5 h-5" />
                         ) : (

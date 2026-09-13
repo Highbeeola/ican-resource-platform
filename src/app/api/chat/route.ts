@@ -16,7 +16,6 @@ export async function POST(req: Request) {
 
     const { message, subjectName } = await req.json();
 
-    // The Persona Prompt
     // The Persona Prompt & Strict Guardrails
     const prompt = `You are a professional, highly intelligent accounting tutor for ICAN and ATSWA students in Nigeria. 
     The student is currently studying the subject: ${subjectName}. 

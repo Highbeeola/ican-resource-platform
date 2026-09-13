@@ -1,21 +1,17 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
+import { toast } from "react-hot-toast";
 
 export default function ForgotPasswordPage() {
   const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setMessage(null);
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
 
@@ -26,12 +22,11 @@ export default function ForgotPasswordPage() {
       });
 
       if (error) {
-        setMessage({ type: "error", text: error.message });
+        toast.error(error.message);
       } else {
-        setMessage({
-          type: "success",
-          text: "If an account exists, a password reset link has been sent to your email.",
-        });
+        toast.success(
+          "If an account exists, a password reset link has been sent to your email.",
+        );
       }
     });
   }
@@ -48,23 +43,6 @@ export default function ForgotPasswordPage() {
             Enter your email to receive a password reset link.
           </p>
         </div>
-
-        {message && (
-          <div
-            className={`p-3 border rounded-lg text-xs flex items-center gap-2 ${
-              message.type === "success"
-                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                : "bg-red-50 text-red-700 border-red-200"
-            }`}
-          >
-            {message.type === "success" ? (
-              <CheckCircle className="w-4 h-4 flex-shrink-0" />
-            ) : (
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            )}
-            <span>{message.text}</span>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

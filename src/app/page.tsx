@@ -32,23 +32,30 @@ export default async function HomePage() {
             expert study materials, pathfinders, and revision guides.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-2">
+          {/* INTEGRATED CTA BUTTONS */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
+            {/* ALWAYS SHOW EXPLORE COURSES */}
             <Link
-              href={user ? "/dashboard" : "/resources"}
-              className="w-full sm:w-auto px-7 py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition text-sm"
+              href="/resources"
+              className="w-full sm:w-auto px-8 py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-md shadow-md transition text-center"
             >
-              <span>
-                {user ? "Go to Dashboard" : "Explore Study Materials"}
-              </span>
-              <ArrowRight className="w-4 h-4" />
+              Explore Courses &rarr;
             </Link>
 
-            {!user && (
+            {/* DYNAMIC SECONDARY BUTTON */}
+            {user ? (
+              <Link
+                href="/dashboard"
+                className="w-full sm:w-auto px-8 py-3.5 bg-transparent border-2 border-white hover:bg-white hover:text-[#1e3a8a] text-white font-bold rounded-md transition text-center"
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
               <Link
                 href="/register"
-                className="w-full sm:w-auto px-7 py-3.5 bg-transparent hover:bg-white hover:text-[#2a52be] text-white border-2 border-white font-semibold rounded-xl flex items-center justify-center gap-2 transition text-sm"
+                className="w-full sm:w-auto px-8 py-3.5 bg-transparent border-2 border-white hover:bg-white hover:text-[#1e3a8a] text-white font-bold rounded-md transition text-center"
               >
-                <span>Register Free</span>
+                Register Free
               </Link>
             )}
           </div>

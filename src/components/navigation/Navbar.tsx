@@ -125,6 +125,9 @@ export default function Navbar() {
   }
 
   const handleLogout = async () => {
+    if (!window.confirm("Are you sure you want to log out?")) {
+      return;
+    }
     const supabase = createClient();
     await supabase.auth.signOut();
     setUser(null);

@@ -17,7 +17,7 @@ export default function AnnouncementBanner({ announcement }: Props) {
 
   useEffect(() => {
     if (announcement) {
-      // Check if the browser remembers we dismissed this specific announcement
+      
       const isDismissedLocally = localStorage.getItem(
         `dismissed_banner_${announcement.id}`,
       );

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Bot, X, Send, Loader2, Sparkles } from "lucide-react";
-import ReactMarkdown from "react-markdown"; // Optional: if you don't have this, you can just render text normally, but markdown makes AI bolding look nice!
+import ReactMarkdown from "react-markdown";
 
 interface Props {
   subjectName: string;
@@ -21,6 +21,19 @@ export default function AITutorPanel({ subjectName }: Props) {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Prevent body scrolling when the modal/drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -81,84 +94,94 @@ export default function AITutorPanel({ subjectName }: Props) {
         </button>
       )}
 
-      {/* CHAT WINDOW */}
+      {/* CHAT WINDOW & BACKDROP */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-[90vw] sm:w-[400px] h-[500px] bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
-          {/* HEADER */}
-          <div className="bg-[#1e3a8a] p-4 flex items-center justify-between text-white">
-            <div className="flex items-center gap-2">
-              <div className="bg-[#f59e0b] p-1.5 rounded-lg">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-bold text-sm">CA Prep AI Tutor</h3>
-                <p className="text-[10px] text-blue-200">
-                  Powered by Gemini Flash 2.5
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-blue-200 hover:text-white transition p-1"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+        <>
+          {/* Optional: Semi-transparent backdrop to click outside & close */}
+          <div
+            onClick={() => setIsOpen(false)}
+            className="fixed inset-0 bg-black/40 z-40 sm:bg-transparent"
+          />
 
-          {/* CHAT AREA */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-            {chatHistory.map((chat, idx) => (
-              <div
-                key={idx}
-                className={`flex ${chat.role === "user" ? "justify-end" : "justify-start"}`}
+          <div className="fixed bottom-0 right-0 w-full h-[85dvh] sm:bottom-6 sm:right-6 sm:w-[400px] sm:h-[500px] bg-white sm:border border-slate-200 rounded-t-3xl sm:rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
+            {/* HEADER */}
+            <div className="bg-[#1e3a8a] p-4 flex items-center justify-between text-white">
+              <div className="flex items-center gap-2">
+                <div className="bg-[#f59e0b] p-1.5 rounded-lg">
+                  <Bot className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm">CA Prep AI Tutor</h3>
+                  <p className="text-[10px] text-blue-200">
+                    Powered by Gemini Flash 3.6
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-blue-200 hover:text-white transition p-1"
               >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* CHAT AREA */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+              {chatHistory.map((chat, idx) => (
                 <div
-                  className={`max-w-[80%] p-3 rounded-2xl text-sm ${
-                    chat.role === "user"
-                      ? "bg-[#1e3a8a] text-white rounded-tr-sm"
-                      : "bg-white border border-slate-200 text-slate-700 rounded-tl-sm shadow-sm"
+                  key={idx}
+                  className={`flex ${
+                    chat.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  <div className="prose prose-sm prose-slate max-w-none text-current leading-relaxed">
-                    <ReactMarkdown>{chat.text}</ReactMarkdown>
+                  <div
+                    className={`max-w-[80%] p-3 rounded-2xl text-sm ${
+                      chat.role === "user"
+                        ? "bg-[#1e3a8a] text-white rounded-tr-sm"
+                        : "bg-white border border-slate-200 text-slate-700 rounded-tl-sm shadow-sm"
+                    }`}
+                  >
+                    <div className="prose prose-sm prose-slate max-w-none text-current leading-relaxed">
+                      <ReactMarkdown>{chat.text}</ReactMarkdown>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-sm flex items-center gap-2 shadow-sm">
-                  <Sparkles className="w-4 h-4 text-[#f59e0b] animate-pulse" />
-                  <span className="text-xs text-slate-500 font-medium">
-                    AI is thinking...
-                  </span>
+              ))}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-sm flex items-center gap-2 shadow-sm">
+                    <Sparkles className="w-4 h-4 text-[#f59e0b] animate-pulse" />
+                    <span className="text-xs text-slate-500 font-medium">
+                      AI is thinking...
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
-            <div ref={chatEndRef} />
-          </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
 
-          {/* INPUT AREA */}
-          <form
-            onSubmit={handleSend}
-            className="p-3 bg-white border-t border-slate-100 flex gap-2"
-          >
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Ask about IAS 16, taxation..."
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-[#1e3a8a]"
-            />
-            <button
-              type="submit"
-              disabled={isTyping || !message.trim()}
-              className="p-2.5 bg-[#f59e0b] hover:bg-[#d97706] text-white rounded-xl transition disabled:opacity-50"
+            {/* INPUT AREA */}
+            <form
+              onSubmit={handleSend}
+              className="p-3 bg-white border-t border-slate-100 flex gap-2"
             >
-              <Send className="w-4 h-4" />
-            </button>
-          </form>
-        </div>
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Ask about IAS 16, taxation..."
+                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm focus:outline-none focus:border-[#1e3a8a]"
+              />
+              <button
+                type="submit"
+                disabled={isTyping || !message.trim()}
+                className="p-2.5 bg-[#f59e0b] hover:bg-[#d97706] text-white rounded-xl transition disabled:opacity-50"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </form>
+          </div>
+        </>
       )}
     </>
   );
