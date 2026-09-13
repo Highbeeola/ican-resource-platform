@@ -34,7 +34,6 @@ export default function Navbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Prevent background scrolling when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -46,7 +45,6 @@ export default function Navbar() {
     };
   }, [mobileMenuOpen]);
 
-  // Handle outside clicks for user dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -60,7 +58,6 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch User, Role, and Unread Announcements Count
   useEffect(() => {
     const supabase = createClient();
 
@@ -68,7 +65,6 @@ export default function Navbar() {
       setUser(sessionUser);
 
       if (sessionUser) {
-        // Fetch Admin Status
         const { data: profile } = await supabase
           .from("profiles")
           .select("role")
@@ -76,7 +72,6 @@ export default function Navbar() {
           .single();
         setIsAdmin(profile?.role === "admin");
 
-        // Fetch Total Published Announcements & Read Announcements
         const { count: totalNotes } = await supabase
           .from("announcements")
           .select("id", { count: "exact", head: true })
@@ -134,21 +129,31 @@ export default function Navbar() {
     window.location.href = "/";
   };
 
+  const isActive = (path: string) => pathname === path;
+
   return (
     <>
-      <header className="bg-white border-b border-slate-200 text-slate-900 sticky top-0 z-50">
+      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 text-slate-900 sticky top-0 z-40 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          {/* BRAND LOGO */}
           <Link href="/" className="flex-shrink-0">
             <BrandLogo />
           </Link>
 
-          {/* DESKTOP NAVIGATION */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <Link href="/" className="hover:text-[#1e3a8a] transition">
+            <Link
+              href="/"
+              className={`transition hover:text-[#1e3a8a] ${
+                isActive("/") ? "text-[#1e3a8a] font-semibold" : ""
+              }`}
+            >
               Home
             </Link>
-            <Link href="/resources" className="hover:text-[#1e3a8a] transition">
+            <Link
+              href="/resources"
+              className={`transition hover:text-[#1e3a8a] ${
+                isActive("/resources") ? "text-[#1e3a8a] font-semibold" : ""
+              }`}
+            >
               Courses
             </Link>
 
@@ -167,7 +172,6 @@ export default function Navbar() {
                   Past Questions
                 </Link>
 
-                {/* MORE DROPDOWN */}
                 <div
                   className="relative"
                   onMouseLeave={() => setMoreDropdownOpen(false)}
@@ -182,22 +186,22 @@ export default function Navbar() {
                   </button>
 
                   {moreDropdownOpen && (
-                    <div className="absolute top-full left-0 w-40 bg-white rounded-lg shadow-lg border border-slate-200 py-2 text-slate-700 z-50">
+                    <div className="absolute top-full left-0 w-44 bg-white rounded-xl shadow-xl border border-slate-200/80 py-2 text-slate-700 z-50">
                       <Link
                         href="/lecturers"
-                        className="block px-4 py-2 hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                        className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
                       >
                         Faculty
                       </Link>
                       <Link
                         href="/about"
-                        className="block px-4 py-2 hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                        className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
                       >
                         About Us
                       </Link>
                       <Link
                         href="/contact"
-                        className="block px-4 py-2 hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                        className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
                       >
                         Contact
                       </Link>
@@ -208,19 +212,18 @@ export default function Navbar() {
             )}
           </nav>
 
-          {/* AUTH / USER MENU */}
           <div className="hidden md:flex items-center gap-3">
             {!user ? (
               <>
                 <Link
                   href="/login"
-                  className="text-sm font-bold bg-[#1e3a8a] hover:bg-blue-900 text-white px-6 py-2 rounded-md transition shadow-sm"
+                  className="text-sm font-bold bg-[#1e3a8a] hover:bg-blue-900 active:scale-95 text-white px-5 py-2 rounded-lg transition shadow-sm"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  className="text-sm font-semibold text-slate-700 border border-slate-300 hover:bg-slate-50 px-5 py-2 rounded-md transition"
+                  className="text-sm font-semibold text-slate-700 border border-slate-300 hover:bg-slate-50 active:scale-95 px-5 py-2 rounded-lg transition"
                 >
                   Register Free
                 </Link>
@@ -233,14 +236,13 @@ export default function Navbar() {
                 {isAdmin && (
                   <Link
                     href="/admin/resources"
-                    className="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 px-3 py-2 rounded-md border border-slate-300 flex items-center gap-1.5 transition"
+                    className="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 px-3 py-1.5 rounded-lg border border-slate-300 flex items-center gap-1.5 transition"
                   >
                     <Shield className="w-3.5 h-3.5 text-[#1e3a8a]" />{" "}
                     <span>Admin</span>
                   </Link>
                 )}
 
-                {/* DESKTOP NOTIFICATION BELL */}
                 <Link
                   href="/notifications"
                   className="relative p-2 text-slate-600 hover:text-[#1e3a8a] hover:bg-slate-100 rounded-full transition"
@@ -252,7 +254,6 @@ export default function Navbar() {
                   )}
                 </Link>
 
-                {/* USER AVATAR DROPDOWN */}
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   className="w-9 h-9 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-700 hover:bg-slate-200 transition cursor-pointer focus:outline-none"
@@ -261,9 +262,9 @@ export default function Navbar() {
                 </button>
 
                 {userDropdownOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-2 text-slate-700 z-50">
+                  <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200/80 py-2 text-slate-700 z-50">
                     <div className="px-4 py-2 border-b border-slate-100 mb-1">
-                      <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                         Signed in as
                       </p>
                       <p className="text-sm font-bold text-[#1e3a8a] truncate">
@@ -272,13 +273,13 @@ export default function Navbar() {
                     </div>
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
                     >
                       <LayoutDashboard className="w-4 h-4" /> Dashboard
                     </Link>
                     <Link
                       href="/notifications"
-                      className="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
                     >
                       <Bell className="w-4 h-4" /> Notifications
                       {unreadCount > 0 && (
@@ -289,20 +290,20 @@ export default function Navbar() {
                     </Link>
                     <Link
                       href="/performance"
-                      className="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
                     >
                       <Target className="w-4 h-4" /> Performance Analytics
                     </Link>
                     <Link
                       href="/settings"
-                      className="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
                     >
                       <Settings className="w-4 h-4" /> Settings
                     </Link>
                     <div className="border-t border-slate-100 mt-1 pt-1">
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-rose-50 text-rose-600 transition text-left font-medium cursor-pointer"
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-rose-50 text-rose-600 transition text-left font-medium cursor-pointer"
                       >
                         <LogOut className="w-4 h-4" /> Logout
                       </button>
@@ -313,34 +314,56 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* MOBILE HAMBURGER BUTTON */}
           <div className="flex md:hidden items-center">
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-600 hover:text-slate-900 focus:outline-none cursor-pointer"
+              onClick={() => setMobileMenuOpen(true)}
+              className="p-2 text-slate-600 hover:text-slate-900 focus:outline-none cursor-pointer rounded-lg hover:bg-slate-100 transition"
+              aria-label="Open Menu"
             >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
+              <Menu className="w-6 h-6" />
             </button>
           </div>
         </div>
+      </header>
 
-        {/* MOBILE MENU DRAWER */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-4 shadow-xl text-slate-800 relative z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
-            <nav className="flex flex-col gap-1 text-sm font-semibold">
+      {/* FULL-SCREEN MOBILE NAVIGATION SHEET */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 h-dvh min-h-screen z-50 md:hidden bg-white flex flex-col justify-between overflow-y-auto">
+          <div className="px-4 h-16 flex items-center justify-between border-b border-slate-200 flex-shrink-0 sticky top-0 bg-white z-10">
+            <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+              <BrandLogo />
+            </Link>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 text-slate-500 hover:text-slate-800 focus:outline-none rounded-full hover:bg-slate-100 transition cursor-pointer"
+              aria-label="Close Menu"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="px-5 py-6 flex-1 space-y-6">
+            <nav className="flex flex-col gap-1 text-base">
+              <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
+                Main Navigation
+              </span>
               <Link
                 href="/"
-                className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center gap-3"
+                className={`p-3 rounded-xl flex items-center gap-3 transition font-medium ${
+                  isActive("/")
+                    ? "bg-blue-50/80 text-[#1e3a8a] font-bold"
+                    : "text-slate-700 hover:bg-slate-50"
+                }`}
               >
                 <Home className="w-5 h-5 text-slate-400" /> Home
               </Link>
               <Link
                 href="/resources"
-                className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center gap-3"
+                className={`p-3 rounded-xl flex items-center gap-3 transition font-medium ${
+                  isActive("/resources")
+                    ? "bg-blue-50/80 text-[#1e3a8a] font-bold"
+                    : "text-slate-700 hover:bg-slate-50"
+                }`}
               >
                 <BookOpen className="w-5 h-5 text-slate-400" /> Courses
               </Link>
@@ -349,105 +372,119 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/resources?type=pathfinder"
-                    className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center gap-3"
+                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
                   >
                     <FileText className="w-5 h-5 text-slate-400" /> Pathfinders
                   </Link>
                   <Link
                     href="/resources?type=past_question"
-                    className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center gap-3"
+                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
                   >
                     <FileText className="w-5 h-5 text-slate-400" /> Past
                     Questions
                   </Link>
-                  <div className="border-t border-slate-100 my-1"></div>
+
+                  <div className="border-t border-slate-100 my-3" />
+
+                  <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
+                    Account & Analytics
+                  </span>
                   <Link
                     href="/dashboard"
-                    className="p-2.5 rounded-lg bg-blue-50 text-[#1e3a8a] flex items-center gap-3"
+                    className={`p-3 rounded-xl flex items-center gap-3 transition font-medium ${
+                      isActive("/dashboard")
+                        ? "bg-blue-50/80 text-[#1e3a8a] font-bold"
+                        : "text-slate-700 hover:bg-slate-50"
+                    }`}
                   >
-                    <LayoutDashboard className="w-5 h-5" /> Dashboard
+                    <LayoutDashboard className="w-5 h-5 text-slate-400" />{" "}
+                    Dashboard
                   </Link>
-
-                  {/* MOBILE DRAWER NOTIFICATION LINK */}
                   <Link
                     href="/notifications"
-                    className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center justify-between"
+                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center justify-between font-medium transition"
                   >
                     <div className="flex items-center gap-3">
                       <Bell className="w-5 h-5 text-slate-400" /> Notifications
                     </div>
                     {unreadCount > 0 && (
-                      <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      <span className="bg-rose-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                         {unreadCount}
                       </span>
                     )}
                   </Link>
-
                   <Link
                     href="/performance"
-                    className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center gap-3"
+                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
                   >
                     <Target className="w-5 h-5 text-slate-400" /> Performance
                     Analytics
                   </Link>
+
+                  <div className="border-t border-slate-100 my-3" />
+
+                  <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
+                    Company
+                  </span>
                   <Link
                     href="/lecturers"
-                    className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center gap-3"
+                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
                   >
                     <UserIcon className="w-5 h-5 text-slate-400" /> Faculty
                     Directory
                   </Link>
                   <Link
                     href="/about"
-                    className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center gap-3"
+                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
                   >
                     <Info className="w-5 h-5 text-slate-400" /> About Us
                   </Link>
                   <Link
                     href="/contact"
-                    className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center gap-3"
+                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
                   >
                     <Mail className="w-5 h-5 text-slate-400" /> Contact
                   </Link>
                 </>
               )}
             </nav>
+          </div>
 
-            <div className="pt-2 border-t border-slate-100">
-              {user ? (
+          <div className="p-5 border-t border-slate-100 bg-slate-50/60 flex-shrink-0">
+            {user ? (
+              <div className="space-y-3">
+                <div className="px-1 text-xs text-slate-500 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="truncate">
+                    Signed in as{" "}
+                    <strong className="text-slate-800">{user.email}</strong>
+                  </span>
+                </div>
                 <button
                   onClick={handleLogout}
-                  className="w-full p-2.5 bg-rose-50 text-rose-600 rounded-lg text-sm font-bold flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3 bg-rose-50 hover:bg-rose-100/80 text-rose-600 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer border border-rose-100"
                 >
                   <LogOut className="w-4 h-4" /> Logout
                 </button>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <Link
-                    href="/login"
-                    className="w-full py-2.5 text-center bg-[#1e3a8a] text-white rounded-lg text-sm font-bold shadow-sm"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="w-full py-2.5 text-center bg-white text-slate-700 border border-slate-200 rounded-lg text-sm font-bold shadow-sm"
-                  >
-                    Register Free
-                  </Link>
-                </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2.5">
+                <Link
+                  href="/login"
+                  className="w-full py-3 text-center bg-[#1e3a8a] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-blue-900 transition"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="w-full py-3 text-center bg-white text-slate-700 border border-slate-200 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition"
+                >
+                  Register Free
+                </Link>
+              </div>
+            )}
           </div>
-        )}
-      </header>
-
-      {/* BACKDROP OVERLAY FOR MOBILE MENU */}
-      {mobileMenuOpen && (
-        <div
-          onClick={() => setMobileMenuOpen(false)}
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden"
-        />
+        </div>
       )}
     </>
   );

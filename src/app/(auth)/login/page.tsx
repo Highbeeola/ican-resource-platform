@@ -52,28 +52,30 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 py-12">
-      <div className="w-full max-w-md bg-white border border-slate-200 p-8 rounded-2xl shadow-xl space-y-6">
+    <div className="min-h-screen min-h-dvh bg-slate-50/50 flex flex-col justify-center items-center p-4 sm:p-6 py-8 sm:py-12">
+      <div className="w-full max-w-md bg-white border border-slate-200/80 p-6 sm:p-8 rounded-2xl shadow-xl shadow-slate-200/50 space-y-6">
         <div className="text-center space-y-2">
-          <BrandLogo />
-          <h1 className="text-2xl font-bold text-slate-900 pt-2">
+          <div className="flex justify-center">
+            <BrandLogo />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 pt-1 tracking-tight">
             Welcome Back
           </h1>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-500 leading-relaxed">
             Log in to access your study materials and pathfinders.
           </p>
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <div className="p-3.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-xs sm:text-sm font-medium flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Email Address
             </label>
             <input
@@ -81,18 +83,18 @@ export default function LoginPage() {
               name="email"
               required
               placeholder="student@example.com"
-              className="w-full p-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2a52be] transition"
+              className="w-full h-11 px-3.5 bg-slate-50 border border-slate-300 rounded-xl text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition"
             />
           </div>
 
           <div>
-            <div className="flex justify-between items-center mb-1">
+            <div className="flex justify-between items-center mb-1.5">
               <label className="block text-xs font-semibold text-slate-700">
                 Password
               </label>
               <Link
                 href="/forgot-password"
-                className="text-xs font-semibold text-[#f59e0b] hover:underline"
+                className="text-xs font-semibold text-[#f59e0b] hover:text-[#d97706] hover:underline transition"
               >
                 Forgot password?
               </Link>
@@ -103,13 +105,13 @@ export default function LoginPage() {
                 name="password"
                 required
                 placeholder="••••••••"
-                className="w-full p-3 pr-10 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2a52be] transition"
+                className="w-full h-11 pl-3.5 pr-11 bg-slate-50 border border-slate-300 rounded-xl text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1 cursor-pointer transition"
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4" />
@@ -123,7 +125,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isPending || isGoogleLoading}
-            className="w-full py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-md disabled:opacity-50 cursor-pointer"
+            className="w-full h-11 bg-[#f59e0b] hover:bg-[#d97706] active:scale-[0.99] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-md shadow-amber-500/10 disabled:opacity-50 disabled:active:scale-100 cursor-pointer mt-2"
           >
             {isPending ? (
               <>
@@ -136,12 +138,12 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="relative my-6">
+        <div className="relative my-5">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-slate-200"></div>
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-slate-500">
+          <div className="relative flex justify-center text-xs">
+            <span className="px-3 bg-white text-slate-400 font-medium">
               Or continue with
             </span>
           </div>
@@ -150,10 +152,10 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleLogin}
           disabled={isGoogleLoading || isPending}
-          className="w-full py-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-sm disabled:opacity-50 cursor-pointer"
+          className="w-full h-11 bg-white border border-slate-300 hover:bg-slate-50 active:scale-[0.99] text-slate-700 font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 transition shadow-sm disabled:opacity-50 disabled:active:scale-100 cursor-pointer"
         >
           {isGoogleLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin text-slate-500" />
           ) : (
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -177,7 +179,7 @@ export default function LoginPage() {
           <span>Google</span>
         </button>
 
-        <p className="text-center text-sm text-slate-600 pt-2">
+        <p className="text-center text-sm text-slate-500 pt-1">
           Don't have an account?{" "}
           <Link
             href="/register"
