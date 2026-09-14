@@ -28,8 +28,9 @@ export default function UpdatePasswordPage() {
       if (updateError) {
         toast.error(updateError.message);
       } else {
-        toast.success("Password updated successfully!");
-        window.location.href = "/";
+        await supabase.auth.signOut()
+        toast.success("Password updated successfully! Please log in with your new password.");
+        window.location.href = "/login";
       }
     });
   }
