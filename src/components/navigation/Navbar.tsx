@@ -34,17 +34,7 @@ export default function Navbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [mobileMenuOpen]);
-
+  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -58,6 +48,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Fetch User, Role, and Notifications
   useEffect(() => {
     const supabase = createClient();
 
@@ -126,7 +117,7 @@ export default function Navbar() {
     const supabase = createClient();
     await supabase.auth.signOut();
     setUser(null);
-    window.location.href = "/";
+    window.location.href = "/login";
   };
 
   const isActive = (path: string) => pathname === path;
@@ -139,6 +130,7 @@ export default function Navbar() {
             <BrandLogo />
           </Link>
 
+          {/* DESKTOP NAVIGATION */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
             <Link
               href="/"
@@ -212,6 +204,7 @@ export default function Navbar() {
             )}
           </nav>
 
+          {/* DESKTOP AUTH / USER MENU */}
           <div className="hidden md:flex items-center gap-3">
             {!user ? (
               <>
@@ -314,6 +307,7 @@ export default function Navbar() {
             )}
           </div>
 
+          {/* MOBILE HAMBURGER BUTTON */}
           <div className="flex md:hidden items-center">
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -328,8 +322,9 @@ export default function Navbar() {
 
       {/* FULL-SCREEN MOBILE NAVIGATION SHEET */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 h-dvh min-h-screen z-50 md:hidden bg-white flex flex-col justify-between overflow-y-auto">
-          <div className="px-4 h-16 flex items-center justify-between border-b border-slate-200 flex-shrink-0 sticky top-0 bg-white z-10">
+        <div className="fixed inset-0 z-50 md:hidden bg-white flex flex-col justify-between">
+          {/* TOP HEADER */}
+          <div className="px-4 h-16 flex items-center justify-between border-b border-slate-200 flex-shrink-0 bg-white">
             <Link href="/" onClick={() => setMobileMenuOpen(false)}>
               <BrandLogo />
             </Link>
@@ -342,7 +337,8 @@ export default function Navbar() {
             </button>
           </div>
 
-          <div className="px-5 py-6 flex-1 space-y-6">
+          {/* SCROLLABLE NAV BODY */}
+          <div className="px-5 py-6 flex-1 overflow-y-auto space-y-6 bg-white">
             <nav className="flex flex-col gap-1 text-base">
               <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
                 Main Navigation
@@ -450,19 +446,21 @@ export default function Navbar() {
             </nav>
           </div>
 
-          <div className="p-5 border-t border-slate-100 bg-slate-50/60 flex-shrink-0">
+          {/* PINNED BOTTOM FOOTER WITH EXTRA PADDING FOR MOBILE TOOLBARS */}
+          <div className="p-5 pb-10 border-t border-slate-200 bg-white flex-shrink-0">
             {user ? (
               <div className="space-y-3">
                 <div className="px-1 text-xs text-slate-500 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
                   <span className="truncate">
                     Signed in as{" "}
                     <strong className="text-slate-800">{user.email}</strong>
                   </span>
                 </div>
                 <button
+                  type="button"
                   onClick={handleLogout}
-                  className="w-full py-3 bg-rose-50 hover:bg-rose-100/80 text-rose-600 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer border border-rose-100"
+                  className="w-full py-3.5 bg-rose-50 hover:bg-rose-100/80 active:bg-rose-200 text-rose-600 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer border border-rose-200"
                 >
                   <LogOut className="w-4 h-4" /> Logout
                 </button>
