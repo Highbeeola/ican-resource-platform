@@ -55,11 +55,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-dvh flex-1 bg-slate-50 flex flex-col justify-center items-center p-4 sm:p-6 py-12 overflow-y-auto">
-      <div className="w-full max-w-md bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-sm space-y-6 my-auto">
+    <div className="min-h-dvh flex-1 bg-slate-50 flex flex-col justify-center items-center p-4 sm:p-6 py-6 sm:py-12 overflow-y-auto">
+      <div className="w-full max-w-md bg-white border border-slate-200 p-5 sm:p-8 rounded-2xl shadow-sm space-y-5 my-auto">
         <div className="text-center space-y-2">
-          <BrandLogo />
-          <h1 className="text-2xl font-bold text-[#1e3a8a] pt-2">
+          <div className="flex justify-center">
+            <BrandLogo />
+          </div>
+          <h1 className="text-2xl font-bold text-[#1e3a8a] pt-1">
             Create Your Account
           </h1>
           <p className="text-xs sm:text-sm text-slate-600">
@@ -84,7 +86,7 @@ export default function RegisterPage() {
               name="fullName"
               required
               placeholder="e.g. Babatunde Adeleke"
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
+              className="w-full h-11 px-3.5 bg-slate-50 border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
             />
           </div>
 
@@ -97,7 +99,7 @@ export default function RegisterPage() {
               name="email"
               required
               placeholder="student@example.com"
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
+              className="w-full h-11 px-3.5 bg-slate-50 border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
             />
           </div>
 
@@ -112,7 +114,7 @@ export default function RegisterPage() {
                 required
                 minLength={6}
                 placeholder="Minimum 6 characters"
-                className="w-full px-3.5 py-2.5 pr-10 bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
+                className="w-full h-11 px-3.5 pr-10 bg-slate-50 border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
               />
               <button
                 type="button"
@@ -136,7 +138,7 @@ export default function RegisterPage() {
             <select
               name="levelId"
               defaultValue=""
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition cursor-pointer"
+              className="w-full h-11 px-3.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition cursor-pointer"
             >
               <option value="" disabled className="bg-white text-slate-400">
                 Select your current level...
@@ -159,7 +161,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isPending || isGoogleLoading}
-            className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg transition text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-sm"
+            className="w-full h-11 bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-sm mt-2"
           >
             {isPending ? (
               <>
@@ -172,12 +174,12 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <div className="relative my-6">
+        <div className="relative my-5">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-slate-200"></div>
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-slate-500">
+          <div className="relative flex justify-center text-xs">
+            <span className="px-3 bg-white text-slate-400 font-medium">
               Or continue with
             </span>
           </div>
@@ -187,10 +189,10 @@ export default function RegisterPage() {
           type="button"
           onClick={handleGoogleLogin}
           disabled={isGoogleLoading || isPending}
-          className="w-full py-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-xs disabled:opacity-50 cursor-pointer"
+          className="w-full h-11 bg-white border border-slate-300 hover:bg-slate-50 active:scale-[0.99] text-slate-700 font-bold rounded-xl text-sm flex items-center justify-center gap-2.5 transition shadow-sm disabled:opacity-50 cursor-pointer"
         >
           {isGoogleLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
           ) : (
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -214,7 +216,7 @@ export default function RegisterPage() {
           <span>Google</span>
         </button>
 
-        <p className="text-center text-xs text-slate-600">
+        <p className="text-center text-xs text-slate-600 pt-1">
           Already have an account?{" "}
           <Link
             href="/login"

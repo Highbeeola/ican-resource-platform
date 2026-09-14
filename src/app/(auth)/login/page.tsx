@@ -52,8 +52,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen min-h-dvh bg-slate-50/50 flex flex-col justify-center items-center p-4 sm:p-6 py-8 sm:py-12">
-      <div className="w-full max-w-md bg-white border border-slate-200/80 p-6 sm:p-8 rounded-2xl shadow-xl shadow-slate-200/50 space-y-6">
+    <div className="min-h-dvh bg-slate-50/50 flex flex-col justify-center items-center p-4 sm:p-6 py-6 sm:py-12 overflow-y-auto">
+      <div className="w-full max-w-md bg-white border border-slate-200/80 p-5 sm:p-8 rounded-2xl shadow-xl shadow-slate-200/50 space-y-5 my-auto">
         <div className="text-center space-y-2">
           <div className="flex justify-center">
             <BrandLogo />

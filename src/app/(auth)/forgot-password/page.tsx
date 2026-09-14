@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
     startTransition(async () => {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/update-password`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/update-password`,
       });
 
       if (error) {
@@ -32,21 +32,21 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 py-12">
-      <div className="w-full max-w-md bg-white border border-slate-200 p-8 rounded-2xl shadow-xl space-y-6">
-        <div className="text-center space-y-2">
+    <div className="min-h-dvh flex-1 bg-slate-50/50 flex flex-col justify-center items-center p-4 sm:p-6 py-6 sm:py-12 overflow-y-auto">
+      <div className="w-full max-w-md bg-white border border-slate-200/80 p-5 sm:p-8 rounded-2xl shadow-xl shadow-slate-200/50 space-y-5 my-auto">
+        <div className="text-center space-y-2 flex flex-col items-center">
           <BrandLogo />
-          <h1 className="text-2xl font-bold text-slate-900 pt-2">
+          <h1 className="text-2xl font-bold text-slate-900 pt-1 tracking-tight">
             Reset Password
           </h1>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-500 leading-relaxed">
             Enter your email to receive a password reset link.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Email Address
             </label>
             <input
@@ -54,24 +54,27 @@ export default function ForgotPasswordPage() {
               name="email"
               required
               placeholder="student@example.com"
-              className="w-full p-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2a52be] transition"
+              className="w-full h-11 px-3.5 bg-slate-50 border border-slate-300 rounded-xl text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition"
             />
           </div>
 
           <button
             type="submit"
             disabled={isPending}
-            className="w-full py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-md disabled:opacity-50 cursor-pointer"
+            className="w-full h-11 bg-[#f59e0b] hover:bg-[#d97706] active:scale-[0.99] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-md shadow-amber-500/10 disabled:opacity-50 disabled:active:scale-100 cursor-pointer mt-2"
           >
             {isPending ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Sending Link...</span>
+              </>
             ) : (
-              "Send Reset Link"
+              <span>Send Reset Link</span>
             )}
           </button>
         </form>
 
-        <p className="text-center text-sm text-slate-600 pt-2">
+        <p className="text-center text-sm text-slate-500 pt-1">
           Remembered your password?{" "}
           <Link
             href="/login"
