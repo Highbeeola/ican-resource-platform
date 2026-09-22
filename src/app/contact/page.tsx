@@ -1,11 +1,34 @@
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+"use client";
+
+import { useState, useTransition } from "react";
+import { submitContactMessage } from "@/lib/actions/contact";
+import toast from "react-hot-toast";
+import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import BackButton from "@/components/navigation/BackButton";
 
 export default function ContactPage() {
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    startTransition(async () => {
+      const res = await submitContactMessage(formData);
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success("Message sent! Our team will get back to you shortly.");
+        form.reset();
+      }
+    });
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
       <div className="max-w-5xl mx-auto space-y-8">
-        <BackButton text="Back to Home" />
+        <BackButton text="Back" />
 
         <div className="text-center max-w-2xl mx-auto space-y-3">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1e3a8a]">
@@ -53,29 +76,33 @@ export default function ContactPage() {
             </div>
           </div>
 
-          {/* MESSAGE FORM UI (Visual Only for now) */}
+          {/* MESSAGE FORM */}
           <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
             <h2 className="text-xl font-bold text-[#1e3a8a] mb-6">
               Send us a Message
             </h2>
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Your Name
+                    Your Name *
                   </label>
                   <input
                     type="text"
+                    name="name"
+                    required
                     placeholder="John Doe"
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Email Address
+                    Email Address *
                   </label>
                   <input
                     type="email"
+                    name="email"
+                    required
                     placeholder="john@example.com"
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
                   />
@@ -83,19 +110,30 @@ export default function ContactPage() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Message
+                  Message *
                 </label>
                 <textarea
+                  name="message"
                   rows={4}
+                  required
                   placeholder="How can we help you?"
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
                 ></textarea>
               </div>
               <button
-                type="button"
-                className="bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold px-6 py-3 rounded-xl text-sm transition flex items-center gap-2"
+                type="submit"
+                disabled={isPending}
+                className="bg-[#f59e0b] hover:bg-[#d97706] active:scale-95 text-white font-bold px-6 py-3 rounded-xl text-sm transition flex items-center justify-center gap-2 disabled:opacity-50 w-full sm:w-auto cursor-pointer"
               >
-                <Send className="w-4 h-4" /> Send Message
+                {isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" /> Send Message
+                  </>
+                )}
               </button>
             </form>
           </div>

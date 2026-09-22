@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Subject } from "@/types";
 import { createModule } from "@/lib/actions/modules";
 import { Layers, Loader2, Plus } from "lucide-react";
@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 
 export default function AddModuleForm({ subjects }: { subjects: Subject[] }) {
   const [isPending, startTransition] = useTransition();
+  const [selectedSubjectId, setSelectedSubjectId] = useState("");
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -21,6 +22,7 @@ export default function AddModuleForm({ subjects }: { subjects: Subject[] }) {
       } else {
         toast.success("Learning Module created successfully!");
         form.reset();
+        setSelectedSubjectId(""); // Reset the controlled select dropdown
       }
     });
   }
@@ -42,6 +44,7 @@ export default function AddModuleForm({ subjects }: { subjects: Subject[] }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Controlled Target Subject Dropdown */}
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
             Target Subject *
@@ -49,16 +52,28 @@ export default function AddModuleForm({ subjects }: { subjects: Subject[] }) {
           <select
             name="subject_id"
             required
+            value={selectedSubjectId}
+            onChange={(e) => setSelectedSubjectId(e.target.value)}
             className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
           >
-            <option value="">Select Subject</option>
-            {subjects.map((sub) => (
-              <option key={sub.id} value={sub.id}>
-                {sub.name}
-              </option>
-            ))}
+            <option value="" disabled>
+              Select Subject
+            </option>
+            {subjects.map((sub: any) => {
+              const progName =
+                sub.level?.programme?.slug === "atswa" ? "ATSWA" : "ICAN";
+              const levelName = sub.level?.name ? ` ${sub.level.name}` : "";
+
+              return (
+                <option key={sub.id} value={sub.id}>
+                  {progName}
+                  {levelName} — {sub.name}
+                </option>
+              );
+            })}
           </select>
         </div>
+
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
             Module Title *

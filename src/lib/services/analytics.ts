@@ -29,11 +29,18 @@ export async function getAdminAnalytics() {
     .from("subjects")
     .select("*", { count: "exact", head: true });
 
+  // 6. Total Unread Messages
+  const { count: unreadMessages } = await supabase
+    .from("contact_messages")
+    .select("id", { count: "exact", head: true })
+    .eq("is_read", false);
+
   return {
     totalStudents: studentCount || 0,
     totalResources: resourceCount || 0,
     totalVideos: videoCount || 0,
     totalQuizAttempts: quizCount || 0,
     totalSubjects: subjectCount || 0,
+    unreadMessages: unreadMessages || 0,
   };
 }

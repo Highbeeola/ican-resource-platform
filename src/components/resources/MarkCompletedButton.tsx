@@ -20,31 +20,50 @@ export default function MarkCompletedButton({
   const [isCompleted, setIsCompleted] = useState(initialIsCompleted);
   const [isPending, startTransition] = useTransition();
 
-  function handleToggle() {
+  function handleToggle(e: React.MouseEvent | React.KeyboardEvent) {
+    // Stop the click/key event from triggering parent <Link> navigation
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isPending) return;
+
     startTransition(async () => {
       const res = await toggleItemCompletion(subjectId, resourceId, videoId);
-      if (res.success) {
-        setIsCompleted(!isCompleted);
+      if (res?.success) {
+        setIsCompleted((prev) => !prev);
       }
     });
   }
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter" || e.key === " ") {
+      handleToggle(e);
+    }
+  }
+
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={handleToggle}
-      disabled={isPending}
-      className={`w-full py-3.5 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50 ${
+      onKeyDown={handleKeyDown}
+      aria-disabled={isPending}
+      className={`px-3 py-2 font-bold rounded-lg transition text-xs flex items-center justify-center gap-1.5 shadow-sm cursor-pointer shrink-0 touch-manipulation select-none ${
+        isPending ? "opacity-50 pointer-events-none" : ""
+      } ${
         isCompleted
-          ? "bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100"
-          : "bg-[#f59e0b] hover:bg-[#d97706] text-white"
+          ? "bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 active:bg-emerald-200"
+          : "bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 active:bg-slate-300"
       }`}
     >
       {isPending ? (
-        <Loader2 className="w-5 h-5 animate-spin" />
+        <Loader2 className="w-4 h-4 animate-spin shrink-0" />
       ) : (
-        <CheckCircle className="w-5 h-5" />
+        <CheckCircle className="w-4 h-4 shrink-0" />
       )}
-      <span>{isCompleted ? "Completed" : "Mark as Completed"}</span>
-    </button>
+      <span className="hidden sm:inline">
+        {isCompleted ? "Completed" : "Mark Completed"}
+      </span>
+    </div>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useRef, useTransition } from "react";
 import { Level, Subject } from "@/types";
 import { createResource } from "@/lib/actions/resources";
+import { createClient } from "@/lib/supabase/client";
 import { Upload, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -17,6 +18,8 @@ export default function ResourceUploadForm({
   subjects,
   modules = [],
 }: Props) {
+  const formRef = useRef<HTMLFormElement>(null);
+
   const [selectedLevelId, setSelectedLevelId] = useState<string>("");
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("");
   const [selectedModuleId, setSelectedModuleId] = useState<string>("");
@@ -45,25 +48,76 @@ export default function ResourceUploadForm({
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    if (!formRef.current) return;
+
+    // Extract FormData before async operations
+    const formData = new FormData(formRef.current);
+    const file = formData.get("file") as File;
+
+    if (!file || file.size === 0) {
+      toast.error("Please select a file to upload.");
+      return;
+    }
 
     startTransition(async () => {
-      const res = await createResource(formData);
-      if (res?.error) {
-        toast.error(res.error);
-      } else {
-        toast.success("Resource uploaded successfully!");
-        form.reset();
-        setSelectedLevelId("");
-        setSelectedSubjectId("");
-        setSelectedModuleId("");
+      try {
+        // 1. Upload directly to Supabase Storage client-side
+        const supabase = createClient();
+        const fileExt = file.name.split(".").pop();
+        const fileName = `resources/${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(2)}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("ican-resources")
+          .upload(fileName, file, { upsert: false });
+
+        if (uploadError) {
+          toast.error(`Storage Upload Error: ${uploadError.message}`);
+          return;
+        }
+
+        // 2. Retrieve Public URL
+        const { data: publicUrlData } = supabase.storage
+          .from("ican-resources")
+          .getPublicUrl(fileName);
+
+        if (!publicUrlData?.publicUrl) {
+          toast.error("Could not retrieve file public URL.");
+          return;
+        }
+
+        // 3. Prepare payload for Server Action
+        formData.delete("file");
+        formData.append("file_url", publicUrlData.publicUrl);
+        formData.append("file_size_bytes", file.size.toString());
+
+        // 4. Send metadata to Server Action
+        const res = await createResource(formData);
+
+        if (res?.error) {
+          toast.error(res.error);
+        } else {
+          toast.success("Resource uploaded successfully!");
+
+          // Reset form safely via Ref and state resets
+          formRef.current?.reset();
+          setSelectedLevelId("");
+          setSelectedSubjectId("");
+          setSelectedModuleId("");
+        }
+      } catch (err: any) {
+        console.error("Upload Submission Error:", err);
+        toast.error(
+          err?.message || "An unexpected error occurred during upload.",
+        );
       }
     });
   }
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
       className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 text-slate-900 shadow-sm"
     >
@@ -97,7 +151,7 @@ export default function ResourceUploadForm({
             required
             value={selectedLevelId}
             onChange={handleLevelChange}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition cursor-pointer"
           >
             <option value="">Select Level</option>
             {levels.map((lvl: Level) => (
@@ -119,7 +173,7 @@ export default function ResourceUploadForm({
             disabled={!selectedLevelId}
             value={selectedSubjectId}
             onChange={handleSubjectChange}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition disabled:opacity-50 disabled:bg-slate-100"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition disabled:opacity-50 disabled:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
           >
             <option value="">Select Subject</option>
             {filteredSubjects.map((sub: Subject) => (
@@ -175,7 +229,7 @@ export default function ResourceUploadForm({
           <select
             name="resource_type"
             required
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition cursor-pointer"
           >
             <option value="past_question">Past Question</option>
             <option value="study_text">Study Text</option>

@@ -14,31 +14,18 @@ export async function createResource(formData: FormData) {
   const moduleId = (formData.get("module_id") as string) || null;
   const resourceType = formData.get("resource_type") as ResourceType;
   const dietYear = (formData.get("diet_year") as string) || "";
-  const file = formData.get("file") as File;
 
-  if (!file || !title || !levelId || !subjectId || !resourceType) {
+  // 1. Read metadata injected from the client upload instead of raw File
+  const fileUrl = formData.get("file_url") as string;
+  const fileSizeBytesStr = formData.get("file_size_bytes") as string;
+  const fileSizeBytes = fileSizeBytesStr ? parseInt(fileSizeBytesStr, 10) : 0;
+
+  // Validation check on fileUrl rather than binary file payload
+  if (!fileUrl || !title || !levelId || !subjectId || !resourceType) {
     return { error: "Please fill in all required fields and select a file." };
   }
 
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-  const filePath = `resources/${fileName}`;
-
-  // 1. Upload File
-  const { error: uploadError } = await supabase.storage
-    .from("ican-resources")
-    .upload(filePath, file, { contentType: file.type, upsert: false });
-
-  if (uploadError) {
-    return { error: `Failed to upload file: ${uploadError.message}` };
-  }
-
-  // Synchronously compute public URL without extra server roundtrips
-  const { data: publicUrlData } = supabase.storage
-    .from("ican-resources")
-    .getPublicUrl(filePath);
-
-  // 2. Insert metadata record
+  // 2. Insert metadata record into DB
   const { error: dbError } = await supabase.from("resources").insert({
     title,
     description,
@@ -47,8 +34,8 @@ export async function createResource(formData: FormData) {
     module_id: moduleId,
     resource_type: resourceType,
     exam_diet: dietYear,
-    file_url: publicUrlData.publicUrl,
-    file_size_bytes: file.size,
+    file_url: fileUrl,
+    file_size_bytes: fileSizeBytes,
     is_published: true,
   });
 
@@ -62,9 +49,52 @@ export async function createResource(formData: FormData) {
 }
 
 export async function uploadResource(formData: FormData) {
-  return createResource(formData);
-}
+  const supabase = await createClient();
 
+  // 1. Grab all text fields
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const levelId = formData.get("level_id") as string;
+  const subjectId = formData.get("subject_id") as string;
+  const moduleId = formData.get("module_id") as string;
+  const resourceType = formData.get("resource_type") as string;
+  const examYear = formData.get("exam_year")
+    ? parseInt(formData.get("exam_year") as string)
+    : null;
+  const examDiet = formData.get("exam_diet") as string;
+
+  // 2. Grab the URL from the browser upload
+  const fileUrl = formData.get("file_url") as string;
+  const fileSizeBytes = formData.get("file_size_bytes")
+    ? parseInt(formData.get("file_size_bytes") as string)
+    : 0;
+
+  // 🚨 THE FIX: Check for fileUrl instead of file!
+  if (!title || !levelId || !subjectId || !fileUrl) {
+    return { error: "Missing required fields or file upload failed." };
+  }
+
+  // 3. Save to database
+  const { error: dbError } = await supabase.from("resources").insert({
+    title,
+    description: description || null,
+    level_id: levelId,
+    subject_id: subjectId,
+    module_id: moduleId || null,
+    resource_type: resourceType,
+    exam_year: examYear,
+    exam_diet: examDiet || null,
+    file_url: fileUrl, // Saves the Supabase URL
+    file_size_bytes: fileSizeBytes,
+    is_published: true,
+  });
+
+  if (dbError) return { error: dbError.message };
+
+  revalidatePath("/resources");
+  revalidatePath("/admin/resources");
+  return { success: true };
+}
 export async function deleteResource(id: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("resources").delete().eq("id", id);

@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Video,
   BookOpen,
+  Maximize2,
 } from "lucide-react";
 
 interface Props {
@@ -106,7 +107,7 @@ export default async function ResourceItemPage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* MAIN CONTENT DISPLAY */}
           <div className="lg:col-span-2 space-y-6">
-            {/* DISPLAY CONTAINER: VIDEO, RICH TEXT ARTICLE, OR PDF */}
+            {/* DISPLAY CONTAINER: VIDEO, RICH TEXT ARTICLE, OR ENHANCED PDF */}
             {itemData.article_content ? (
               <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-sm overflow-hidden">
                 <div
@@ -114,37 +115,37 @@ export default async function ResourceItemPage({
                   dangerouslySetInnerHTML={{ __html: itemData.article_content }}
                 />
               </div>
-            ) : (
+            ) : isVideo ? (
               <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm aspect-video flex items-center justify-center border border-slate-200 group">
-                {isVideo ? (
-                  <iframe
-                    src={embedVideoUrl}
-                    title={itemData.title}
-                    className="w-full h-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                ) : (
-                  <>
-                    <iframe
-                      src={`${itemData.file_url}#toolbar=0`}
-                      title={itemData.title}
-                      className="w-full h-full border-0"
-                    ></iframe>
-                    {/* POP-OUT TO NEW TAB ICON BUTTON */}
-                    {itemData.file_url && (
-                      <a
-                        href={itemData.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute top-3 right-3 p-2.5 bg-slate-900/90 hover:bg-amber-500 hover:text-white text-white rounded-xl border border-slate-700 transition shadow-lg flex items-center gap-1.5 text-xs font-bold"
-                        title="Open PDF in full tab"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        <span className="hidden sm:inline">Pop Out Viewer</span>
-                      </a>
-                    )}
-                  </>
+                <iframe
+                  src={embedVideoUrl}
+                  title={itemData.title}
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            ) : (
+              /* CLEAN EMBED FRAME FOR PDF VIEWER */
+              <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm h-[80vh] min-h-[700px] flex items-center justify-center border border-slate-200 group">
+                <iframe
+                  src={`${itemData.file_url}#toolbar=0&view=FitH`}
+                  title={itemData.title}
+                  className="w-full h-full border-0"
+                ></iframe>
+
+                {/* OPEN FULLSCREEN / POP-OUT ACTION BUTTON */}
+                {itemData.file_url && (
+                  <a
+                    href={itemData.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute top-4 right-4 z-10 px-3.5 py-2.5 bg-slate-900/90 hover:bg-amber-500 hover:text-white text-white rounded-xl border border-slate-700 transition shadow-lg flex items-center gap-2 text-xs font-bold backdrop-blur-sm"
+                    title="Open PDF in full tab"
+                  >
+                    <Maximize2 className="w-4 h-4" />
+                    <span>Open Fullscreen</span>
+                  </a>
                 )}
               </div>
             )}

@@ -12,28 +12,41 @@ interface CreateModuleParams {
 export async function createModule(input: FormData | CreateModuleParams) {
   const supabase = await createClient();
 
-  // Extract fields whether passed as an object or FormData
   let title: string;
   let subjectId: string;
   let displayOrder: number;
 
   if (input instanceof FormData) {
-    title = input.get("title") as string;
-    subjectId = input.get("subjectId") as string;
-    displayOrder = parseInt((input.get("displayOrder") as string) || "1", 10);
+    title = (input.get("title") as string)?.trim();
+    // Accept either "subject_id" (from JSX form) or "subjectId"
+    subjectId = (input.get("subject_id") || input.get("subjectId")) as string;
+
+    const rawOrder = (input.get("display_order") ||
+      input.get("displayOrder")) as string;
+    displayOrder = parseInt(rawOrder || "1", 10);
   } else {
     title = input.title;
     subjectId = input.subjectId;
     displayOrder = input.displayOrder;
   }
 
+  // 1. Validate required fields before querying the DB
+  if (!subjectId || subjectId.trim() === "") {
+    return { error: "Please select a target subject.", data: null };
+  }
+
+  if (!title || title.trim() === "") {
+    return { error: "Module title is required.", data: null };
+  }
+
+  // 2. Perform the database insert
   const { data, error } = await supabase
     .from("modules")
     .insert([
       {
         title,
         subject_id: subjectId,
-        display_order: displayOrder,
+        display_order: isNaN(displayOrder) ? 1 : displayOrder,
       },
     ])
     .select()
@@ -47,7 +60,6 @@ export async function createModule(input: FormData | CreateModuleParams) {
 
   return { error: null, data };
 }
-
 // Helper to fetch modules for the upload dropdowns
 export async function getModules() {
   const supabase = await createClient();

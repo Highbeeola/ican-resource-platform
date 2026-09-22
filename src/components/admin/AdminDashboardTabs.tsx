@@ -16,6 +16,7 @@ import { deleteResource, bulkDeleteItems } from "@/lib/actions/resources";
 import { deleteVideo } from "@/lib/actions/videos";
 import { deleteQuestion } from "@/lib/actions/quiz";
 import { deleteSubject } from "@/lib/actions/subjects";
+import { markMessageAsRead, deleteMessage } from "@/lib/actions/contact";
 import toast from "react-hot-toast";
 import {
   FileText,
@@ -36,6 +37,8 @@ import {
   UserPlus,
   PenTool,
   FolderPlus,
+  Mail,
+  CheckCircle2,
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -44,6 +47,7 @@ interface AnalyticsData {
   totalVideos: number;
   totalQuizAttempts: number;
   totalSubjects: number;
+  unreadMessages: number;
 }
 
 interface Props {
@@ -55,10 +59,12 @@ interface Props {
   isSuperAdmin: boolean;
   modules: any[];
   questions?: any[];
+  messages?: any[];
 }
 
 type TabType =
   | "analytics"
+  | "inbox"
   | "pdf"
   | "video"
   | "article"
@@ -77,6 +83,7 @@ export default function AdminDashboardTabs({
   resources: initialResources = [],
   videos: initialVideos = [],
   questions: initialQuestions = [],
+  messages = [],
   analytics,
   isSuperAdmin = false,
 }: Props) {
@@ -252,6 +259,23 @@ export default function AdminDashboardTabs({
           </button>
         )}
 
+        {isSuperAdmin && (
+          <button
+            onClick={() => setActiveTab("inbox")}
+            className={tabClass("inbox")}
+          >
+            <div className="relative flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              <span>Inbox</span>
+              {analytics.unreadMessages > 0 && (
+                <span className="absolute -top-2 -right-3 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full animate-pulse">
+                  {analytics.unreadMessages}
+                </span>
+              )}
+            </div>
+          </button>
+        )}
+
         <button onClick={() => setActiveTab("pdf")} className={tabClass("pdf")}>
           <FileText className="w-4 h-4" />
           <span>Upload PDF</span>
@@ -341,7 +365,8 @@ export default function AdminDashboardTabs({
             <h2 className="font-bold text-[#1e3a8a] text-lg border-b border-slate-100 pb-3 mb-4">
               Platform Overview
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
+              {/* Total Students */}
               <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
                 <div className="flex justify-between items-center text-slate-500 mb-2">
                   <span className="text-xs font-semibold uppercase">
@@ -354,6 +379,7 @@ export default function AdminDashboardTabs({
                 </p>
               </div>
 
+              {/* PDF Materials */}
               <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
                 <div className="flex justify-between items-center text-slate-500 mb-2">
                   <span className="text-xs font-semibold uppercase">
@@ -366,6 +392,7 @@ export default function AdminDashboardTabs({
                 </p>
               </div>
 
+              {/* Video Lectures */}
               <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
                 <div className="flex justify-between items-center text-slate-500 mb-2">
                   <span className="text-xs font-semibold uppercase">
@@ -378,6 +405,7 @@ export default function AdminDashboardTabs({
                 </p>
               </div>
 
+              {/* Quizzes Taken */}
               <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
                 <div className="flex justify-between items-center text-slate-500 mb-2">
                   <span className="text-xs font-semibold uppercase">
@@ -389,7 +417,113 @@ export default function AdminDashboardTabs({
                   {analytics.totalQuizAttempts}
                 </p>
               </div>
+
+              {/* Support Messages */}
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
+                <div className="flex justify-between items-center text-slate-500 mb-2">
+                  <span className="text-xs font-semibold uppercase">
+                    Support Messages
+                  </span>
+                  <Mail className="w-4 h-4 text-purple-500" />
+                </div>
+                <p className="text-3xl font-extrabold text-[#1e3a8a]">
+                  {analytics.unreadMessages}{" "}
+                  <span className="text-xs font-semibold text-slate-500">
+                    Unread
+                  </span>
+                </p>
+              </div>
             </div>
+          </div>
+        </div>
+      )}
+      {/* TAB: SUPPORT INBOX */}
+      {isSuperAdmin && activeTab === "inbox" && (
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+          <div className="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <div>
+              <h2 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
+                <Mail className="w-5 h-5 text-purple-500" />
+                Support Inbox
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Read and manage messages sent from the Contact Us page.
+              </p>
+            </div>
+          </div>
+
+          <div className="divide-y divide-slate-100">
+            {!messages || messages.length === 0 ? (
+              <div className="p-12 text-center text-slate-500">
+                <Mail className="w-8 h-8 mx-auto text-slate-300 mb-3" />
+                <p>Your inbox is empty!</p>
+              </div>
+            ) : (
+              messages.map((msg: any) => (
+                <div
+                  key={msg.id}
+                  className={`p-6 transition-colors ${
+                    msg.is_read ? "bg-white" : "bg-blue-50/50"
+                  }`}
+                >
+                  <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-bold text-slate-900">{msg.name}</h3>
+                        <a
+                          href={`mailto:${msg.email}`}
+                          className="text-xs font-semibold text-blue-600 hover:underline bg-blue-50 px-2 py-1 rounded-md"
+                        >
+                          {msg.email}
+                        </a>
+                        {!msg.is_read && (
+                          <span className="bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                            New
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        {msg.message}
+                      </p>
+
+                      <p className="text-[10px] font-bold uppercase text-slate-400">
+                        Received:{" "}
+                        {new Date(msg.created_at).toLocaleString("en-GB")}
+                      </p>
+                    </div>
+
+                    <div className="flex md:flex-col items-center gap-2 w-full md:w-auto mt-4 md:mt-0">
+                      {!msg.is_read && (
+                        <button
+                          onClick={async () => {
+                            const res = await markMessageAsRead(msg.id);
+                            if (res.success) toast.success("Marked as read");
+                          }}
+                          className="flex-1 md:w-full px-4 py-2 bg-[#1e3a8a] text-white text-xs font-bold rounded-lg hover:bg-blue-800 transition flex items-center justify-center gap-1.5"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                          Mark Read
+                        </button>
+                      )}
+
+                      <button
+                        onClick={async () => {
+                          if (confirm("Delete this message permanently?")) {
+                            const res = await deleteMessage(msg.id);
+                            if (res.success) toast.success("Message deleted");
+                          }
+                        }}
+                        className="flex-1 md:w-full px-4 py-2 bg-rose-50 text-rose-600 text-xs font-bold rounded-lg hover:bg-rose-100 border border-rose-100 transition flex items-center justify-center gap-1.5"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
@@ -600,7 +734,7 @@ export default function AdminDashboardTabs({
                       <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          checked={!!selectedItems.find((i) => i.id === res.id)}
+                          checked={!!selectedItems?.find((i) => i.id === res.id)}
                           onChange={() => toggleSelection(res.id, "resource")}
                           className="w-4 h-4 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
                         />
@@ -654,7 +788,7 @@ export default function AdminDashboardTabs({
                       <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          checked={!!selectedItems.find((i) => i.id === vid.id)}
+                          checked={!!selectedItems?.find((i) => i.id === vid.id)}
                           onChange={() => toggleSelection(vid.id, "video")}
                           className="w-4 h-4 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
                         />
@@ -693,7 +827,7 @@ export default function AdminDashboardTabs({
                       <div className="flex items-start gap-2">
                         <input
                           type="checkbox"
-                          checked={!!selectedItems.find((i) => i.id === q.id)}
+                          checked={!!selectedItems?.find((i) => i.id === q.id)}
                           onChange={() => toggleSelection(q.id, "question")}
                           className="w-4 h-4 mt-0.5 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
                         />
@@ -765,7 +899,7 @@ export default function AdminDashboardTabs({
                           <input
                             type="checkbox"
                             checked={
-                              !!selectedItems.find((i) => i.id === res.id)
+                              !!selectedItems?.find((i) => i.id === res.id)
                             }
                             onChange={() => toggleSelection(res.id, "resource")}
                             className="w-4 h-4 text-blue-600 rounded border-slate-300 cursor-pointer"
@@ -817,7 +951,7 @@ export default function AdminDashboardTabs({
                           <input
                             type="checkbox"
                             checked={
-                              !!selectedItems.find((i) => i.id === vid.id)
+                              !!selectedItems?.find((i) => i.id === vid.id)
                             }
                             onChange={() => toggleSelection(vid.id, "video")}
                             className="w-4 h-4 text-blue-600 rounded border-slate-300 cursor-pointer"
@@ -856,7 +990,7 @@ export default function AdminDashboardTabs({
                         <td className="p-3 sm:p-4">
                           <input
                             type="checkbox"
-                            checked={!!selectedItems.find((i) => i.id === q.id)}
+                            checked={!!selectedItems?.find((i) => i.id === q.id)}
                             onChange={() => toggleSelection(q.id, "question")}
                             className="w-4 h-4 text-blue-600 rounded border-slate-300 cursor-pointer"
                           />

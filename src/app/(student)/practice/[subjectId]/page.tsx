@@ -14,6 +14,8 @@ import {
   Lightbulb,
   HelpCircle,
   Timer,
+  AlertCircle,
+  X,
 } from "lucide-react";
 
 export default function PracticeQuizPage() {
@@ -24,6 +26,7 @@ export default function PracticeQuizPage() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   // Timer states
   const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -69,6 +72,7 @@ export default function PracticeQuizPage() {
 
   // Submit Quiz Function
   const handleSubmitQuiz = useCallback(() => {
+    setShowConfirmModal(false);
     setIsTimerRunning(false); // Stop timer
     startTransition(async () => {
       const res = await submitQuizAttempt(
@@ -121,8 +125,11 @@ export default function PracticeQuizPage() {
     setUserAnswers((prev) => ({ ...prev, [questionId]: optionId }));
   }
 
+  const answeredCount = Object.keys(userAnswers).length;
+  const unansweredCount = questions.length - answeredCount;
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
+    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10 relative">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* BACK BUTTON */}
         <Link
@@ -133,7 +140,7 @@ export default function PracticeQuizPage() {
           <span>Back to {subject?.name || "Course"}</span>
         </Link>
 
-        {/* HEADER & FLOATING TIMER */}
+        {/* HEADER SECTION */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a]">
@@ -144,21 +151,21 @@ export default function PracticeQuizPage() {
               solution explanations.
             </p>
           </div>
-
-          {/* EXAM TIMER */}
-          {!result && questions.length > 0 && !isLoading && (
-            <div
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 shadow-sm font-mono text-lg font-bold transition-colors ${
-                timeLeft <= 60
-                  ? "bg-rose-50 border-rose-500 text-rose-600 animate-pulse"
-                  : "bg-white border-slate-200 text-[#1e3a8a]"
-              }`}
-            >
-              <Timer className="w-5 h-5" />
-              <span>{formatTime(timeLeft)}</span>
-            </div>
-          )}
         </div>
+
+        {/* FLOATING TIMER (Fixed in viewport so it doesn't obstruct content) */}
+        {!result && questions.length > 0 && !isLoading && (
+          <div
+            className={`fixed bottom-6 right-6 sm:bottom-auto sm:top-20 sm:right-8 z-30 flex items-center gap-2 px-4 py-2.5 rounded-2xl border-2 shadow-xl font-mono text-base sm:text-lg font-bold transition-all ${
+              timeLeft <= 60
+                ? "bg-rose-50 border-rose-500 text-rose-600 animate-pulse"
+                : "bg-white/95 backdrop-blur-md border-slate-200 text-[#1e3a8a]"
+            }`}
+          >
+            <Timer className="w-5 h-5 text-[#f59e0b]" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
+        )}
 
         {/* RESULTS BANNER */}
         {result && (
@@ -312,8 +319,8 @@ export default function PracticeQuizPage() {
         {/* SUBMIT BUTTON */}
         {!result && questions.length > 0 && !isLoading && (
           <button
-            onClick={handleSubmitQuiz}
-            disabled={isPending || Object.keys(userAnswers).length === 0}
+            onClick={() => setShowConfirmModal(true)}
+            disabled={isPending || answeredCount === 0}
             className="w-full py-4 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {isPending ? (
@@ -324,6 +331,74 @@ export default function PracticeQuizPage() {
           </button>
         )}
       </div>
+
+      {/* SUBMISSION CONFIRMATION MODAL */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in duration-150">
+            <div className="flex justify-between items-start">
+              <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-slate-900">
+                Submit Practice Test?
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                Are you sure you want to finalize your submission? You won't be
+                able to change your answers after submitting.
+              </p>
+            </div>
+
+            {/* ANSWER SUMMARY BOX */}
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-around text-center text-xs sm:text-sm font-semibold">
+              <div>
+                <p className="text-emerald-600 font-bold text-base">
+                  {answeredCount}
+                </p>
+                <p className="text-slate-500 text-[11px]">Answered</p>
+              </div>
+              <div className="h-8 w-px bg-slate-200" />
+              <div>
+                <p
+                  className={`font-bold text-base ${unansweredCount > 0 ? "text-rose-500" : "text-slate-400"}`}
+                >
+                  {unansweredCount}
+                </p>
+                <p className="text-slate-500 text-[11px]">Unanswered</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs sm:text-sm transition cursor-pointer"
+              >
+                Continue Quiz
+              </button>
+              <button
+                onClick={handleSubmitQuiz}
+                disabled={isPending}
+                className="flex-1 py-2.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-xs sm:text-sm transition shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <span>Yes, Submit</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

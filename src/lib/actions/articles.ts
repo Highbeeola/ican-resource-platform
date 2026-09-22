@@ -12,8 +12,10 @@ export async function createArticleLesson(
   const title = formData.get("title") as string;
   const levelId = formData.get("level_id") as string;
   const subjectId = formData.get("subject_id") as string;
-  const resourceType = formData.get("resource_type") as any;
+  const resourceType = formData.get("resource_type") as string;
   const description = formData.get("description") as string;
+  // 🚨 NEW: Capture the module_id
+  const moduleId = formData.get("module_id") as string;
 
   if (
     !title ||
@@ -30,17 +32,16 @@ export async function createArticleLesson(
 
   const { error } = await supabase.from("resources").insert({
     title,
-    description,
+    description: description || null,
     level_id: levelId,
     subject_id: subjectId,
-    resource_type: resourceType,
-    article_content: htmlContent, // Save the rich HTML text!
+    resource_type: resourceType || "notes", // Defaults to notes
+    article_content: htmlContent,
     is_published: true,
+    module_id: moduleId || null, // 🚨 NEW: Save it to the database!
   });
 
-  if (error) {
-    return { error: error.message };
-  }
+  if (error) return { error: error.message };
 
   revalidatePath("/resources");
   revalidatePath("/admin/resources");

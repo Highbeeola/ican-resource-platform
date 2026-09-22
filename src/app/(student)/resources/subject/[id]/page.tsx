@@ -13,7 +13,6 @@ import {
   Clock,
   Star,
   Award,
-  FolderOpen,
   BarChart3,
   Target,
   CalendarRange,
@@ -126,13 +125,6 @@ export default async function SubjectDetailsPage({
     const sum = ratings.reduce((acc, curr) => acc + curr.rating, 0);
     avgRating = parseFloat((sum / ratings.length).toFixed(1));
   }
-
-  // Unassigned Content (Items without module_id assigned, excluding pathfinders)
-  const unassignedVideos = videos?.filter((v) => !v.module_id) || [];
-  const unassignedResources =
-    curriculumResources.filter((r) => !r.module_id) || [];
-  const hasUnassignedContent =
-    unassignedVideos.length > 0 || unassignedResources.length > 0;
 
   return (
     <div
@@ -336,7 +328,7 @@ export default async function SubjectDetailsPage({
                   Course modules are currently being updated by the faculty.
                 </p>
               ) : (
-                modules.map((mod, index) => {
+                modules.map((mod) => {
                   const modVideos =
                     videos?.filter((v) => v.module_id === mod.id) || [];
                   const modResources =
@@ -352,7 +344,7 @@ export default async function SubjectDetailsPage({
                     >
                       <div className="bg-slate-50 border-b border-slate-200 p-5 sm:p-6">
                         <h3 className="text-lg font-bold text-[#1e3a8a]">
-                          Module {index + 1}: {mod.title}
+                          {mod.title}
                         </h3>
                         {mod.description && (
                           <p className="text-xs sm:text-sm text-slate-600 mt-1">
@@ -370,14 +362,15 @@ export default async function SubjectDetailsPage({
                           <>
                             {/* VIDEOS IN MODULE */}
                             {modVideos.map((vid: Video, vIdx: number) => (
-                              <div
+                              <Link
                                 key={vid.id}
-                                className="p-4 sm:p-5 flex items-center justify-between hover:bg-blue-50/50 transition"
+                                href={`/resources/item/${vid.id}?type=video`}
+                                className="group p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-blue-50/50 transition cursor-pointer"
                               >
-                                <div className="flex items-center gap-3.5">
-                                  <PlayCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
-                                  <div>
-                                    <h4 className="font-semibold text-slate-900 text-sm">
+                                <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                                  <PlayCircle className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                                  <div className="min-w-0">
+                                    <h4 className="font-semibold text-slate-900 text-sm truncate sm:whitespace-normal group-hover:text-[#1e3a8a] transition-colors">
                                       {vIdx + 1}. {vid.title}
                                     </h4>
                                     <span className="text-[10px] uppercase font-bold text-slate-400">
@@ -385,31 +378,29 @@ export default async function SubjectDetailsPage({
                                     </span>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-3 flex-shrink-0 self-end sm:self-auto">
                                   <MarkCompletedButton
                                     subjectId={id}
                                     videoId={vid.id}
                                   />
-                                  <Link
-                                    href={`/resources/item/${vid.id}?type=video`}
-                                    className="px-4 py-2 bg-blue-50 text-[#1e3a8a] text-xs font-bold rounded-lg hover:bg-blue-100 transition whitespace-nowrap"
-                                  >
+                                  <span className="px-4 py-2 bg-blue-50 text-[#1e3a8a] text-xs font-bold rounded-lg group-hover:bg-[#1e3a8a] group-hover:text-white transition-colors whitespace-nowrap">
                                     Watch →
-                                  </Link>
+                                  </span>
                                 </div>
-                              </div>
+                              </Link>
                             ))}
 
                             {/* PDFs/NOTES IN MODULE */}
                             {modResources.map((res: Resource, rIdx: number) => (
-                              <div
+                              <Link
                                 key={res.id}
-                                className="p-4 sm:p-5 flex items-center justify-between hover:bg-amber-50/50 transition"
+                                href={`/resources/item/${res.id}?type=doc`}
+                                className="group p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-amber-50/50 transition cursor-pointer"
                               >
-                                <div className="flex items-center gap-3.5">
-                                  <FileText className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                                  <div>
-                                    <h4 className="font-semibold text-slate-900 text-sm">
+                                <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                                  <FileText className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5 sm:mt-0" />
+                                  <div className="min-w-0">
+                                    <h4 className="font-semibold text-slate-900 text-sm truncate sm:whitespace-normal group-hover:text-[#d97706] transition-colors">
                                       {modVideos.length + rIdx + 1}. {res.title}
                                     </h4>
                                     <span className="text-[10px] uppercase font-bold text-slate-400">
@@ -417,19 +408,17 @@ export default async function SubjectDetailsPage({
                                     </span>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-2">
+
+                                <div className="flex items-center gap-3 flex-shrink-0 self-end sm:self-auto">
                                   <MarkCompletedButton
                                     subjectId={id}
                                     resourceId={res.id}
                                   />
-                                  <Link
-                                    href={`/resources/item/${res.id}?type=doc`}
-                                    className="px-4 py-2 bg-amber-50 text-[#d97706] text-xs font-bold rounded-lg hover:bg-[#f59e0b] hover:text-white transition whitespace-nowrap"
-                                  >
+                                  <span className="px-4 py-2 bg-amber-50 text-[#d97706] text-xs font-bold rounded-lg group-hover:bg-[#f59e0b] group-hover:text-white transition-colors whitespace-nowrap">
                                     Read →
-                                  </Link>
+                                  </span>
                                 </div>
-                              </div>
+                              </Link>
                             ))}
                           </>
                         )}
@@ -439,81 +428,80 @@ export default async function SubjectDetailsPage({
                 })
               )}
 
-              {/* UNASSIGNED GENERAL MATERIALS */}
-              {hasUnassignedContent && (
-                <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm mt-8">
-                  <div className="bg-slate-100 border-b border-slate-200 p-5 sm:p-6 flex items-center gap-2">
-                    <FolderOpen className="w-5 h-5 text-[#1e3a8a]" />
-                    <h3 className="text-lg font-bold text-[#1e3a8a]">
-                      General Course Materials
-                    </h3>
-                  </div>
+              {/* UNASSIGNED MATERIALS (Files/Notes not linked to a specific module) */}
+              {(() => {
+                const unassignedVideos =
+                  videos?.filter((v) => !v.module_id) || [];
+                const unassignedDocs =
+                  curriculumResources.filter((r) => !r.module_id) || [];
 
-                  <div className="divide-y divide-slate-100">
-                    {unassignedVideos.map((vid: Video, vIdx: number) => (
-                      <div
-                        key={vid.id}
-                        className="p-4 sm:p-5 flex items-center justify-between hover:bg-blue-50/50 transition"
-                      >
-                        <div className="flex items-center gap-3.5">
-                          <PlayCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
-                          <div>
-                            <h4 className="font-semibold text-slate-900 text-sm">
-                              {vIdx + 1}. {vid.title}
-                            </h4>
-                            <span className="text-[10px] uppercase font-bold text-slate-400">
-                              Video Lesson
+                if (
+                  unassignedVideos.length === 0 &&
+                  unassignedDocs.length === 0
+                )
+                  return null;
+
+                return (
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm mt-6">
+                    <div className="bg-amber-50 p-5 border-b border-amber-100">
+                      <h3 className="font-bold text-amber-900">
+                        General Course Materials
+                      </h3>
+                      <p className="text-xs text-amber-700 mt-1">
+                        Materials not assigned to a specific module.
+                      </p>
+                    </div>
+                    <div className="divide-y divide-slate-100">
+                      {unassignedVideos.map((vid: Video) => (
+                        <Link
+                          key={vid.id}
+                          href={`/resources/item/${vid.id}?type=video`}
+                          className="group flex items-center justify-between p-4 hover:bg-blue-50 transition gap-4 cursor-pointer"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <PlayCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
+                            <span className="text-sm font-semibold truncate group-hover:text-[#1e3a8a] transition-colors">
+                              {vid.title}
                             </span>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MarkCompletedButton
-                            subjectId={id}
-                            videoId={vid.id}
-                          />
-                          <Link
-                            href={`/resources/item/${vid.id}?type=video`}
-                            className="px-4 py-2 bg-blue-50 text-[#1e3a8a] text-xs font-bold rounded-lg hover:bg-[#1e3a8a] hover:text-white transition whitespace-nowrap"
-                          >
-                            Watch →
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
-
-                    {unassignedResources.map((res: Resource, rIdx: number) => (
-                      <div
-                        key={res.id}
-                        className="p-4 sm:p-5 flex items-center justify-between hover:bg-amber-50/50 transition"
-                      >
-                        <div className="flex items-center gap-3.5">
-                          <FileText className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                          <div>
-                            <h4 className="font-semibold text-slate-900 text-sm">
-                              {unassignedVideos.length + rIdx + 1}. {res.title}
-                            </h4>
-                            <span className="text-[10px] uppercase font-bold text-slate-400">
-                              {res.resource_type.replace("_", " ")}
+                          <div className="flex items-center gap-3 flex-shrink-0 self-end sm:self-auto">
+                            <MarkCompletedButton
+                              subjectId={id}
+                              videoId={vid.id}
+                            />
+                            <span className="px-4 py-2 bg-blue-50 text-[#1e3a8a] text-xs font-bold rounded-lg group-hover:bg-[#1e3a8a] group-hover:text-white transition-colors whitespace-nowrap">
+                              Watch →
                             </span>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MarkCompletedButton
-                            subjectId={id}
-                            resourceId={res.id}
-                          />
-                          <Link
-                            href={`/resources/item/${res.id}?type=doc`}
-                            className="px-4 py-2 bg-amber-50 text-[#d97706] text-xs font-bold rounded-lg hover:bg-[#f59e0b] hover:text-white transition whitespace-nowrap"
-                          >
-                            Read →
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
+                        </Link>
+                      ))}
+                      {unassignedDocs.map((doc: Resource) => (
+                        <Link
+                          key={doc.id}
+                          href={`/resources/item/${doc.id}?type=doc`}
+                          className="group flex items-center justify-between p-4 hover:bg-amber-50 transition gap-4 cursor-pointer"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <FileText className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                            <span className="text-sm font-semibold truncate group-hover:text-[#d97706] transition-colors">
+                              {doc.title}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3 flex-shrink-0 self-end sm:self-auto">
+                            <MarkCompletedButton
+                              subjectId={id}
+                              resourceId={doc.id}
+                            />
+                            <span className="px-4 py-2 bg-amber-50 text-[#d97706] text-xs font-bold rounded-lg group-hover:bg-[#f59e0b] group-hover:text-white transition-colors whitespace-nowrap">
+                              Read →
+                            </span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           </div>
 

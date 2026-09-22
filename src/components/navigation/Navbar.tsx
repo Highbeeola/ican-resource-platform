@@ -27,6 +27,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState<boolean>(true);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false);
@@ -79,6 +80,8 @@ export default function Navbar() {
         setIsAdmin(false);
         setUnreadCount(0);
       }
+
+      setIsChecking(false);
     }
 
     supabase.auth
@@ -206,7 +209,9 @@ export default function Navbar() {
 
           {/* DESKTOP AUTH / USER MENU */}
           <div className="hidden md:flex items-center gap-3">
-            {!user ? (
+            {isChecking ? (
+              <div className="w-32 h-10" />
+            ) : !user ? (
               <>
                 <Link
                   href="/login"
@@ -231,7 +236,7 @@ export default function Navbar() {
                     href="/admin/resources"
                     className="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 px-3 py-1.5 rounded-lg border border-slate-300 flex items-center gap-1.5 transition"
                   >
-                    <Shield className="w-3.5 h-3.5 text-[#1e3a8a]" />{" "}
+                    <Shield className="w-3.5 h-3.5 text-[#1e3a8a]" />
                     <span>Admin</span>
                   </Link>
                 )}
@@ -269,17 +274,6 @@ export default function Navbar() {
                       className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
                     >
                       <LayoutDashboard className="w-4 h-4" /> Dashboard
-                    </Link>
-                    <Link
-                      href="/notifications"
-                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
-                    >
-                      <Bell className="w-4 h-4" /> Notifications
-                      {unreadCount > 0 && (
-                        <span className="ml-auto bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                          {unreadCount}
-                        </span>
-                      )}
                     </Link>
                     <Link
                       href="/performance"
@@ -322,7 +316,7 @@ export default function Navbar() {
 
       {/* FULL-SCREEN MOBILE NAVIGATION SHEET */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden bg-white flex flex-col justify-between">
+        <div className="fixed inset-0 z-50 md:hidden bg-white flex flex-col justify-between h-dvh">
           {/* TOP HEADER */}
           <div className="px-4 h-16 flex items-center justify-between border-b border-slate-200 flex-shrink-0 bg-white">
             <Link href="/" onClick={() => setMobileMenuOpen(false)}>
@@ -338,70 +332,70 @@ export default function Navbar() {
           </div>
 
           {/* SCROLLABLE NAV BODY */}
-          <div className="px-5 py-6 flex-1 overflow-y-auto space-y-6 bg-white">
-            <nav className="flex flex-col gap-1 text-base">
-              <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
+          <div className="px-5 py-3 flex-1 overflow-y-auto max-h-[calc(100vh-14rem)] space-y-4 bg-white">
+            <nav className="flex flex-col gap-0.5 text-base">
+              <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
                 Main Navigation
               </span>
               <Link
                 href="/"
-                className={`p-3 rounded-xl flex items-center gap-3 transition font-medium ${
+                className={`p-2.5 rounded-xl flex items-center gap-3 transition font-medium text-sm ${
                   isActive("/")
                     ? "bg-blue-50/80 text-[#1e3a8a] font-bold"
                     : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
-                <Home className="w-5 h-5 text-slate-400" /> Home
+                <Home className="w-4 h-4 text-slate-400" /> Home
               </Link>
               <Link
                 href="/resources"
-                className={`p-3 rounded-xl flex items-center gap-3 transition font-medium ${
+                className={`p-2.5 rounded-xl flex items-center gap-3 transition font-medium text-sm ${
                   isActive("/resources")
                     ? "bg-blue-50/80 text-[#1e3a8a] font-bold"
                     : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
-                <BookOpen className="w-5 h-5 text-slate-400" /> Courses
+                <BookOpen className="w-4 h-4 text-slate-400" /> Courses
               </Link>
 
               {user && (
                 <>
                   <Link
                     href="/resources?type=pathfinder"
-                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
+                    className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
                   >
-                    <FileText className="w-5 h-5 text-slate-400" /> Pathfinders
+                    <FileText className="w-4 h-4 text-slate-400" /> Pathfinders
                   </Link>
                   <Link
                     href="/resources?type=past_question"
-                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
+                    className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
                   >
-                    <FileText className="w-5 h-5 text-slate-400" /> Past
+                    <FileText className="w-4 h-4 text-slate-400" /> Past
                     Questions
                   </Link>
 
-                  <div className="border-t border-slate-100 my-3" />
+                  <div className="border-t border-slate-100 my-2" />
 
-                  <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
+                  <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
                     Account & Analytics
                   </span>
                   <Link
                     href="/dashboard"
-                    className={`p-3 rounded-xl flex items-center gap-3 transition font-medium ${
+                    className={`p-2.5 rounded-xl flex items-center gap-3 transition font-medium text-sm ${
                       isActive("/dashboard")
                         ? "bg-blue-50/80 text-[#1e3a8a] font-bold"
                         : "text-slate-700 hover:bg-slate-50"
                     }`}
                   >
-                    <LayoutDashboard className="w-5 h-5 text-slate-400" />{" "}
+                    <LayoutDashboard className="w-4 h-4 text-slate-400" />{" "}
                     Dashboard
                   </Link>
                   <Link
                     href="/notifications"
-                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center justify-between font-medium transition"
+                    className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center justify-between font-medium text-sm transition"
                   >
                     <div className="flex items-center gap-3">
-                      <Bell className="w-5 h-5 text-slate-400" /> Notifications
+                      <Bell className="w-4 h-4 text-slate-400" /> Notifications
                     </div>
                     {unreadCount > 0 && (
                       <span className="bg-rose-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
@@ -411,45 +405,47 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/performance"
-                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
+                    className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
                   >
-                    <Target className="w-5 h-5 text-slate-400" /> Performance
+                    <Target className="w-4 h-4 text-slate-400" /> Performance
                     Analytics
                   </Link>
 
-                  <div className="border-t border-slate-100 my-3" />
+                  <div className="border-t border-slate-100 my-2" />
 
-                  <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
+                  <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
                     Company
                   </span>
                   <Link
                     href="/lecturers"
-                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
+                    className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
                   >
-                    <UserIcon className="w-5 h-5 text-slate-400" /> Faculty
+                    <UserIcon className="w-4 h-4 text-slate-400" /> Faculty
                     Directory
                   </Link>
                   <Link
                     href="/about"
-                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
+                    className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
                   >
-                    <Info className="w-5 h-5 text-slate-400" /> About Us
+                    <Info className="w-4 h-4 text-slate-400" /> About Us
                   </Link>
                   <Link
                     href="/contact"
-                    className="p-3 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium transition"
+                    className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
                   >
-                    <Mail className="w-5 h-5 text-slate-400" /> Contact
+                    <Mail className="w-4 h-4 text-slate-400" /> Contact
                   </Link>
                 </>
               )}
             </nav>
           </div>
 
-          {/* PINNED BOTTOM FOOTER WITH EXTRA PADDING FOR MOBILE TOOLBARS */}
-          <div className="p-5 pb-10 border-t border-slate-200 bg-white flex-shrink-0">
-            {user ? (
-              <div className="space-y-3">
+          {/* PINNED BOTTOM FOOTER */}
+          <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-slate-200 bg-white flex-shrink-0 mt-auto">
+            {isChecking ? (
+              <div className="h-10 w-full" />
+            ) : user ? (
+              <div className="space-y-2.5">
                 <div className="px-1 text-xs text-slate-500 flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
                   <span className="truncate">
@@ -460,22 +456,22 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full py-3.5 bg-rose-50 hover:bg-rose-100/80 active:bg-rose-200 text-rose-600 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer border border-rose-200"
+                  className="w-full py-2.5 bg-rose-50 hover:bg-rose-100/80 active:bg-rose-200 text-rose-600 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer border border-rose-200"
                 >
                   <LogOut className="w-4 h-4" /> Logout
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-2">
                 <Link
                   href="/login"
-                  className="w-full py-3 text-center bg-[#1e3a8a] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-blue-900 transition"
+                  className="w-full py-2.5 text-center bg-[#1e3a8a] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-blue-900 transition"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  className="w-full py-3 text-center bg-white text-slate-700 border border-slate-200 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition"
+                  className="w-full py-2.5 text-center bg-white text-slate-700 border border-slate-200 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition"
                 >
                   Register Free
                 </Link>

@@ -1,4 +1,5 @@
 "use client";
+
 import {
   useState,
   useTransition,
@@ -27,23 +28,6 @@ const ReactQuill = dynamic(
     loading: () => <p className="p-4 text-slate-400">Loading editor...</p>,
   },
 );
-
-// Register Quill imageResize ONCE outside the render loop
-let isImageResizeRegistered = false;
-function registerQuillImageResize() {
-  if (typeof window !== "undefined" && !isImageResizeRegistered) {
-    try {
-      const { Quill } = require("react-quill-new");
-      const ImageResize =
-        require("quill-image-resize-module-react").default ||
-        require("quill-image-resize-module-react");
-      Quill.register("modules/imageResize", ImageResize);
-      isImageResizeRegistered = true;
-    } catch (e) {
-      console.warn("Quill imageResize registration warning:", e);
-    }
-  }
-}
 
 interface Props {
   levels: Level[];
@@ -155,8 +139,6 @@ export default function AddArticleForm({
   }, []);
 
   const editorModules = useMemo(() => {
-    registerQuillImageResize();
-
     return {
       toolbar: {
         container: [
@@ -170,13 +152,6 @@ export default function AddArticleForm({
         handlers: {
           image: imageHandler,
         },
-      },
-      imageResize: {
-        parchment:
-          typeof window !== "undefined"
-            ? require("react-quill-new").Quill.import("parchment")
-            : null,
-        modules: ["Resize", "DisplaySize", "Toolbar"],
       },
     };
   }, [imageHandler]);
@@ -206,6 +181,9 @@ export default function AddArticleForm({
       onSubmit={handleSubmit}
       className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm text-slate-900"
     >
+      {/* 🚨 HIDDEN INPUT: Automatically sets category to Lecture Notes */}
+      <input type="hidden" name="resource_type" value="notes" />
+
       <div className="border-b border-slate-100 pb-3">
         <h2 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
           <Edit3 className="w-5 h-5 text-[#f59e0b]" />
@@ -229,7 +207,7 @@ export default function AddArticleForm({
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
             Level *
@@ -304,20 +282,6 @@ export default function AddArticleForm({
               tab.
             </p>
           )}
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
-            Category *
-          </label>
-          <select
-            name="resource_type"
-            required
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none capitalize"
-          >
-            <option value="notes">Lecture Notes</option>
-            <option value="study_text">Study Text</option>
-          </select>
         </div>
       </div>
 

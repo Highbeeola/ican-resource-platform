@@ -205,7 +205,7 @@ export default async function ResourcesPage({ searchParams }: PageProps) {
                           {pdfCount > 0 && (
                             <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-md text-xs font-bold">
                               <FileText className="w-3.5 h-3.5" />
-                              {pdfCount} PDFs
+                              {pdfCount} Docs
                             </span>
                           )}
                           {videoCount > 0 && (
