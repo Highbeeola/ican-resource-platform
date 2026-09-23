@@ -385,26 +385,34 @@ export default function AdminDashboardTabs({
 
         {mobilePickerOpen && (
           <div
-            className="fixed inset-0 z-50 flex items-end bg-black/40"
+            className="fixed inset-0 z-50 flex items-end bg-slate-900/40 backdrop-blur-sm"
             onClick={() => setMobilePickerOpen(false)}
           >
             <div
               className="w-full bg-white rounded-t-3xl max-h-[80vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom duration-200"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="sticky top-0 bg-white flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                <h3 className="font-bold text-[#1e3a8a] text-sm">
-                  Go to section
-                </h3>
-                <button
-                  onClick={() => setMobilePickerOpen(false)}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              <div className="sticky top-0 bg-white pt-3 px-5 pb-4 border-b border-slate-100">
+                <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-3" />
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-[#1e3a8a] text-sm">
+                    Go to section
+                  </h3>
+                  <button
+                    onClick={() => setMobilePickerOpen(false)}
+                    className="p-1.5 text-slate-400 hover:text-slate-700 cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 p-5">
+              <div
+                className="grid grid-cols-2 gap-3 p-5"
+                style={{
+                  paddingBottom: "max(2rem, env(safe-area-inset-bottom))",
+                }}
+              >
                 {visibleTabs.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = tab.id === activeTab;
