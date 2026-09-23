@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { Level, Subject, Resource, Video } from "@/types";
 import ResourceUploadForm from "@/components/admin/ResourceUploadForm";
 import VideoUploadForm from "@/components/admin/VideoUploadForm";
@@ -109,6 +109,20 @@ export default function AdminDashboardTabs({
 
   // MOBILE TAB PICKER STATE
   const [mobilePickerOpen, setMobilePickerOpen] = useState(false);
+
+  // Lock background scroll while the mobile picker sheet is open, and
+  // always restore it — on close AND on unmount — so it can never get
+  // stuck locked (e.g. if the component unmounts while the sheet is open).
+  useEffect(() => {
+    if (!mobilePickerOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobilePickerOpen]);
 
   // NUDGE STATE
   const [hideNudge, setHideNudge] = useState(false);
