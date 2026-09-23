@@ -39,6 +39,8 @@ import {
   FolderPlus,
   Mail,
   CheckCircle2,
+  ChevronDown,
+  LucideIcon,
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -76,6 +78,15 @@ type TabType =
   | "lecturer_profile"
   | "list";
 
+interface TabConfig {
+  id: TabType;
+  label: string;
+  shortLabel: string; // used in the mobile picker grid
+  icon: LucideIcon;
+  visible: boolean;
+  badge?: number;
+}
+
 export default function AdminDashboardTabs({
   levels,
   subjects,
@@ -95,6 +106,9 @@ export default function AdminDashboardTabs({
   const [videosList, setVideosList] = useState<Video[]>(initialVideos);
   const [questionsList, setQuestionsList] = useState<any[]>(initialQuestions);
   const [isPending, startTransition] = useTransition();
+
+  // MOBILE TAB PICKER STATE
+  const [mobilePickerOpen, setMobilePickerOpen] = useState(false);
 
   // NUDGE STATE
   const [hideNudge, setHideNudge] = useState(false);
@@ -236,6 +250,102 @@ export default function AdminDashboardTabs({
   const totalPublishedCount =
     resourcesList.length + videosList.length + questionsList.length;
 
+  // ===== SINGLE SOURCE OF TRUTH FOR ALL 12 NAV DESTINATIONS =====
+  // Both the desktop scroll bar and the mobile picker sheet render from this
+  // array, so adding/removing a tab only ever needs one edit.
+  const tabs: TabConfig[] = [
+    {
+      id: "analytics",
+      label: "Analytics",
+      shortLabel: "Analytics",
+      icon: BarChart3,
+      visible: isSuperAdmin,
+    },
+    {
+      id: "inbox",
+      label: "Inbox",
+      shortLabel: "Inbox",
+      icon: Mail,
+      visible: isSuperAdmin,
+      badge:
+        analytics.unreadMessages > 0 ? analytics.unreadMessages : undefined,
+    },
+    {
+      id: "pdf",
+      label: "Upload PDF",
+      shortLabel: "Upload PDF",
+      icon: FileText,
+      visible: true,
+    },
+    {
+      id: "video",
+      label: "Add Video",
+      shortLabel: "Add Video",
+      icon: VideoIcon,
+      visible: true,
+    },
+    {
+      id: "article",
+      label: "Write Article",
+      shortLabel: "Write Article",
+      icon: PenTool,
+      visible: true,
+    },
+    {
+      id: "module",
+      label: "Curriculum",
+      shortLabel: "Curriculum",
+      icon: FolderPlus,
+      visible: true,
+    },
+    {
+      id: "subject",
+      label: "Manage Subjects",
+      shortLabel: "Subjects",
+      icon: BookOpen,
+      visible: true,
+    },
+    {
+      id: "question",
+      label: "Question Bank",
+      shortLabel: "Questions",
+      icon: HelpCircle,
+      visible: true,
+    },
+    {
+      id: "announcement",
+      label: "Broadcast",
+      shortLabel: "Broadcast",
+      icon: Megaphone,
+      visible: true,
+    },
+    {
+      id: "faculty",
+      label: "Faculty Access",
+      shortLabel: "Faculty",
+      icon: ShieldCheck,
+      visible: isSuperAdmin,
+    },
+    {
+      id: "lecturer_profile",
+      label: "Lecturer Profiles",
+      shortLabel: "Lecturers",
+      icon: UserPlus,
+      visible: isSuperAdmin,
+    },
+    {
+      id: "list",
+      label: `All Published (${totalPublishedCount})`,
+      shortLabel: `Published (${totalPublishedCount})`,
+      icon: Layers,
+      visible: true,
+    },
+  ];
+
+  const visibleTabs = tabs.filter((t) => t.visible);
+  const activeTabConfig =
+    visibleTabs.find((t) => t.id === activeTab) ?? visibleTabs[0];
+
   const tabClass = (tab: TabType) => `
     flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center
     ${
@@ -245,10 +355,93 @@ export default function AdminDashboardTabs({
     }
   `;
 
+  function selectTab(tab: TabType) {
+    setActiveTab(tab);
+    setMobilePickerOpen(false);
+  }
+
   return (
     <div className="space-y-6">
-      {/* TAB NAVIGATION BAR */}
-      <div className="flex bg-slate-100 border border-slate-200 p-1.5 rounded-2xl w-full overflow-x-auto">
+      {/* ===== MOBILE NAV: current-tab pill that opens a full destination picker ===== */}
+      <div className="md:hidden">
+        <button
+          onClick={() => setMobilePickerOpen(true)}
+          className="w-full flex items-center justify-between gap-3 bg-[#1e3a8a] text-white px-4 py-3 rounded-2xl shadow-sm cursor-pointer"
+        >
+          <span className="flex items-center gap-2.5 font-bold text-sm">
+            <activeTabConfig.icon className="w-4 h-4" />
+            {activeTabConfig.label}
+            {activeTabConfig.badge ? (
+              <span className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                {activeTabConfig.badge}
+              </span>
+            ) : null}
+          </span>
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-100">
+            {visibleTabs.length} sections
+            <ChevronDown className="w-4 h-4" />
+          </span>
+        </button>
+
+        {mobilePickerOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-end bg-black/40"
+            onClick={() => setMobilePickerOpen(false)}
+          >
+            <div
+              className="w-full bg-white rounded-t-3xl max-h-[80vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-white flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                <h3 className="font-bold text-[#1e3a8a] text-sm">
+                  Go to section
+                </h3>
+                <button
+                  onClick={() => setMobilePickerOpen(false)}
+                  className="p-1.5 text-slate-400 hover:text-slate-700 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 p-5">
+                {visibleTabs.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = tab.id === activeTab;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => selectTab(tab.id)}
+                      className={`flex flex-col items-start gap-2 p-4 rounded-2xl border text-left transition cursor-pointer relative ${
+                        isActive
+                          ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
+                          : "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300"
+                      }`}
+                    >
+                      {tab.badge ? (
+                        <span className="absolute top-2.5 right-2.5 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                          {tab.badge}
+                        </span>
+                      ) : null}
+                      <Icon
+                        className={`w-5 h-5 ${
+                          isActive ? "text-white" : "text-[#1e3a8a]"
+                        }`}
+                      />
+                      <span className="text-xs font-bold leading-tight">
+                        {tab.shortLabel}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ===== DESKTOP NAV: original scrollable tab bar, unchanged, hidden on mobile ===== */}
+      <div className="hidden md:flex bg-slate-100 border border-slate-200 p-1.5 rounded-2xl w-full overflow-x-auto">
         {isSuperAdmin && (
           <button
             onClick={() => setActiveTab("analytics")}
@@ -734,7 +927,9 @@ export default function AdminDashboardTabs({
                       <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          checked={!!selectedItems?.find((i) => i.id === res.id)}
+                          checked={
+                            !!selectedItems?.find((i) => i.id === res.id)
+                          }
                           onChange={() => toggleSelection(res.id, "resource")}
                           className="w-4 h-4 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
                         />
@@ -788,7 +983,9 @@ export default function AdminDashboardTabs({
                       <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          checked={!!selectedItems?.find((i) => i.id === vid.id)}
+                          checked={
+                            !!selectedItems?.find((i) => i.id === vid.id)
+                          }
                           onChange={() => toggleSelection(vid.id, "video")}
                           className="w-4 h-4 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
                         />
@@ -990,7 +1187,9 @@ export default function AdminDashboardTabs({
                         <td className="p-3 sm:p-4">
                           <input
                             type="checkbox"
-                            checked={!!selectedItems?.find((i) => i.id === q.id)}
+                            checked={
+                              !!selectedItems?.find((i) => i.id === q.id)
+                            }
                             onChange={() => toggleSelection(q.id, "question")}
                             className="w-4 h-4 text-blue-600 rounded border-slate-300 cursor-pointer"
                           />
