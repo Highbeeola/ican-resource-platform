@@ -16,6 +16,7 @@ import {
   Timer,
   AlertCircle,
   X,
+  BookOpen,
 } from "lucide-react";
 
 export default function PracticeQuizPage() {
@@ -28,6 +29,10 @@ export default function PracticeQuizPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+  // Exercise selection states
+  const [availableExercises, setAvailableExercises] = useState<string[]>([]);
+  const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
+
   // Timer states
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -38,7 +43,7 @@ export default function PracticeQuizPage() {
     userAnswersRef.current = userAnswers;
   }, [userAnswers]);
 
-  // Fetch Subject and Practice Questions
+  // Fetch Subject and Available Exercise/Topic list
   useEffect(() => {
     const supabase = createClient();
 
@@ -50,14 +55,34 @@ export default function PracticeQuizPage() {
       .single()
       .then(({ data }) => setSubject(data));
 
-    // Fetch Practice Questions with Options
+    // Fetch available exercise topics
+    supabase
+      .from("questions")
+      .select("topic_name")
+      .eq("subject_id", subjectId)
+      .then(({ data, error }) => {
+        if (error) console.error("Error fetching exercise list:", error);
+        const unique = [
+          ...new Set(data?.map((q) => q.topic_name).filter(Boolean)),
+        ] as string[];
+        setAvailableExercises(unique);
+        setIsLoading(false);
+      });
+  }, [subjectId]);
+
+  // Function to start a specific exercise/mock test
+  function startExercise(exerciseName: string) {
+    setIsLoading(true);
+    setSelectedExercise(exerciseName);
+
+    const supabase = createClient();
     supabase
       .from("questions")
       .select("*, question_options(*)")
       .eq("subject_id", subjectId)
-      .limit(20)
+      .eq("topic_name", exerciseName)
       .then(({ data, error }) => {
-        if (error) console.error("Error fetching questions:", error);
+        if (error) console.error("Error fetching practice questions:", error);
         const fetchedQuestions = data || [];
         setQuestions(fetchedQuestions);
         setIsLoading(false);
@@ -68,7 +93,7 @@ export default function PracticeQuizPage() {
           setIsTimerRunning(true);
         }
       });
-  }, [subjectId]);
+  }
 
   // Submit Quiz Function
   const handleSubmitQuiz = useCallback(() => {
@@ -147,14 +172,15 @@ export default function PracticeQuizPage() {
               {subject?.name || "Subject"} Practice Test
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Answer practice questions and receive automatic scoring with
-              solution explanations.
+              {selectedExercise
+                ? `Currently taking: ${selectedExercise}`
+                : "Select an exercise or mock exam to start testing your knowledge."}
             </p>
           </div>
         </div>
 
-        {/* FLOATING TIMER (Fixed in viewport so it doesn't obstruct content) */}
-        {!result && questions.length > 0 && !isLoading && (
+        {/* FLOATING TIMER */}
+        {!result && selectedExercise && questions.length > 0 && !isLoading && (
           <div
             className={`fixed bottom-6 right-6 sm:bottom-auto sm:top-20 sm:right-8 z-30 flex items-center gap-2 px-4 py-2.5 rounded-2xl border-2 shadow-xl font-mono text-base sm:text-lg font-bold transition-all ${
               timeLeft <= 60
@@ -203,6 +229,17 @@ export default function PracticeQuizPage() {
               You answered {result.correctCount} out of {result.totalQuestions}{" "}
               questions correctly.
             </p>
+            <button
+              onClick={() => {
+                setResult(null);
+                setSelectedExercise(null);
+                setQuestions([]);
+                setUserAnswers({});
+              }}
+              className="mt-4 px-6 py-2.5 bg-[#1e3a8a] text-white font-bold rounded-xl text-xs sm:text-sm hover:bg-[#162c6d] transition shadow-sm cursor-pointer"
+            >
+              Back to Exercise List
+            </button>
           </div>
         )}
 
@@ -211,25 +248,54 @@ export default function PracticeQuizPage() {
           <div className="bg-white border border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center space-y-3 shadow-sm">
             <Loader2 className="w-8 h-8 text-[#f59e0b] animate-spin" />
             <p className="text-slate-500 font-medium">
-              Loading practice questions...
+              Loading practice test...
             </p>
           </div>
-        ) : questions.length === 0 ? (
+        ) : !selectedExercise && availableExercises.length > 0 ? (
+          /* EXERCISE SELECTION LOBBY */
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-5">
+            <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
+              <BookOpen className="w-5 h-5 text-[#f59e0b]" />
+              <h3 className="text-lg font-bold text-[#1e3a8a]">
+                Select a Practice Test / Exercise
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {availableExercises.map((ex) => (
+                <button
+                  key={ex}
+                  onClick={() => startExercise(ex)}
+                  className="p-5 text-left border border-slate-200 rounded-xl hover:border-[#f59e0b] hover:shadow-md transition group bg-slate-50/50 hover:bg-white cursor-pointer"
+                >
+                  <h4 className="font-bold text-slate-900 group-hover:text-[#1e3a8a] text-base">
+                    {ex}
+                  </h4>
+                  <p className="text-xs font-semibold text-slate-500 mt-2 flex items-center gap-1">
+                    <span>Start timed test</span>
+                    <span className="group-hover:translate-x-1 transition-transform">
+                      →
+                    </span>
+                  </p>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : !selectedExercise && availableExercises.length === 0 ? (
           /* EMPTY STATE */
           <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-12 text-center space-y-3 shadow-sm">
             <div className="w-12 h-12 bg-blue-50 text-[#1e3a8a] rounded-xl flex items-center justify-center mx-auto">
               <HelpCircle className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-slate-900">
-              No questions available yet!
+              No practice exercises available yet!
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
-              The faculty has not added any practice questions to this subject's
-              question bank. Please check back later.
+              The faculty has not added any exercises to this subject's question
+              bank. Please check back later.
             </p>
           </div>
         ) : (
-          /* QUESTIONS LIST */
+          /* QUESTIONS LIST (ACTIVE TEST) */
           <div className="space-y-6">
             {questions.map((q, qIdx) => (
               <div
@@ -317,7 +383,7 @@ export default function PracticeQuizPage() {
         )}
 
         {/* SUBMIT BUTTON */}
-        {!result && questions.length > 0 && !isLoading && (
+        {!result && selectedExercise && questions.length > 0 && !isLoading && (
           <button
             onClick={() => setShowConfirmModal(true)}
             disabled={isPending || answeredCount === 0}

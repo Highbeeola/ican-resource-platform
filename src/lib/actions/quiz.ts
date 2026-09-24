@@ -124,12 +124,16 @@ export async function submitQuizAttempt(
 export async function uploadBulkQuestions(
   subjectId: string,
   questionsData: any[],
+  quizGroupName: string,
 ) {
   const supabase = await createClient();
 
-  const questionsToInsert = [];
-  const optionsToInsert = [];
-  const questionIds: string[] = []; // Store IDs for potential rollback
+  // Ensure a fallback name if quizGroupName isn't explicitly provided or is blank
+  const finalGroupName = quizGroupName?.trim() || "General Practice Questions";
+
+  const questionsToInsert: any[] = [];
+  const optionsToInsert: any[] = [];
+  const questionIds: string[] = []; // Track IDs for manual rollback
 
   for (const row of questionsData) {
     const normRow: Record<string, string> = {};
@@ -145,7 +149,6 @@ export async function uploadBulkQuestions(
     const optB = normRow["optionb"] || normRow["b"];
     const optC = normRow["optionc"] || normRow["c"];
     const optD = normRow["optiond"] || normRow["d"];
-    const topic = normRow["topic"] || null;
     const explanation = normRow["explanation"] || null;
 
     let correctOpt = String(
@@ -155,15 +158,16 @@ export async function uploadBulkQuestions(
       .toUpperCase();
     correctOpt = correctOpt.replace("OPTION ", "").replace("OPTION", "").trim();
 
+    // Skip invalid rows missing mandatory fields
     if (!qText || !optA || !optB || !correctOpt) continue;
 
     const questionId = crypto.randomUUID();
-    questionIds.push(questionId); // Track for rollback
+    questionIds.push(questionId);
 
     questionsToInsert.push({
       id: questionId,
       subject_id: subjectId,
-      topic_name: topic,
+      topic_name: finalGroupName, // All questions get assigned to this Test Group
       question_text: qText,
       explanation: explanation,
     });
@@ -179,18 +183,20 @@ export async function uploadBulkQuestions(
       is_correct: correctOpt === "B",
     });
 
-    if (optC)
+    if (optC) {
       optionsToInsert.push({
         question_id: questionId,
         option_text: optC,
         is_correct: correctOpt === "C",
       });
-    if (optD)
+    }
+    if (optD) {
       optionsToInsert.push({
         question_id: questionId,
         option_text: optD,
         is_correct: correctOpt === "D",
       });
+    }
   }
 
   if (questionsToInsert.length === 0) {
@@ -204,14 +210,17 @@ export async function uploadBulkQuestions(
   const { error: qError } = await supabase
     .from("questions")
     .insert(questionsToInsert);
-  if (qError) return { error: `Failed to insert questions: ${qError.message}` };
+
+  if (qError) {
+    return { error: `Failed to insert questions: ${qError.message}` };
+  }
 
   // 2. Insert Options
   const { error: optError } = await supabase
     .from("question_options")
     .insert(optionsToInsert);
 
-  // 3. 🚨 THE ROLLBACK (If options fail, delete the questions we just inserted)
+  // 3. Rollback (Delete questions if inserting options fails)
   if (optError) {
     await supabase.from("questions").delete().in("id", questionIds);
     return {

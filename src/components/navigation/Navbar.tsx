@@ -166,45 +166,52 @@ export default function Navbar() {
                 >
                   Past Questions
                 </Link>
-
-                <div
-                  className="relative"
-                  onMouseLeave={() => setMoreDropdownOpen(false)}
-                >
-                  <button
-                    onMouseEnter={() => setMoreDropdownOpen(true)}
-                    onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
-                    className="flex items-center gap-1 hover:text-[#1e3a8a] transition py-2 focus:outline-none cursor-pointer"
-                  >
-                    <span>More</span>
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-
-                  {moreDropdownOpen && (
-                    <div className="absolute top-full left-0 w-44 bg-white rounded-xl shadow-xl border border-slate-200/80 py-2 text-slate-700 z-50">
-                      <Link
-                        href="/lecturers"
-                        className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
-                      >
-                        Faculty
-                      </Link>
-                      <Link
-                        href="/about"
-                        className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
-                      >
-                        About Us
-                      </Link>
-                      <Link
-                        href="/contact"
-                        className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
-                      >
-                        Contact
-                      </Link>
-                    </div>
-                  )}
-                </div>
               </>
             )}
+
+            {/* "More" dropdown is now always visible — About Us and
+                Contact are public marketing pages per the platform's own
+                access model (guests can view them pre-registration).
+                Faculty stays user-gated since it isn't listed as a guest
+                page; move it above the divider if you want it public too. */}
+            <div
+              className="relative"
+              onMouseLeave={() => setMoreDropdownOpen(false)}
+            >
+              <button
+                onMouseEnter={() => setMoreDropdownOpen(true)}
+                onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
+                className="flex items-center gap-1 hover:text-[#1e3a8a] transition py-2 focus:outline-none cursor-pointer"
+              >
+                <span>More</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+
+              {moreDropdownOpen && (
+                <div className="absolute top-full left-0 w-44 bg-white rounded-xl shadow-xl border border-slate-200/80 py-2 text-slate-700 z-50">
+                  {user && (
+                    <Link
+                      href="/lecturers"
+                      className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                    >
+                      Faculty
+                    </Link>
+                  )}
+                  <Link
+                    href="/about"
+                    className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                  >
+                    About Us
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                  >
+                    Contact
+                  </Link>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* DESKTOP AUTH / USER MENU */}
@@ -412,31 +419,36 @@ export default function Navbar() {
                   </Link>
 
                   <div className="border-t border-slate-100 my-2" />
-
-                  <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
-                    Company
-                  </span>
-                  <Link
-                    href="/lecturers"
-                    className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
-                  >
-                    <UserIcon className="w-4 h-4 text-slate-400" /> Faculty
-                    Directory
-                  </Link>
-                  <Link
-                    href="/about"
-                    className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
-                  >
-                    <Info className="w-4 h-4 text-slate-400" /> About Us
-                  </Link>
-                  <Link
-                    href="/contact"
-                    className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
-                  >
-                    <Mail className="w-4 h-4 text-slate-400" /> Contact
-                  </Link>
                 </>
               )}
+
+              {/* "Company" section is now always visible — About Us and
+                  Contact are guest-facing pages per the platform's access
+                  model. Faculty Directory still requires sign-in. */}
+              <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
+                Company
+              </span>
+              {user && (
+                <Link
+                  href="/lecturers"
+                  className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
+                >
+                  <UserIcon className="w-4 h-4 text-slate-400" /> Faculty
+                  Directory
+                </Link>
+              )}
+              <Link
+                href="/about"
+                className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
+              >
+                <Info className="w-4 h-4 text-slate-400" /> About Us
+              </Link>
+              <Link
+                href="/contact"
+                className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium text-sm transition"
+              >
+                <Mail className="w-4 h-4 text-slate-400" /> Contact
+              </Link>
             </nav>
           </div>
 

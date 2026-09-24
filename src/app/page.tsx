@@ -42,27 +42,101 @@ export default async function HomePage() {
               Explore Courses &rarr;
             </Link>
 
-            {/* DYNAMIC SECONDARY BUTTON */}
-            {user ? (
+            {/* DYNAMIC SECONDARY BUTTON — only shown once we know the visitor
+                is signed in. The nav bar already offers Login/Register to
+                guests, so repeating "Register Free" here was a duplicate
+                CTA; guests now see a single, unambiguous hero action. */}
+            {user && (
               <Link
                 href="/dashboard"
                 className="w-full sm:w-auto px-8 py-3.5 bg-transparent border-2 border-white hover:bg-white hover:text-[#1e3a8a] text-white font-bold rounded-md transition text-center"
               >
                 Go to Dashboard
               </Link>
-            ) : (
-              <Link
-                href="/register"
-                className="w-full sm:w-auto px-8 py-3.5 bg-transparent border-2 border-white hover:bg-white hover:text-[#1e3a8a] text-white font-bold rounded-md transition text-center"
-              >
-                Register Free
-              </Link>
             )}
           </div>
         </div>
       </section>
 
-      {/* SECTION 1: WHY CHOOSE KRL ACADEMY? */}
+      {/* SECTION 1: PROGRAMME SELECTION (moved up — this is the actual
+          decision point for most visitors, who already know which exam
+          body they're preparing for) */}
+      <section className="py-16 px-4 sm:px-6 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-7xl mx-auto space-y-10">
+          <div className="text-center space-y-2 max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#1e3a8a]">
+              Select Your Learning Track
+            </h2>
+            <p className="text-slate-600 text-xs sm:text-sm">
+              Choose your registered professional body to jump straight into
+              tailored study materials.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 hover:border-amber-500 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <div className="p-3 bg-blue-50 text-[#1e3a8a] rounded-xl">
+                    <GraduationCap className="w-7 h-7" />
+                  </div>
+                  <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full border border-amber-200">
+                    Professional Track
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-[#1e3a8a]">
+                  ICAN Programme
+                </h3>
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                  Access comprehensive study texts, video lectures, pathfinders,
+                  and past questions for Foundation, Skills, and Professional
+                  stages.
+                </p>
+              </div>
+
+              <Link
+                href="/resources?prog=ican"
+                className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-center transition text-sm flex items-center justify-center gap-2 shadow-sm"
+              >
+                <span>Explore ICAN Courses</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 hover:border-amber-500 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <div className="p-3 bg-blue-50 text-[#1e3a8a] rounded-xl">
+                    <Award className="w-7 h-7" />
+                  </div>
+                  <span className="px-3 py-1 bg-blue-50 text-[#1e3a8a] text-xs font-semibold rounded-full border border-blue-200">
+                    Technician Track
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-[#1e3a8a]">
+                  ATSWA Programme
+                </h3>
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                  Browse structured study materials and exam pathfinders for
+                  Accounting Technicians Scheme West Africa across Parts I, II &
+                  III.
+                </p>
+              </div>
+
+              <Link
+                href="/resources?prog=atswa"
+                className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-center transition text-sm flex items-center justify-center gap-2 shadow-sm"
+              >
+                <span>Explore ATSWA Courses</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 2: WHY CHOOSE KRL ACADEMY? (now supporting detail,
+          reinforcing the choice after the visitor has picked a track) */}
       <section className="py-16 px-4 sm:px-6 max-w-7xl mx-auto space-y-10">
         <div className="text-center space-y-2">
           <h2 className="text-2xl sm:text-3xl font-bold text-[#1e3a8a]">
@@ -160,80 +234,30 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 2: PROGRAMME SELECTION */}
-      <section className="py-16 px-4 sm:px-6 bg-slate-50 border-t border-slate-200">
-        <div className="max-w-7xl mx-auto space-y-10">
-          <div className="text-center space-y-2 max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#1e3a8a]">
-              Select Your Learning Track
+      {/* SECTION 3: CLOSING CTA BAND — fills the dead whitespace that used
+          to sit between the programme cards and the footer, and gives
+          guests one last unambiguous next step. Same navy/amber palette
+          as the hero, just inverted (light bg, colored text) so it reads
+          as a footer-adjacent band rather than a second hero. */}
+      {!user && (
+        <section className="py-14 px-4 sm:px-6 border-t border-slate-200">
+          <div className="max-w-3xl mx-auto text-center space-y-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#1e3a8a]">
+              Ready to start your exam prep?
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm">
-              Choose your registered professional body to jump straight into
-              tailored study materials.
+              Create a free account to unlock full course access, video
+              lectures, and practice tests.
             </p>
+            <Link
+              href="/register"
+              className="inline-block px-8 py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-md shadow-md transition"
+            >
+              Register Free &rarr;
+            </Link>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 hover:border-amber-500 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="p-3 bg-blue-50 text-[#1e3a8a] rounded-xl">
-                    <GraduationCap className="w-7 h-7" />
-                  </div>
-                  <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full border border-amber-200">
-                    Professional Track
-                  </span>
-                </div>
-                <h3 className="text-2xl font-bold text-[#1e3a8a]">
-                  ICAN Programme
-                </h3>
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                  Access comprehensive study texts, video lectures, pathfinders,
-                  and past questions for Foundation, Skills, and Professional
-                  stages.
-                </p>
-              </div>
-
-              <Link
-                href="/resources?prog=ican"
-                className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-center transition text-sm flex items-center justify-center gap-2 shadow-sm"
-              >
-                <span>Explore ICAN Courses</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 hover:border-amber-500 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="p-3 bg-blue-50 text-[#1e3a8a] rounded-xl">
-                    <Award className="w-7 h-7" />
-                  </div>
-                  <span className="px-3 py-1 bg-blue-50 text-[#1e3a8a] text-xs font-semibold rounded-full border border-blue-200">
-                    Technician Track
-                  </span>
-                </div>
-                <h3 className="text-2xl font-bold text-[#1e3a8a]">
-                  ATSWA Programme
-                </h3>
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                  Browse structured study materials and exam pathfinders for
-                  Accounting Technicians Scheme West Africa across Parts I, II &
-                  III.
-                </p>
-              </div>
-
-              <Link
-                href="/resources?prog=atswa"
-                className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-center transition text-sm flex items-center justify-center gap-2 shadow-sm"
-              >
-                <span>Explore ATSWA Courses</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

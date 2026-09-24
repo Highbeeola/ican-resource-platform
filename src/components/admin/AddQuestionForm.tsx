@@ -20,13 +20,16 @@ interface Props {
 export default function AddQuestionForm({ subjects }: Props) {
   const [mode, setMode] = useState<"manual" | "bulk">("bulk");
   const [selectedSubject, setSelectedSubject] = useState("");
+  const [exerciseName, setExerciseName] = useState("");
   const [isPending, startTransition] = useTransition();
 
   // HANDLE BULK CSV UPLOAD
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file || !selectedSubject) {
-      toast.error("Please select a subject and a CSV file.");
+    if (!file || !selectedSubject || !exerciseName) {
+      toast.error(
+        "Please select a subject, type a quiz name, and upload a file.",
+      );
       return;
     }
 
@@ -36,14 +39,19 @@ export default function AddQuestionForm({ subjects }: Props) {
       skipEmptyLines: true,
       complete: (results) => {
         startTransition(async () => {
-          const res = await uploadBulkQuestions(selectedSubject, results.data);
+          const res = await uploadBulkQuestions(
+            selectedSubject,
+            results.data,
+            exerciseName,
+          );
           if (res.success) {
             toast.success(
               `Successfully uploaded ${res.count} questions to the bank!`,
             );
             e.target.value = "";
+            setExerciseName("");
           } else {
-            toast.error("Error uploading bulk questions.");
+            toast.error(res.error || "Error uploading bulk questions.");
           }
         });
       },
@@ -66,6 +74,7 @@ export default function AddQuestionForm({ subjects }: Props) {
       } else {
         toast.success("Practice question added to Question Bank!");
         form.reset();
+        setExerciseName("");
       }
     });
   }
@@ -87,13 +96,21 @@ export default function AddQuestionForm({ subjects }: Props) {
         <div className="flex bg-slate-100 p-1 rounded-lg">
           <button
             onClick={() => setMode("bulk")}
-            className={`px-4 py-1.5 text-xs font-bold rounded-md transition cursor-pointer ${mode === "bulk" ? "bg-white text-[#1e3a8a] shadow-sm" : "text-slate-500 hover:text-slate-900"}`}
+            className={`px-4 py-1.5 text-xs font-bold rounded-md transition cursor-pointer ${
+              mode === "bulk"
+                ? "bg-white text-[#1e3a8a] shadow-sm"
+                : "text-slate-500 hover:text-slate-900"
+            }`}
           >
             Bulk Upload (CSV)
           </button>
           <button
             onClick={() => setMode("manual")}
-            className={`px-4 py-1.5 text-xs font-bold rounded-md transition cursor-pointer ${mode === "manual" ? "bg-white text-[#1e3a8a] shadow-sm" : "text-slate-500 hover:text-slate-900"}`}
+            className={`px-4 py-1.5 text-xs font-bold rounded-md transition cursor-pointer ${
+              mode === "manual"
+                ? "bg-white text-[#1e3a8a] shadow-sm"
+                : "text-slate-500 hover:text-slate-900"
+            }`}
           >
             Manual Entry
           </button>
@@ -106,7 +123,7 @@ export default function AddQuestionForm({ subjects }: Props) {
           {/* DOWNLOAD TEMPLATE BUTTON */}
           <div className="flex justify-end">
             <a
-              href="data:text/csv;charset=utf-8,Question,Option A,Option B,Option C,Option D,Correct Option,Explanation,Topic%0A%22Which financial statement shows assets and liabilities?%22,%22Income Statement%22,%22Balance Sheet%22,%22Cash Flow%22,%22Equity Statement%22,%22B%22,%22The Balance Sheet shows financial position.%22,%22Financial Statements%22"
+              href="data:text/csv;charset=utf-8,Question,Option A,Option B,Option C,Option D,Correct Option,Explanation%0A%22Which financial statement shows assets and liabilities?%22,%22Income Statement%22,%22Balance Sheet%22,%22Cash Flow%22,%22Equity Statement%22,%22B%22,%22The Balance Sheet shows financial position.%22"
               download="KRL_Academy_Quiz_Template.csv"
               className="text-xs font-bold text-[#1e3a8a] bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg border border-blue-200 transition"
             >
@@ -114,22 +131,38 @@ export default function AddQuestionForm({ subjects }: Props) {
             </a>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Target Subject *
-            </label>
-            <select
-              value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full sm:w-1/2 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
-            >
-              <option value="">Select Subject to upload questions to</option>
-              {subjects.map((sub: Subject) => (
-                <option key={sub.id} value={sub.id}>
-                  {sub.name}
-                </option>
-              ))}
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Target Subject *
+              </label>
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+              >
+                <option value="">Select Subject</option>
+                {subjects.map((sub: Subject) => (
+                  <option key={sub.id} value={sub.id}>
+                    {sub.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Quiz / Mock Exam Name *
+              </label>
+              <input
+                type="text"
+                required
+                value={exerciseName}
+                onChange={(e) => setExerciseName(e.target.value)}
+                placeholder="e.g. May 2026 Mock Exam"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+              />
+            </div>
           </div>
 
           {/* UPLOAD DRAG & DROP ZONE */}
@@ -139,7 +172,7 @@ export default function AddQuestionForm({ subjects }: Props) {
             </div>
             <div>
               <p className="font-bold text-[#1e3a8a]">
-                Upload CSV or XSLX File
+                Upload CSV or XLSX File
               </p>
               <p className="text-xs text-slate-500 mt-1">
                 Please use the exact headers from the downloaded sample
@@ -147,16 +180,16 @@ export default function AddQuestionForm({ subjects }: Props) {
               </p>
             </div>
 
-            <div className="relative inline-block mt-2">
+            <div className="relative inline-block mt-2 group">
               <input
                 type="file"
-                accept=".csv"
+                accept=".xlsx, .xls, .csv"
                 onChange={handleFileUpload}
-                disabled={!selectedSubject || isPending}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                disabled={!selectedSubject || !exerciseName || isPending}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
               />
               <button
-                disabled={!selectedSubject || isPending}
+                disabled={!selectedSubject || !exerciseName || isPending}
                 className="px-6 py-2.5 bg-[#1e3a8a] text-white font-bold rounded-lg text-sm transition shadow-md disabled:opacity-50 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
               >
                 {isPending ? (
@@ -164,8 +197,16 @@ export default function AddQuestionForm({ subjects }: Props) {
                 ) : (
                   <UploadCloud className="w-4 h-4" />
                 )}
-                {isPending ? "Uploading..." : "Select CSV File"}
+                {isPending ? "Uploading..." : "Select File"}
               </button>
+
+              {/* Tooltip update */}
+              {(!selectedSubject || !exerciseName) && (
+                <div className="absolute top-full mt-2 hidden group-hover:block bg-slate-800 text-white text-xs font-medium px-3 py-2 rounded-lg z-20 w-48 left-1/2 -translate-x-1/2 shadow-lg text-center">
+                  Select a Subject and type a Quiz Name first!
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -192,14 +233,16 @@ export default function AddQuestionForm({ subjects }: Props) {
                 ))}
               </select>
             </div>
+
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Topic Name
+                Quiz / Mock Exam Name *
               </label>
               <input
                 type="text"
                 name="topic_name"
-                placeholder="e.g. IAS 16"
+                required
+                placeholder="e.g. Summer Coaching Practice Test"
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
               />
             </div>
