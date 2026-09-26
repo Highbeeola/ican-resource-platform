@@ -10,6 +10,7 @@ export async function createVideo(formData: FormData) {
   const description = formData.get("description") as string;
   const levelId = formData.get("level_id") as string;
   const subjectId = formData.get("subject_id") as string;
+  const moduleId = formData.get("module_id") as string;
   const videoUrl = formData.get("video_url") as string;
   const durationMinutes = formData.get("duration_minutes")
     ? parseInt(formData.get("duration_minutes") as string)
@@ -25,6 +26,7 @@ export async function createVideo(formData: FormData) {
     description,
     level_id: levelId,
     subject_id: subjectId,
+    module_id: moduleId || null,
     video_url: videoUrl,
     duration_minutes: durationMinutes,
     instructor_name: instructorName || null,

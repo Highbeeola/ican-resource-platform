@@ -3,27 +3,33 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function Footer() {
   const pathname = usePathname();
 
-  // ONLY RENDER FOOTER ON THE HOMEPAGE
+  // Homepage-only by design — the fuller footer reads as heavy/odd on
+  // inner app pages (dashboard, resources, etc.), so it's intentionally
+  // scoped to "/" rather than rendered site-wide.
   if (pathname !== "/") {
     return null;
   }
 
   return (
-    <footer className="bg-white border-t border-slate-200 mt-16 py-6 px-4 sm:px-6">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-        {/* COPYRIGHT */}
-        <p className="text-slate-400 text-xs text-center sm:text-left font-medium">
-          © {new Date().getFullYear()} KRL Academy. All rights reserved.
-        </p>
+    <footer className="bg-white border-t border-slate-200 mt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+        {/* BRAND + SOCIALS */}
+        <div className="space-y-4 lg:col-span-2">
+          <BrandLogo />
+          <p className="text-slate-500 text-xs sm:text-sm leading-relaxed max-w-xs">
+            Comprehensive preparation for ICAN & ATSWA professional exams —
+            study texts, video lectures, pathfinders, and revision guides in one
+            place.
+          </p>
 
-        {/* SOCIALS & FACULTY ACCESS */}
-        <div className="flex flex-wrap items-center justify-center gap-6">
-          <div className="flex items-center gap-3 text-slate-400">
-            {/* Facebook */}
+          {/* TODO: replace href="#" below with your real social profile
+              links once they exist. */}
+          <div className="flex items-center gap-3 text-slate-400 pt-2">
             <a
               href="#"
               target="_blank"
@@ -36,7 +42,6 @@ export default function Footer() {
               </svg>
             </a>
 
-            {/* X / Twitter */}
             <a
               href="#"
               target="_blank"
@@ -49,7 +54,6 @@ export default function Footer() {
               </svg>
             </a>
 
-            {/* Instagram */}
             <a
               href="#"
               target="_blank"
@@ -69,7 +73,6 @@ export default function Footer() {
               </svg>
             </a>
 
-            {/* LinkedIn */}
             <a
               href="#"
               target="_blank"
@@ -82,10 +85,79 @@ export default function Footer() {
               </svg>
             </a>
           </div>
+        </div>
 
-          <div className="w-px h-5 bg-slate-200 hidden sm:block"></div>
+        {/* QUICK LINKS */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            Quick Links
+          </h3>
+          <nav className="flex flex-col gap-2 text-sm text-slate-600">
+            <Link href="/" className="hover:text-[#1e3a8a] transition w-fit">
+              Home
+            </Link>
+            <Link
+              href="/resources"
+              className="hover:text-[#1e3a8a] transition w-fit"
+            >
+              Courses
+            </Link>
+            <Link
+              href="/about"
+              className="hover:text-[#1e3a8a] transition w-fit"
+            >
+              About Us
+            </Link>
+            <Link
+              href="/contact"
+              className="hover:text-[#1e3a8a] transition w-fit"
+            >
+              Contact
+            </Link>
+          </nav>
+        </div>
 
-          {/* FACULTY PORTAL */}
+        {/* PROGRAMMES */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            Programmes
+          </h3>
+          <nav className="flex flex-col gap-2 text-sm text-slate-600">
+            <Link
+              href="/resources?prog=ican"
+              className="hover:text-[#1e3a8a] transition w-fit"
+            >
+              ICAN Programme
+            </Link>
+            <Link
+              href="/resources?prog=atswa"
+              className="hover:text-[#1e3a8a] transition w-fit"
+            >
+              ATSWA Programme
+            </Link>
+            <Link
+              href="/resources?type=pathfinder"
+              className="hover:text-[#1e3a8a] transition w-fit"
+            >
+              Pathfinders
+            </Link>
+            <Link
+              href="/resources?type=past_question"
+              className="hover:text-[#1e3a8a] transition w-fit"
+            >
+              Past Questions
+            </Link>
+          </nav>
+        </div>
+      </div>
+
+      {/* BOTTOM BAR */}
+      <div className="border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-slate-400 text-xs text-center sm:text-left font-medium">
+            © {new Date().getFullYear()} KRL Academy. All rights reserved.
+          </p>
+
           <Link
             href="/admin/login"
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 text-slate-700 hover:text-amber-700 transition-all font-semibold text-xs shadow-xs"

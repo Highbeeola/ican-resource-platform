@@ -9,14 +9,17 @@ export async function getStudentDashboardData(userId: string) {
     .select("*, level:levels(*, programme:programmes(*))")
     .eq("id", userId)
     .single();
+
   const { count: completedCount } = await supabase
     .from("user_progress")
     .select("*", { count: "exact", head: true })
     .eq("user_id", userId);
+
   const { count: quizCount } = await supabase
     .from("quiz_attempts")
     .select("*", { count: "exact", head: true })
     .eq("user_id", userId);
+
   const { data: favorites } = await supabase
     .from("favorites")
     .select(
@@ -35,9 +38,10 @@ export async function getStudentDashboardData(userId: string) {
     .limit(3);
 
   // 3. Performance & Recommendations Engine
+  // Updated select to fetch subject_id instead of quiz_id
   const { data: quizAttempts } = await supabase
     .from("quiz_attempts")
-    .select("score_percentage, quiz_id, subject:subjects(name)")
+    .select("score_percentage, subject_id, subject:subjects(name)")
     .eq("user_id", userId);
 
   let avgQuizScore = 0;
@@ -45,18 +49,26 @@ export async function getStudentDashboardData(userId: string) {
 
   if (quizAttempts && quizAttempts.length > 0) {
     const totalScore = quizAttempts.reduce(
-      (acc, curr) => acc + curr.score_percentage,
+      (acc, curr) => acc + (curr.score_percentage || 0),
       0,
     );
     avgQuizScore = Math.round(totalScore / quizAttempts.length);
 
     // Identify subjects where average is < 50%
     const subScores: Record<string, { total: number; count: number }> = {};
+
     quizAttempts.forEach((a) => {
-      if (!subScores[a.quiz_id]) subScores[a.quiz_id] = { total: 0, count: 0 };
-      subScores[a.quiz_id].total += a.score_percentage;
-      subScores[a.quiz_id].count += 1;
+      // Updated to access a.subject_id
+      const subId = a.subject_id;
+      if (subId) {
+        if (!subScores[subId]) {
+          subScores[subId] = { total: 0, count: 0 };
+        }
+        subScores[subId].total += a.score_percentage || 0;
+        subScores[subId].count += 1;
+      }
     });
+
     weakSubjectIds = Object.keys(subScores).filter(
       (id) => subScores[id].total / subScores[id].count < 50,
     );

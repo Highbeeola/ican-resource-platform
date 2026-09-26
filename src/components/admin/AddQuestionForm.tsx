@@ -23,6 +23,22 @@ export default function AddQuestionForm({ subjects }: Props) {
   const [exerciseName, setExerciseName] = useState("");
   const [isPending, startTransition] = useTransition();
 
+  // Render options using relational database properties
+  const renderSubjectOptions = () => {
+    return subjects.map((sub: any) => {
+      const progName =
+        sub.level?.programme?.slug === "atswa" ? "ATSWA" : "ICAN";
+      const levelName = sub.level?.name ? ` ${sub.level.name}` : "";
+
+      return (
+        <option key={sub.id} value={sub.id}>
+          {progName}
+          {levelName} — {sub.name}
+        </option>
+      );
+    });
+  };
+
   // HANDLE BULK CSV UPLOAD
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -141,12 +157,10 @@ export default function AddQuestionForm({ subjects }: Props) {
                 onChange={(e) => setSelectedSubject(e.target.value)}
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
               >
-                <option value="">Select Subject</option>
-                {subjects.map((sub: Subject) => (
-                  <option key={sub.id} value={sub.id}>
-                    {sub.name}
-                  </option>
-                ))}
+                <option value="" disabled>
+                  Select Subject
+                </option>
+                {renderSubjectOptions()}
               </select>
             </div>
 
@@ -200,7 +214,6 @@ export default function AddQuestionForm({ subjects }: Props) {
                 {isPending ? "Uploading..." : "Select File"}
               </button>
 
-              {/* Tooltip update */}
               {(!selectedSubject || !exerciseName) && (
                 <div className="absolute top-full mt-2 hidden group-hover:block bg-slate-800 text-white text-xs font-medium px-3 py-2 rounded-lg z-20 w-48 left-1/2 -translate-x-1/2 shadow-lg text-center">
                   Select a Subject and type a Quiz Name first!
@@ -225,12 +238,10 @@ export default function AddQuestionForm({ subjects }: Props) {
                 required
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
               >
-                <option value="">Select Subject</option>
-                {subjects.map((sub: Subject) => (
-                  <option key={sub.id} value={sub.id}>
-                    {sub.name}
-                  </option>
-                ))}
+                <option value="" disabled>
+                  Select Subject
+                </option>
+                {renderSubjectOptions()}
               </select>
             </div>
 

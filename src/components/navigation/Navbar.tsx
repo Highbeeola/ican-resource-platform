@@ -23,12 +23,41 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import BrandLogo from "@/components/BrandLogo";
 
+// Given a list of timestamps (any order), returns the number of
+// *consecutive calendar days ending today* that have at least one
+// entry — a real day-streak, not a lifetime count.
+//
+// Grace period: if nothing is logged yet today, the streak still
+// counts as intact as long as yesterday has an entry — otherwise
+// every user's streak would show 0 first thing in the morning before
+// they've had a chance to study today.
+function calculateDayStreak(timestamps: string[]): number {
+  if (!timestamps.length) return 0;
+
+  const daySet = new Set(timestamps.map((t) => new Date(t).toDateString()));
+
+  let streak = 0;
+  const cursor = new Date();
+
+  if (!daySet.has(cursor.toDateString())) {
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  while (daySet.has(cursor.toDateString())) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return streak;
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(true);
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [streak, setStreak] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState<boolean>(false);
@@ -49,7 +78,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch User, Role, and Notifications
+  // Fetch User, Role, Notifications, and Day Streak
   useEffect(() => {
     const supabase = createClient();
 
@@ -76,9 +105,25 @@ export default function Navbar() {
 
         const unread = (totalNotes || 0) - (readNotes || 0);
         setUnreadCount(unread > 0 ? unread : 0);
+
+        // Fetch recent activity timestamps to compute a real day-streak.
+        // 400 rows is generous headroom for even a very active daily
+        // user across a full year; adjust "created_at" below if your
+        // actual column is named differently (e.g. "completed_at").
+        const { data: progressRows } = await supabase
+          .from("user_progress")
+          .select("created_at")
+          .eq("user_id", sessionUser.id)
+          .order("created_at", { ascending: false })
+          .limit(400);
+
+        setStreak(
+          calculateDayStreak((progressRows || []).map((r) => r.created_at)),
+        );
       } else {
         setIsAdmin(false);
         setUnreadCount(0);
+        setStreak(0);
       }
 
       setIsChecking(false);
@@ -169,11 +214,6 @@ export default function Navbar() {
               </>
             )}
 
-            {/* "More" dropdown is now always visible — About Us and
-                Contact are public marketing pages per the platform's own
-                access model (guests can view them pre-registration).
-                Faculty stays user-gated since it isn't listed as a guest
-                page; move it above the divider if you want it public too. */}
             <div
               className="relative"
               onMouseLeave={() => setMoreDropdownOpen(false)}
@@ -248,6 +288,24 @@ export default function Navbar() {
                   </Link>
                 )}
 
+                {/* DAY STREAK PILL */}
+                <div
+                  className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200/80 rounded-full shadow-xs cursor-default"
+                  title={`${streak} day streak`}
+                >
+                  <span
+                    className="text-base leading-none"
+                    style={{
+                      textShadow: "0 0 8px rgba(245, 158, 11, 0.4)",
+                    }}
+                  >
+                    🔥
+                  </span>
+                  <span className="text-amber-900 text-xs font-extrabold">
+                    {streak}
+                  </span>
+                </div>
+
                 <Link
                   href="/notifications"
                   className="relative p-2 text-slate-600 hover:text-[#1e3a8a] hover:bg-slate-100 rounded-full transition"
@@ -309,7 +367,18 @@ export default function Navbar() {
           </div>
 
           {/* MOBILE HAMBURGER BUTTON */}
-          <div className="flex md:hidden items-center">
+          <div className="flex md:hidden items-center gap-2">
+            {user && (
+              <div
+                className="flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-200/80 rounded-full shadow-xs cursor-default"
+                title={`${streak} day streak`}
+              >
+                <span className="text-sm leading-none">🔥</span>
+                <span className="text-amber-900 text-xs font-extrabold">
+                  {streak}
+                </span>
+              </div>
+            )}
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="p-2 text-slate-600 hover:text-slate-900 focus:outline-none cursor-pointer rounded-lg hover:bg-slate-100 transition"
@@ -422,9 +491,6 @@ export default function Navbar() {
                 </>
               )}
 
-              {/* "Company" section is now always visible — About Us and
-                  Contact are guest-facing pages per the platform's access
-                  model. Faculty Directory still requires sign-in. */}
               <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase px-3 mb-1">
                 Company
               </span>

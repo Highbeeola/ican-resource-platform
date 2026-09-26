@@ -75,6 +75,13 @@ export async function createQuestion(formData: FormData) {
 }
 
 // 2. Submit Student Quiz Attempt
+// Define the type for the selected option properties
+interface CorrectOption {
+  id: string;
+  question_id: string;
+  is_correct: boolean;
+}
+
 export async function submitQuizAttempt(
   subjectId: string,
   totalQuestions: number,
@@ -91,14 +98,27 @@ export async function submitQuizAttempt(
 
   // Fetch correct options for answered questions
   const questionIds = Object.keys(userAnswers);
-  const { data: correctOptions } = await supabase
-    .from("question_options")
-    .select("id, question_id, is_correct")
-    .in("question_id", questionIds)
-    .eq("is_correct", true);
+  
+  // Explicitly type correctOptions using the interface
+  let correctOptions: CorrectOption[] = [];
+  
+  if (questionIds.length > 0) {
+    const { data, error: fetchError } = await supabase
+      .from("question_options")
+      .select("id, question_id, is_correct")
+      .in("question_id", questionIds)
+      .eq("is_correct", true);
+
+    if (fetchError) {
+      console.error("Error fetching correct options:", fetchError);
+      return { error: "Failed to evaluate quiz answers." };
+    }
+    
+    correctOptions = (data as CorrectOption[]) || [];
+  }
 
   let correctCount = 0;
-  correctOptions?.forEach((opt) => {
+  correctOptions.forEach((opt) => {
     if (userAnswers[opt.question_id] === opt.id) {
       correctCount++;
     }
@@ -108,16 +128,25 @@ export async function submitQuizAttempt(
     (correctCount / (totalQuestions || 1)) * 100,
   );
 
-  // Record attempt
-  await supabase.from("quiz_attempts").insert({
+  // Record attempt with error handling & subject_id schema fix
+  const { error: insertError } = await supabase.from("quiz_attempts").insert({
     user_id: user.id,
-    quiz_id: subjectId, // Subject practice test ID
+    subject_id: subjectId,
     score_percentage: scorePercentage,
     total_questions: totalQuestions,
     correct_answers: correctCount,
   });
 
+  if (insertError) {
+    console.error("Quiz Save Error:", insertError);
+    return { error: "Failed to save quiz score to the database." };
+  }
+
+  // Revalidate relevant cache paths
   revalidatePath("/dashboard");
+  revalidatePath("/performance");
+  revalidatePath("/admin/resources");
+
   return { success: true, scorePercentage, correctCount, totalQuestions };
 }
 

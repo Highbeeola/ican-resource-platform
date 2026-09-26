@@ -75,7 +75,7 @@ export default async function SubjectDetailsPage({
     const { data: quizData } = await supabase
       .from("quiz_attempts")
       .select("*")
-      .eq("quiz_id", id)
+      .eq("subject_id", id)
       .eq("user_id", user.id)
       .order("completed_at", { ascending: false });
     quizzes = quizData || [];

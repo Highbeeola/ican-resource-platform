@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 interface Props {
   levels: Level[];
   subjects: Subject[];
-  modules: any[];
+  modules?: any[];
 }
 
 export default function VideoUploadForm({
@@ -133,26 +133,25 @@ export default function VideoUploadForm({
         {/* MODULE SELECTOR */}
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
-            Assign to Module{" "}
-            <span className="text-slate-400 font-normal">(Optional)</span>
+            Assign to Module
           </label>
           <select
             name="module_id"
             disabled={!selectedSubjectId}
             value={selectedModuleId}
             onChange={(e) => setSelectedModuleId(e.target.value)}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition disabled:opacity-50 disabled:bg-slate-100 cursor-pointer disabled:cursor-not-allowed"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none disabled:opacity-50 disabled:bg-slate-100 transition"
           >
             <option value="">
               {!selectedSubjectId
                 ? "Select a Subject First"
                 : filteredModules.length === 0
-                  ? "-- General / Unassigned (No Modules Found) --"
-                  : "-- General / Unassigned --"}
+                  ? "General / Unassigned (No Modules Found)"
+                  : "General / Unassigned"}
             </option>
             {filteredModules.map((m: any, index: number) => (
               <option key={m.id} value={m.id}>
-                Module {m.display_order || index + 1}: {m.title}
+                {m.title}
               </option>
             ))}
           </select>

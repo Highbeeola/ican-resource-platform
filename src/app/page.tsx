@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminAnalytics } from "@/lib/services/analytics";
+import FAQSection from "@/components/FAQSection";
 import {
   Video,
   FileCheck,
@@ -16,6 +18,8 @@ export default async function HomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const stats = await getAdminAnalytics();
 
   return (
     <div className="bg-white text-slate-900 min-h-screen">
@@ -34,7 +38,6 @@ export default async function HomePage() {
 
           {/* INTEGRATED CTA BUTTONS */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
-            {/* ALWAYS SHOW EXPLORE COURSES */}
             <Link
               href="/resources"
               className="w-full sm:w-auto px-8 py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-md shadow-md transition text-center"
@@ -42,10 +45,6 @@ export default async function HomePage() {
               Explore Courses &rarr;
             </Link>
 
-            {/* DYNAMIC SECONDARY BUTTON — only shown once we know the visitor
-                is signed in. The nav bar already offers Login/Register to
-                guests, so repeating "Register Free" here was a duplicate
-                CTA; guests now see a single, unambiguous hero action. */}
             {user && (
               <Link
                 href="/dashboard"
@@ -58,9 +57,37 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 1: PROGRAMME SELECTION (moved up — this is the actual
-          decision point for most visitors, who already know which exam
-          body they're preparing for) */}
+      {/* STATS STRIP */}
+      <section className="bg-[#1e3a8a] border-y border-blue-800 py-10 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:divide-x sm:divide-blue-800/50">
+          <div className="space-y-1">
+            <p className="text-3xl sm:text-4xl font-extrabold text-[#f59e0b]">
+              {stats.totalSubjects}+
+            </p>
+            <p className="text-xs sm:text-sm font-semibold text-blue-200 uppercase tracking-wider">
+              Courses
+            </p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-3xl sm:text-4xl font-extrabold text-[#f59e0b]">
+              {stats.totalResources}+
+            </p>
+            <p className="text-xs sm:text-sm font-semibold text-blue-200 uppercase tracking-wider">
+              Study Materials
+            </p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-3xl sm:text-4xl font-extrabold text-[#f59e0b]">
+              {stats.totalVideos}+
+            </p>
+            <p className="text-xs sm:text-sm font-semibold text-blue-200 uppercase tracking-wider">
+              Video Lectures
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* PROGRAMME SELECTION */}
       <section className="py-16 px-4 sm:px-6 bg-slate-50 border-t border-slate-200">
         <div className="max-w-7xl mx-auto space-y-10">
           <div className="text-center space-y-2 max-w-2xl mx-auto">
@@ -135,8 +162,65 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 2: WHY CHOOSE KRL ACADEMY? (now supporting detail,
-          reinforcing the choice after the visitor has picked a track) */}
+      {/* HOW IT WORKS */}
+      <section className="py-16 px-4 sm:px-6 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-7xl mx-auto space-y-12">
+          <div className="text-center space-y-3">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1e3a8a]">
+              How KRL Academy Works
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto">
+              Your journey to becoming a Chartered Accountant, simplified into
+              three steps.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            <div className="hidden md:block absolute top-12 left-[15%] right-[15%] h-0.5 bg-blue-100 -z-10"></div>
+
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center space-y-4 relative">
+              <div className="w-12 h-12 bg-[#1e3a8a] text-white rounded-full flex items-center justify-center font-bold text-xl mx-auto shadow-md">
+                1
+              </div>
+              <h3 className="text-xl font-bold text-[#1e3a8a]">
+                Register for Free
+              </h3>
+              <p className="text-slate-600 text-sm">
+                Create your student account in seconds to unlock your
+                personalized learning dashboard.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center space-y-4 relative">
+              <div className="w-12 h-12 bg-[#1e3a8a] text-white rounded-full flex items-center justify-center font-bold text-xl mx-auto shadow-md">
+                2
+              </div>
+              <h3 className="text-xl font-bold text-[#1e3a8a]">
+                Choose Your Stage
+              </h3>
+              <p className="text-slate-600 text-sm">
+                Select your current ICAN or ATSWA level to automatically
+                generate your exact exam syllabus.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center space-y-4 relative">
+              <div className="w-12 h-12 bg-[#f59e0b] text-white rounded-full flex items-center justify-center font-bold text-xl mx-auto shadow-md">
+                3
+              </div>
+              <h3 className="text-xl font-bold text-[#1e3a8a]">
+                Study & Practice
+              </h3>
+              <p className="text-slate-600 text-sm">
+                Watch videos, read lecture notes, and take auto-graded mock
+                exams to track your performance.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHY CHOOSE KRL ACADEMY? */}
       <section className="py-16 px-4 sm:px-6 max-w-7xl mx-auto space-y-10">
         <div className="text-center space-y-2">
           <h2 className="text-2xl sm:text-3xl font-bold text-[#1e3a8a]">
@@ -234,11 +318,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 3: CLOSING CTA BAND — fills the dead whitespace that used
-          to sit between the programme cards and the footer, and gives
-          guests one last unambiguous next step. Same navy/amber palette
-          as the hero, just inverted (light bg, colored text) so it reads
-          as a footer-adjacent band rather than a second hero. */}
+      {/* CLOSING CTA BAND */}
       {!user && (
         <section className="py-14 px-4 sm:px-6 border-t border-slate-200">
           <div className="max-w-3xl mx-auto text-center space-y-5">
@@ -258,6 +338,9 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* FAQ SECTION */}
+      <FAQSection />
     </div>
   );
 }
