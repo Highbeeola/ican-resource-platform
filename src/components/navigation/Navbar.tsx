@@ -23,34 +23,6 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import BrandLogo from "@/components/BrandLogo";
 
-// Given a list of timestamps (any order), returns the number of
-// *consecutive calendar days ending today* that have at least one
-// entry — a real day-streak, not a lifetime count.
-//
-// Grace period: if nothing is logged yet today, the streak still
-// counts as intact as long as yesterday has an entry — otherwise
-// every user's streak would show 0 first thing in the morning before
-// they've had a chance to study today.
-function calculateDayStreak(timestamps: string[]): number {
-  if (!timestamps.length) return 0;
-
-  const daySet = new Set(timestamps.map((t) => new Date(t).toDateString()));
-
-  let streak = 0;
-  const cursor = new Date();
-
-  if (!daySet.has(cursor.toDateString())) {
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  while (daySet.has(cursor.toDateString())) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  return streak;
-}
-
 export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
@@ -86,13 +58,17 @@ export default function Navbar() {
       setUser(sessionUser);
 
       if (sessionUser) {
+        // Fetch user profile role and true daily streak
         const { data: profile } = await supabase
           .from("profiles")
-          .select("role")
+          .select("role, current_streak")
           .eq("id", sessionUser.id)
           .single();
-        setIsAdmin(profile?.role === "admin");
 
+        setIsAdmin(profile?.role === "admin");
+        setStreak(profile?.current_streak || 0);
+
+        // Fetch unread notifications count
         const { count: totalNotes } = await supabase
           .from("announcements")
           .select("id", { count: "exact", head: true })
@@ -105,21 +81,6 @@ export default function Navbar() {
 
         const unread = (totalNotes || 0) - (readNotes || 0);
         setUnreadCount(unread > 0 ? unread : 0);
-
-        // Fetch recent activity timestamps to compute a real day-streak.
-        // 400 rows is generous headroom for even a very active daily
-        // user across a full year; adjust "created_at" below if your
-        // actual column is named differently (e.g. "completed_at").
-        const { data: progressRows } = await supabase
-          .from("user_progress")
-          .select("created_at")
-          .eq("user_id", sessionUser.id)
-          .order("created_at", { ascending: false })
-          .limit(400);
-
-        setStreak(
-          calculateDayStreak((progressRows || []).map((r) => r.created_at)),
-        );
       } else {
         setIsAdmin(false);
         setUnreadCount(0);

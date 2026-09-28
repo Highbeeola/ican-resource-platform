@@ -88,6 +88,41 @@ export async function toggleItemCompletion(
     }
   }
 
+  // 🔥 DAILY STREAK ENGINE 🔥
+  const today = new Date().toISOString().split("T")[0]; // Gets YYYY-MM-DD
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("current_streak, last_active_date")
+    .eq("id", user.id)
+    .single();
+
+  if (profile) {
+    const lastActive = profile.last_active_date;
+    let newStreak = profile.current_streak || 0;
+
+    if (lastActive !== today) {
+      // Calculate yesterday's date
+      const yesterdayDate = new Date();
+      yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+      const yesterday = yesterdayDate.toISOString().split("T")[0];
+
+      if (lastActive === yesterday) {
+        newStreak += 1; // Kept the streak alive!
+      } else {
+        newStreak = 1; // Streak broken, reset to 1
+      }
+
+      // Save new streak to profile
+      await supabase
+        .from("profiles")
+        .update({
+          current_streak: newStreak,
+          last_active_date: today,
+        })
+        .eq("id", user.id);
+    }
+  }
+
   revalidatePath(`/resources/subject/${subjectId}`);
   revalidatePath("/resources");
   return { success: true };

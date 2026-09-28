@@ -21,6 +21,15 @@ export default async function HomePage() {
 
   const stats = await getAdminAnalytics();
 
+  // Hide low-count metrics until platform content reaches threshold
+  const MIN_STAT = 10;
+  const statItems = [
+    { value: stats.totalSubjects, label: "Courses" },
+    { value: stats.totalResources, label: "Study Materials" },
+    { value: stats.totalVideos, label: "Video Lectures" },
+    { value: stats.totalStudents, label: "Students Enrolled" },
+  ].filter((s) => s.value >= MIN_STAT);
+
   return (
     <div className="bg-white text-slate-900 min-h-screen">
       {/* HERO SECTION */}
@@ -53,36 +62,6 @@ export default async function HomePage() {
                 Go to Dashboard
               </Link>
             )}
-          </div>
-        </div>
-      </section>
-
-      {/* STATS STRIP */}
-      <section className="bg-[#1e3a8a] border-y border-blue-800 py-10 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:divide-x sm:divide-blue-800/50">
-          <div className="space-y-1">
-            <p className="text-3xl sm:text-4xl font-extrabold text-[#f59e0b]">
-              {stats.totalSubjects}+
-            </p>
-            <p className="text-xs sm:text-sm font-semibold text-blue-200 uppercase tracking-wider">
-              Courses
-            </p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-3xl sm:text-4xl font-extrabold text-[#f59e0b]">
-              {stats.totalResources}+
-            </p>
-            <p className="text-xs sm:text-sm font-semibold text-blue-200 uppercase tracking-wider">
-              Study Materials
-            </p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-3xl sm:text-4xl font-extrabold text-[#f59e0b]">
-              {stats.totalVideos}+
-            </p>
-            <p className="text-xs sm:text-sm font-semibold text-blue-200 uppercase tracking-wider">
-              Video Lectures
-            </p>
           </div>
         </div>
       </section>
@@ -161,6 +140,24 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* STATS STRIP (MOVED BELOW PROGRAMME TRACKS & CONDITIONAL) */}
+      {statItems.length >= 2 && (
+        <section className="bg-[#1e3a8a] border-y border-blue-800 py-10 px-4 sm:px-6">
+          <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-x-12 gap-y-6 text-center">
+            {statItems.map((s) => (
+              <div key={s.label} className="w-[45%] md:w-auto space-y-1">
+                <p className="text-3xl sm:text-4xl font-extrabold text-[#f59e0b]">
+                  {s.value}+
+                </p>
+                <p className="text-xs sm:text-sm font-semibold text-blue-200 uppercase tracking-wider">
+                  {s.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* HOW IT WORKS */}
       <section className="py-16 px-4 sm:px-6 bg-slate-50 border-t border-slate-200">
