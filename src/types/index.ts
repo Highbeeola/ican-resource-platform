@@ -37,6 +37,7 @@ export interface Subject {
   meet_time?: string | null;
   start_date?: string | null;
   end_date?: string | null;
+  price?: number | null;
 }
 
 export interface Resource {

@@ -40,6 +40,7 @@ import {
   Mail,
   CheckCircle2,
   ChevronDown,
+  Briefcase,
   LucideIcon,
 } from "lucide-react";
 
@@ -62,11 +63,13 @@ interface Props {
   modules: any[];
   questions?: any[];
   messages?: any[];
+  applications?: any[];
 }
 
 type TabType =
   | "analytics"
   | "inbox"
+  | "applications"
   | "pdf"
   | "video"
   | "article"
@@ -95,6 +98,7 @@ export default function AdminDashboardTabs({
   videos: initialVideos = [],
   questions: initialQuestions = [],
   messages = [],
+  applications = [],
   analytics,
   isSuperAdmin = false,
 }: Props) {
@@ -491,6 +495,23 @@ export default function AdminDashboardTabs({
           </button>
         )}
 
+        {isSuperAdmin && (
+          <button
+            onClick={() => setActiveTab("applications")}
+            className={tabClass("applications")}
+          >
+            <div className="relative flex items-center gap-2">
+              <Briefcase className="w-4 h-4" />
+              <span>Job Applications</span>
+              {applications && applications.length > 0 && (
+                <span className="absolute -top-2 -right-3 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                  {applications.length}
+                </span>
+              )}
+            </div>
+          </button>
+        )}
+
         <button onClick={() => setActiveTab("pdf")} className={tabClass("pdf")}>
           <FileText className="w-4 h-4" />
           <span>Upload PDF</span>
@@ -734,6 +755,79 @@ export default function AdminDashboardTabs({
                         <Trash2 className="w-4 h-4" />
                         Delete
                       </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB: TUTOR APPLICATIONS */}
+      {activeTab === "applications" && (
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+          <div className="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <div>
+              <h2 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-emerald-600" />
+                Tutor Applications
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Review CVs and cover letters submitted by prospective lecturers.
+              </p>
+            </div>
+          </div>
+
+          <div className="divide-y divide-slate-100">
+            {!applications || applications.length === 0 ? (
+              <div className="p-12 text-center text-slate-500">
+                <Briefcase className="w-8 h-8 mx-auto text-slate-300 mb-3" />
+                <p>No new tutor applications.</p>
+              </div>
+            ) : (
+              applications.map((app: any) => (
+                <div key={app.id} className="p-6 hover:bg-slate-50 transition">
+                  <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-bold text-slate-900 text-lg">
+                          {app.full_name}
+                        </h3>
+                        <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded-md text-xs font-semibold">
+                          {app.phone}
+                        </span>
+                      </div>
+                      <a
+                        href={`mailto:${app.email}`}
+                        className="text-sm font-semibold text-blue-600 hover:underline"
+                      >
+                        {app.email}
+                      </a>
+
+                      <div className="bg-slate-100 p-4 rounded-xl border border-slate-200 mt-2">
+                        <p className="text-xs font-bold text-slate-500 uppercase mb-1">
+                          Cover Letter / Experience
+                        </p>
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                          {app.cover_letter}
+                        </p>
+                      </div>
+                      <p className="text-[10px] font-bold uppercase text-slate-400 pt-2">
+                        Applied:{" "}
+                        {new Date(app.created_at).toLocaleDateString("en-GB")}
+                      </p>
+                    </div>
+
+                    <div className="flex w-full md:w-auto mt-4 md:mt-0">
+                      <a
+                        href={app.cv_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full md:w-auto px-6 py-3 bg-[#1e3a8a] text-white text-sm font-bold rounded-xl hover:bg-blue-800 transition flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <Download className="w-4 h-4" /> Download CV (PDF)
+                      </a>
                     </div>
                   </div>
                 </div>

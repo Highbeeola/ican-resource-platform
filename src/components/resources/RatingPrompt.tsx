@@ -6,9 +6,10 @@ import { Star, CheckCircle, Loader2 } from "lucide-react";
 
 interface Props {
   subjectId: string;
+  userId: string;
 }
 
-export default function RatingPrompt({ subjectId }: Props) {
+export default function RatingPrompt({ subjectId, userId }: Props) {
   const [rating, setRating] = useState<number>(0);
   const [hover, setHover] = useState<number>(0);
   const [isPending, startTransition] = useTransition();
@@ -17,7 +18,7 @@ export default function RatingPrompt({ subjectId }: Props) {
   function handleRate(stars: number) {
     setRating(stars);
     startTransition(async () => {
-      const res = await submitCourseRating(subjectId, stars);
+      const res = await submitCourseRating(subjectId, stars, userId);
       if (res.success) {
         setSubmitted(true);
       }

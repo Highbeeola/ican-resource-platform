@@ -14,6 +14,7 @@ export async function createSubject(formData: FormData) {
   const estimatedHours = formData.get("estimated_hours")
     ? parseInt(formData.get("estimated_hours") as string)
     : 0;
+  const price = parseFloat(formData.get("price") as string) || 0;
   const description = formData.get("description") as string;
   const startDate = formData.get("start_date") as string;
   const endDate = formData.get("end_date") as string;
@@ -28,6 +29,7 @@ export async function createSubject(formData: FormData) {
     code: code || null,
     instructor_name: instructorName || null,
     estimated_hours: estimatedHours,
+    price: price,
     description: description || null,
     meet_url: meetUrl || null,
     meet_time: meetTime || null,
@@ -57,19 +59,23 @@ export async function deleteSubject(id: string) {
   return { success: true };
 }
 
-export async function updateSubjectLiveClass(
+export async function updateSubjectSettings(
   subjectId: string,
   meetUrl: string,
   meetTime: string,
+  price: number,
 ) {
   const supabase = await createClient();
+
   const { error } = await supabase
     .from("subjects")
     .update({
       meet_url: meetUrl || null,
       meet_time: meetTime || null,
+      price: price || 0, // 🚨 Now updates the price!
     })
     .eq("id", subjectId);
+
   if (error) return { error: error.message };
 
   revalidatePath("/resources");

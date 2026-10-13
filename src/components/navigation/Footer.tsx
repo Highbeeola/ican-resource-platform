@@ -121,6 +121,12 @@ export default function Footer() {
             >
               Contact
             </Link>
+            <Link
+              href="/careers"
+              className="hover:text-[#1e3a8a] transition w-fit"
+            >
+              Become a Tutor
+            </Link>
           </nav>
         </div>
 

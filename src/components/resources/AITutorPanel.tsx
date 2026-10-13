@@ -5,10 +5,11 @@ import { Bot, X, Send, Loader2, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 interface Props {
+  subjectId: string;
   subjectName: string;
 }
 
-export default function AITutorPanel({ subjectName }: Props) {
+export default function AITutorPanel({ subjectId, subjectName }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<
@@ -53,7 +54,7 @@ export default function AITutorPanel({ subjectName }: Props) {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage, subjectName }),
+        body: JSON.stringify({ message: userMessage, subjectName, subjectId }),
       });
 
       const data = await res.json();

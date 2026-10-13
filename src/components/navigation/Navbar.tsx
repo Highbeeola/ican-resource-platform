@@ -19,6 +19,7 @@ import {
   Info,
   Mail,
   Bell,
+  Briefcase,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import BrandLogo from "@/components/BrandLogo";
@@ -29,7 +30,6 @@ export default function Navbar() {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(true);
   const [unreadCount, setUnreadCount] = useState<number>(0);
-  const [streak, setStreak] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState<boolean>(false);
@@ -50,7 +50,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch User, Role, Notifications, and Day Streak
+  // Fetch User, Role, and Notifications
   useEffect(() => {
     const supabase = createClient();
 
@@ -58,15 +58,14 @@ export default function Navbar() {
       setUser(sessionUser);
 
       if (sessionUser) {
-        // Fetch user profile role and true daily streak
+        // Fetch user profile role
         const { data: profile } = await supabase
           .from("profiles")
-          .select("role, current_streak")
+          .select("role")
           .eq("id", sessionUser.id)
           .single();
 
         setIsAdmin(profile?.role === "admin");
-        setStreak(profile?.current_streak || 0);
 
         // Fetch unread notifications count
         const { count: totalNotes } = await supabase
@@ -84,7 +83,6 @@ export default function Navbar() {
       } else {
         setIsAdmin(false);
         setUnreadCount(0);
-        setStreak(0);
       }
 
       setIsChecking(false);
@@ -158,6 +156,17 @@ export default function Navbar() {
               Courses
             </Link>
 
+            {/* GUESTS ONLY: High visibility recruitment link */}
+            {!user && (
+              <Link
+                href="/careers"
+                className="hover:text-amber-600 font-bold transition flex items-center gap-1 text-slate-900"
+              >
+                Teach on KRL
+              </Link>
+            )}
+
+            {/* LOGGED-IN STUDENTS ONLY */}
             {user && (
               <>
                 <Link
@@ -249,24 +258,6 @@ export default function Navbar() {
                   </Link>
                 )}
 
-                {/* DAY STREAK PILL */}
-                <div
-                  className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200/80 rounded-full shadow-xs cursor-default"
-                  title={`${streak} day streak`}
-                >
-                  <span
-                    className="text-base leading-none"
-                    style={{
-                      textShadow: "0 0 8px rgba(245, 158, 11, 0.4)",
-                    }}
-                  >
-                    🔥
-                  </span>
-                  <span className="text-amber-900 text-xs font-extrabold">
-                    {streak}
-                  </span>
-                </div>
-
                 <Link
                   href="/notifications"
                   className="relative p-2 text-slate-600 hover:text-[#1e3a8a] hover:bg-slate-100 rounded-full transition"
@@ -329,17 +320,6 @@ export default function Navbar() {
 
           {/* MOBILE HAMBURGER BUTTON */}
           <div className="flex md:hidden items-center gap-2">
-            {user && (
-              <div
-                className="flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-200/80 rounded-full shadow-xs cursor-default"
-                title={`${streak} day streak`}
-              >
-                <span className="text-sm leading-none">🔥</span>
-                <span className="text-amber-900 text-xs font-extrabold">
-                  {streak}
-                </span>
-              </div>
-            )}
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="p-2 text-slate-600 hover:text-slate-900 focus:outline-none cursor-pointer rounded-lg hover:bg-slate-100 transition"
@@ -394,6 +374,15 @@ export default function Navbar() {
               >
                 <BookOpen className="w-4 h-4 text-slate-400" /> Courses
               </Link>
+
+              {!user && (
+                <Link
+                  href="/careers"
+                  className="p-2.5 rounded-xl text-amber-600 bg-amber-50/60 hover:bg-amber-100/80 flex items-center gap-3 font-bold text-sm transition my-1"
+                >
+                  <Briefcase className="w-4 h-4 text-amber-600" /> Teach on KRL
+                </Link>
+              )}
 
               {user && (
                 <>

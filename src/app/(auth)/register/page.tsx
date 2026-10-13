@@ -1,16 +1,30 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
+import { Level } from "@/types";
 
 export default function RegisterPage() {
   const [isPending, startTransition] = useTransition();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [levels, setLevels] = useState<Level[]>([]);
+
+  // Fetch real levels on mount
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("levels")
+      .select("*, programme:programmes(name)")
+      .order("display_order", { ascending: true })
+      .then(({ data }) => {
+        if (data) setLevels(data);
+      });
+  }, []);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -65,7 +79,7 @@ export default function RegisterPage() {
             Create Your Account
           </h1>
           <p className="text-xs sm:text-sm text-slate-600">
-            Access ICAN study texts, pathfinders, and past questions.
+            Access official study texts, pathfinders, and mock tests.
           </p>
         </div>
 
@@ -131,9 +145,10 @@ export default function RegisterPage() {
             </div>
           </div>
 
+          {/* DYNAMIC LEVELS DROPDOWN */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Level (Optional)
+              Stage / Level (Optional)
             </label>
             <select
               name="levelId"
@@ -141,20 +156,18 @@ export default function RegisterPage() {
               className="w-full h-11 px-3.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition cursor-pointer"
             >
               <option value="" disabled className="bg-white text-slate-400">
-                Select your current level...
+                Select your current stage...
               </option>
-              <option value="foundation" className="bg-white text-slate-900">
-                ICAN Foundation
-              </option>
-              <option value="skills" className="bg-white text-slate-900">
-                ICAN Skills
-              </option>
-              <option value="professional" className="bg-white text-slate-900">
-                ICAN Professional
-              </option>
-              <option value="atswa" className="bg-white text-slate-900">
-                ATSWA Levels
-              </option>
+              {levels.map((lvl) => (
+                <option
+                  key={lvl.id}
+                  value={lvl.id}
+                  className="bg-white text-slate-900"
+                >
+                  {lvl.programme?.name ? `${lvl.programme.name} - ` : ""}
+                  {lvl.name}
+                </option>
+              ))}
             </select>
           </div>
 

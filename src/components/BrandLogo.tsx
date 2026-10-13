@@ -1,28 +1,21 @@
-import { GraduationCap } from "lucide-react";
+import React from "react";
+import Image from "next/image";
 
 interface Props {
   className?: string;
-  textSize?: string;
 }
 
-export default function BrandLogo({
-  className = "",
-  textSize = "text-xl",
-}: Props) {
+export default function BrandLogo({ className = "" }: Props) {
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
-      {/* LOGO ICON BOX */}
-      <div className="bg-[#f59e0b] p-1.5 rounded-lg shadow-sm flex items-center justify-center">
-        <GraduationCap className="w-5 h-5 text-white" />
-      </div>
-
-      {/* LOGO TEXT (Dual-Tone Typography) */}
-      <div
-        className={`font-extrabold tracking-tight ${textSize} flex items-center gap-1`}
-      >
-        <span className="text-[#1e3a8a]">KRL</span>
-        <span className="text-slate-600 font-medium">Academy</span>
-      </div>
+    <div className={`flex items-center ${className}`}>
+      <Image
+        src="/logo.png"
+        alt="KRL Academy"
+        width={180}
+        height={48}
+        className="h-10 w-auto object-contain"
+        priority
+      />
     </div>
   );
 }

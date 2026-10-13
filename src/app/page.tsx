@@ -315,6 +315,28 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* BECOME A TUTOR CTA (Logged out only) */}
+      {!user && (
+        <section className="py-16 px-4 sm:px-6 bg-[#1e3a8a] text-center border-t-4 border-[#f59e0b]">
+          <div className="max-w-3xl mx-auto space-y-6">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
+              Are you an ICAN Expert?
+            </h2>
+            <p className="text-blue-100 text-lg leading-relaxed">
+              Join our roster of elite Chartered Accountants. Teach thousands of
+              students online, set your own schedule, and monetize your
+              expertise.
+            </p>
+            <Link
+              href="/careers"
+              className="inline-block mt-4 px-8 py-4 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-lg shadow-lg transition"
+            >
+              Apply to become a Tutor &rarr;
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* CLOSING CTA BAND */}
       {!user && (
         <section className="py-14 px-4 sm:px-6 border-t border-slate-200">

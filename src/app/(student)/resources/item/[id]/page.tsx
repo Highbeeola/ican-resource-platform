@@ -4,15 +4,8 @@ import BackButton from "@/components/navigation/BackButton";
 import { getYouTubeEmbedUrl } from "@/lib/utils";
 import Link from "next/link";
 import DownloadButton from "@/components/resources/DownloadButton";
-import { notFound } from "next/navigation";
-import {
-  FileText,
-  Lightbulb,
-  ExternalLink,
-  Video,
-  BookOpen,
-  Maximize2,
-} from "lucide-react";
+import { notFound, redirect } from "next/navigation";
+import { FileText, Lightbulb, Video, BookOpen, Maximize2 } from "lucide-react";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -28,7 +21,7 @@ export default async function ResourceItemPage({
   const supabase = await createClient();
 
   let itemData: any = null;
-  let isVideo = type === "video";
+  const isVideo = type === "video";
 
   if (isVideo) {
     const { data } = await supabase
@@ -50,28 +43,69 @@ export default async function ResourceItemPage({
     notFound();
   }
 
-  // Check user auth and completion status
+  // ---------------------------------------------------------------
+  // ACCESS CONTROL (same rules as the subject details page)
+  // ---------------------------------------------------------------
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  let isCompleted = false;
 
-  if (user) {
-    const { data: progress } = await supabase
-      .from("user_progress")
+  // Must be logged in to view any material
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, is_super_admin")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = profile?.role === "admin" || !!profile?.is_super_admin;
+
+  // Hide unpublished material from everyone except admins
+  if (!isAdmin && itemData.is_published === false) {
+    notFound();
+  }
+
+  const subjectPrice = itemData.subject?.price;
+  const isFree = subjectPrice === 0 || !subjectPrice;
+
+  let hasAccess = isAdmin || isFree;
+
+  if (!hasAccess) {
+    const { data: enrollment } = await supabase
+      .from("enrollments")
       .select("id")
       .eq("user_id", user.id)
-      .eq(isVideo ? "video_id" : "resource_id", id)
+      .eq("subject_id", itemData.subject_id)
+      .eq("status", "active")
       .maybeSingle();
-
-    isCompleted = !!progress;
+    hasAccess = !!enrollment;
   }
+
+  if (!hasAccess) {
+    // Send them back to the course page where they can enroll
+    redirect(`/resources/${itemData.subject_id}`);
+  }
+
+  // ---------------------------------------------------------------
+  // Completion status
+  // ---------------------------------------------------------------
+  const { data: progress } = await supabase
+    .from("user_progress")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq(isVideo ? "video_id" : "resource_id", id)
+    .maybeSingle();
+
+  const isCompleted = !!progress;
 
   // Query other PDF resources (excluding current item)
   const { data: otherResources } = await supabase
     .from("resources")
     .select("id, title, resource_type")
     .eq("subject_id", itemData.subject_id)
+    .eq("is_published", true)
     .neq("id", id);
 
   // Query other Video lectures (excluding current item)
@@ -79,6 +113,7 @@ export default async function ResourceItemPage({
     .from("videos")
     .select("id, title")
     .eq("subject_id", itemData.subject_id)
+    .eq("is_published", true)
     .neq("id", id);
 
   // Format YouTube URL safely
@@ -210,21 +245,12 @@ export default async function ResourceItemPage({
             </div>
 
             {/* INTERACTIVE MARK AS COMPLETED BUTTON */}
-            {user ? (
-              <MarkCompletedButton
-                subjectId={itemData.subject_id}
-                resourceId={!isVideo ? id : undefined}
-                videoId={isVideo ? id : undefined}
-                initialIsCompleted={isCompleted}
-              />
-            ) : (
-              <Link
-                href="/login"
-                className="w-full py-3.5 bg-slate-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition font-bold rounded-xl text-sm flex items-center justify-center gap-2 border border-slate-200"
-              >
-                Login to track your progress
-              </Link>
-            )}
+            <MarkCompletedButton
+              subjectId={itemData.subject_id}
+              resourceId={!isVideo ? id : undefined}
+              videoId={isVideo ? id : undefined}
+              initialIsCompleted={isCompleted}
+            />
           </div>
 
           {/* OTHER COURSE MODULES SIDEBAR */}

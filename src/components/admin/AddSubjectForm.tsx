@@ -99,6 +99,19 @@ export default function AddSubjectForm({ levels }: Props) {
 
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Course Price (₦) - Leave 0 for Free
+          </label>
+          <input
+            type="number"
+            name="price"
+            defaultValue={0}
+            min={0}
+            className="w-full px-4 py-2.5 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
             Estimated Course Hours
           </label>
           <input

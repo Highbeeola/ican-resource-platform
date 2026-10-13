@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getLevels, getSubjects, getResources } from "@/lib/services/resources";
 import { getAdminAnalytics } from "@/lib/services/analytics";
 import AdminDashboardTabs from "@/components/admin/AdminDashboardTabs";
+import { getTutorApplications } from '@/lib/actions/careers'
 import { Shield } from "lucide-react";
 
 export default async function AdminResourcesPage() {
@@ -25,6 +26,7 @@ export default async function AdminResourcesPage() {
   const subjects = await getSubjects(undefined, undefined, "all");
   const { resources } = await getResources({ limit: 100 });
   const analytics = await getAdminAnalytics();
+ const applications = await getTutorApplications()
 
   // Fetch modules for the forms
   const { data: modules } = await supabase
@@ -68,6 +70,7 @@ export default async function AdminResourcesPage() {
           videos={videos || []}
           analytics={analytics}
           isSuperAdmin={isSuperAdmin}
+          applications={applications}
           questions={questions || []}
         />
       </div>
