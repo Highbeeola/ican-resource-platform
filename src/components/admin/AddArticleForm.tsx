@@ -185,8 +185,8 @@ export default function AddArticleForm({
       <input type="hidden" name="resource_type" value="notes" />
 
       <div className="border-b border-slate-100 pb-3">
-        <h2 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
-          <Edit3 className="w-5 h-5 text-[#f59e0b]" />
+        <h2 className="font-bold text-ink text-base flex items-center gap-2">
+          <Edit3 className="w-5 h-5 text-accent" />
           <span>Write a Text Lesson</span>
         </h2>
         <p className="text-xs text-slate-500 mt-1">
@@ -203,7 +203,7 @@ export default function AddArticleForm({
           name="title"
           required
           placeholder="e.g. Chapter 1: Introduction to Accounting"
-          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
         />
       </div>
 
@@ -217,7 +217,7 @@ export default function AddArticleForm({
             required
             value={selectedLevelId}
             onChange={handleLevelChange}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
           >
             <option value="">Select Level</option>
             {levels.map((lvl) => (
@@ -238,7 +238,7 @@ export default function AddArticleForm({
             disabled={!selectedLevelId}
             value={selectedSubjectId}
             onChange={handleSubjectChange}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none disabled:opacity-50"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none disabled:opacity-50"
           >
             <option value="">Select Subject</option>
             {filteredSubjects.map((sub) => (
@@ -260,7 +260,7 @@ export default function AddArticleForm({
             disabled={!selectedSubjectId}
             value={selectedModuleId}
             onChange={(e) => setSelectedModuleId(e.target.value)}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             <option value="">
               {!selectedSubjectId
@@ -278,8 +278,7 @@ export default function AddArticleForm({
           {selectedSubjectId && filteredModules.length === 0 && (
             <p className="text-[11px] text-slate-500 mt-1">
               No modules created yet. Build syllabus structure in the{" "}
-              <span className="font-semibold text-[#1e3a8a]">Curriculum</span>{" "}
-              tab.
+              <span className="font-semibold text-ink">Curriculum</span> tab.
             </p>
           )}
         </div>
@@ -289,7 +288,7 @@ export default function AddArticleForm({
         <label className="block text-xs font-semibold text-slate-700 mb-2">
           Lesson Content *
           {isImageUploading && (
-            <span className="text-[#f59e0b] ml-2 animate-pulse">
+            <span className="text-accent ml-2 animate-pulse">
               Compressing & uploading image(s)...
             </span>
           )}
@@ -329,7 +328,7 @@ export default function AddArticleForm({
       <button
         type="submit"
         disabled={isPending || isImageUploading}
-        className="w-full py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer"
+        className="w-full py-3.5 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer"
       >
         {isPending ? (
           <Loader2 className="w-5 h-5 animate-spin" />

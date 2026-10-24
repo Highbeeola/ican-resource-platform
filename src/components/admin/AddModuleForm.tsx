@@ -33,8 +33,8 @@ export default function AddModuleForm({ subjects }: { subjects: Subject[] }) {
       className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm text-slate-900"
     >
       <div className="border-b border-slate-100 pb-3">
-        <h2 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
-          <Layers className="w-5 h-5 text-[#f59e0b]" />
+        <h2 className="font-bold text-ink text-base flex items-center gap-2">
+          <Layers className="w-5 h-5 text-accent" />
           <span>Create Learning Module</span>
         </h2>
         <p className="text-xs text-slate-500 mt-1">
@@ -54,7 +54,7 @@ export default function AddModuleForm({ subjects }: { subjects: Subject[] }) {
             required
             value={selectedSubjectId}
             onChange={(e) => setSelectedSubjectId(e.target.value)}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
           >
             <option value="" disabled>
               Select Subject
@@ -83,7 +83,7 @@ export default function AddModuleForm({ subjects }: { subjects: Subject[] }) {
             name="title"
             required
             placeholder="e.g. Module 1: Intro to Accounting"
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
           />
         </div>
       </div>
@@ -97,7 +97,7 @@ export default function AddModuleForm({ subjects }: { subjects: Subject[] }) {
             type="text"
             name="description"
             placeholder="What will students learn in this module?"
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
           />
         </div>
         <div>
@@ -108,7 +108,7 @@ export default function AddModuleForm({ subjects }: { subjects: Subject[] }) {
             type="number"
             name="display_order"
             defaultValue={1}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
           />
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function AddModuleForm({ subjects }: { subjects: Subject[] }) {
       <button
         type="submit"
         disabled={isPending}
-        className="bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold px-6 py-3 rounded-xl text-sm transition flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+        className="bg-accent hover:bg-accent-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition flex items-center gap-2 disabled:opacity-50 cursor-pointer"
       >
         {isPending ? (
           <Loader2 className="w-4 h-4 animate-spin" />

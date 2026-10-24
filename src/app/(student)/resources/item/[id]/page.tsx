@@ -130,7 +130,7 @@ export default async function ResourceItemPage({
 
         {/* HEADER */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-ink">
             {itemData.title}
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 mt-1">
@@ -187,7 +187,7 @@ export default async function ResourceItemPage({
 
             {/* DYNAMIC LESSON OVERVIEW CARD */}
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3">
-              <h3 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
+              <h3 className="font-bold text-ink text-base flex items-center gap-2">
                 {isVideo ? (
                   <Video className="w-5 h-5 text-amber-500" />
                 ) : isArticle ? (
@@ -224,7 +224,7 @@ export default async function ResourceItemPage({
 
             {/* KEY LEARNING POINTS */}
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3">
-              <h3 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
+              <h3 className="font-bold text-ink text-base flex items-center gap-2">
                 <Lightbulb className="w-5 h-5 text-amber-500" />
                 <span>Key Learning Points</span>
               </h3>
@@ -255,7 +255,7 @@ export default async function ResourceItemPage({
 
           {/* OTHER COURSE MODULES SIDEBAR */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-fit space-y-4">
-            <h3 className="font-bold text-[#1e3a8a] text-base border-b border-slate-100 pb-3">
+            <h3 className="font-bold text-ink text-base border-b border-slate-100 pb-3">
               Other Course Modules
             </h3>
 

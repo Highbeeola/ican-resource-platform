@@ -45,15 +45,15 @@ export default async function StudentDashboardPage() {
         {/* WELCOME & PROGRAMME BANNER */}
         <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 text-[#1e3a8a] font-extrabold text-xl flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 text-ink font-extrabold text-xl flex items-center justify-center">
               {profile?.full_name?.charAt(0) || "S"}
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a]">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-ink">
                 Welcome, {profile?.full_name || "Student"}
               </h1>
               <div className="flex items-center gap-2 mt-1">
-                <span className="px-2.5 py-0.5 bg-[#1e3a8a] text-white text-xs font-bold rounded-md uppercase">
+                <span className="px-2.5 py-0.5 bg-ink text-white text-xs font-bold rounded-md uppercase">
                   {profile?.level?.programme?.name || "Programme"}
                 </span>
                 <span className="text-slate-500 text-xs sm:text-sm font-medium">
@@ -64,14 +64,14 @@ export default async function StudentDashboardPage() {
           </div>
           <Link
             href="/performance"
-            className="w-full md:w-auto px-6 py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md"
+            className="w-full md:w-auto px-6 py-3.5 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md"
           >
             <Target className="w-4 h-4" />
             <span>My Performance Profile</span>
           </Link>
         </div>
 
-        {/* SYSTEM ANNOUNCEMENT ALERT */} 
+        {/* SYSTEM ANNOUNCEMENT ALERT */}
         <DashboardBanner announcement={announcement} />
 
         {/* METRICS */}
@@ -81,7 +81,7 @@ export default async function StudentDashboardPage() {
               <p className="text-xs font-semibold text-slate-500 uppercase">
                 Completed Modules
               </p>
-              <p className="text-3xl font-extrabold text-[#1e3a8a] mt-1">
+              <p className="text-3xl font-extrabold text-ink mt-1">
                 {completedCount}
               </p>
             </div>
@@ -92,7 +92,7 @@ export default async function StudentDashboardPage() {
               <p className="text-xs font-semibold text-slate-500 uppercase">
                 Quizzes Taken
               </p>
-              <p className="text-3xl font-extrabold text-[#1e3a8a] mt-1">
+              <p className="text-3xl font-extrabold text-ink mt-1">
                 {quizCount}
               </p>
             </div>
@@ -103,7 +103,7 @@ export default async function StudentDashboardPage() {
               <p className="text-xs font-semibold text-slate-500 uppercase">
                 Average Score
               </p>
-              <p className="text-3xl font-extrabold text-[#1e3a8a] mt-1">
+              <p className="text-3xl font-extrabold text-ink mt-1">
                 {quizCount > 0 ? `${avgQuizScore}%` : "N/A"}
               </p>
             </div>
@@ -116,9 +116,8 @@ export default async function StudentDashboardPage() {
           <div className="lg:col-span-2 space-y-8">
             {/* CONTINUE LEARNING */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
-              <h2 className="text-lg font-bold text-[#1e3a8a] flex items-center gap-2 border-b border-slate-100 pb-3">
-                <PlayCircle className="w-5 h-5 text-[#f59e0b]" /> Continue
-                Learning
+              <h2 className="text-lg font-bold text-ink flex items-center gap-2 border-b border-slate-100 pb-3">
+                <PlayCircle className="w-5 h-5 text-accent" /> Continue Learning
               </h2>
               {recentActivity.length === 0 ? (
                 <p className="text-sm text-slate-500 py-4">
@@ -138,14 +137,14 @@ export default async function StudentDashboardPage() {
                         className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50 transition group"
                       >
                         <div>
-                          <h4 className="font-bold text-slate-900 text-sm group-hover:text-[#1e3a8a] transition">
+                          <h4 className="font-bold text-slate-900 text-sm group-hover:text-ink transition">
                             {item.title}
                           </h4>
                           <p className="text-xs text-slate-500 mt-0.5">
                             {item.subject?.name}
                           </p>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#1e3a8a]" />
+                        <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-ink" />
                       </Link>
                     );
                   })}
@@ -159,7 +158,7 @@ export default async function StudentDashboardPage() {
                 <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                   <AlertCircle className="w-5 h-5 text-rose-500" />
                   <div>
-                    <h2 className="text-lg font-bold text-[#1e3a8a]">
+                    <h2 className="text-lg font-bold text-ink">
                       Targeted Revision Recommended
                     </h2>
                     <p className="text-xs text-slate-500">
@@ -189,8 +188,8 @@ export default async function StudentDashboardPage() {
 
           {/* RIGHT COLUMN: SUBJECT PROGRESS */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm h-fit">
-            <h2 className="text-lg font-bold text-[#1e3a8a] border-b border-slate-100 pb-3 mb-4 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-[#1e3a8a]" /> Your Syllabus
+            <h2 className="text-lg font-bold text-ink border-b border-slate-100 pb-3 mb-4 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-ink" /> Your Syllabus
             </h2>
 
             <div className="space-y-5 max-h-[400px] overflow-y-auto pr-2">
@@ -200,7 +199,7 @@ export default async function StudentDashboardPage() {
                     <div className="flex justify-between items-end mb-1">
                       <Link
                         href={`/resources/subject/${sub.id}`}
-                        className="font-bold text-sm text-slate-900 hover:text-[#f59e0b] transition"
+                        className="font-bold text-sm text-slate-900 hover:text-accent transition"
                       >
                         {sub.name}
                       </Link>
@@ -209,7 +208,7 @@ export default async function StudentDashboardPage() {
                       </span>
                     </div>
                     <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-[#1e3a8a] h-full rounded-full w-0 transition-all duration-500"></div>
+                      <div className="bg-ink h-full rounded-full w-0 transition-all duration-500"></div>
                     </div>
                   </div>
                 ))
@@ -221,7 +220,7 @@ export default async function StudentDashboardPage() {
                   </p>
                   <Link
                     href="/resources"
-                    className="inline-block text-xs font-bold text-[#f59e0b] hover:underline"
+                    className="inline-block text-xs font-bold text-accent hover:underline"
                   >
                     Browse All Courses →
                   </Link>

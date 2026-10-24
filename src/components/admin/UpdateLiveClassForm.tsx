@@ -71,7 +71,7 @@ export default function UpdateLiveClassForm({
       {/* HEADER SECTION */}
       <div className="border-b border-slate-100 pb-4 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h2 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
+          <h2 className="font-bold text-ink text-base flex items-center gap-2">
             <Settings2 className="w-5 h-5 text-amber-500" />
             <span>Update Existing Course Settings</span>
           </h2>
@@ -110,7 +110,7 @@ export default function UpdateLiveClassForm({
             required
             value={selectedSubId}
             onChange={handleSubjectChange}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-[#1e3a8a] focus:border-transparent outline-none transition cursor-pointer"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-ink focus:border-transparent outline-none transition cursor-pointer"
           >
             <option value="">-- Choose a Course to Edit --</option>
             {subjects.map((sub: any) => (
@@ -138,7 +138,7 @@ export default function UpdateLiveClassForm({
               placeholder="0.00"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#1e3a8a] focus:border-transparent outline-none transition"
+              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-ink focus:border-transparent outline-none transition"
             />
           </div>
           <p className="text-[11px] text-slate-400 mt-1">
@@ -157,7 +157,7 @@ export default function UpdateLiveClassForm({
             value={meetTime}
             onChange={(e) => setMeetTime(e.target.value)}
             placeholder="e.g. Saturdays at 10:00 AM"
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-[#1e3a8a] focus:border-transparent outline-none transition"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-ink focus:border-transparent outline-none transition"
           />
         </div>
 
@@ -172,7 +172,7 @@ export default function UpdateLiveClassForm({
             value={meetUrl}
             onChange={(e) => setMeetUrl(e.target.value)}
             placeholder="https://meet.google.com/abc-defg-hij"
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-[#1e3a8a] focus:border-transparent outline-none transition font-mono text-slate-800 placeholder:font-sans"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-ink focus:border-transparent outline-none transition font-mono text-slate-800 placeholder:font-sans"
           />
         </div>
       </div>
@@ -182,7 +182,7 @@ export default function UpdateLiveClassForm({
         <button
           type="submit"
           disabled={isPending || !selectedSubId}
-          className="bg-[#1e3a8a] hover:bg-blue-900 active:scale-[0.98] text-white font-bold px-6 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
+          className="bg-ink hover:bg-blue-900 active:scale-[0.98] text-white font-bold px-6 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
         >
           {isPending ? (
             <>

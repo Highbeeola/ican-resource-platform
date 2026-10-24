@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 
 const faqs = [
@@ -26,33 +27,57 @@ export default function FAQSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <section className="py-16 px-4 sm:px-6 bg-white border-t border-slate-200">
-      <div className="max-w-3xl mx-auto space-y-8">
-        <h2 className="text-3xl sm:text-4xl font-bold text-[#1e3a8a] text-center">
-          Frequently Asked Questions
-        </h2>
-        <div className="space-y-4">
-          {faqs.map((faq, idx) => (
-            <div
-              key={idx}
-              className="border border-slate-200 rounded-xl overflow-hidden shadow-sm"
+    <section className="py-16 lg:py-20 px-4 sm:px-6 border-t border-line">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+        {/* Left: heading */}
+        <div className="lg:col-span-4 space-y-3">
+          <h2 className="text-3xl sm:text-4xl font-semibold text-ink">
+            Frequently asked questions
+          </h2>
+          <p className="text-muted leading-relaxed">
+            Can&apos;t find what you&apos;re looking for?{" "}
+            <Link
+              href="/contact"
+              className="font-semibold text-ink underline underline-offset-4 decoration-accent hover:text-accent-dark transition-colors"
             >
-              <button
-                onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
-                className="w-full flex items-center justify-between p-5 bg-slate-50 hover:bg-slate-100 transition text-left font-bold text-[#1e3a8a]"
-              >
-                <span>{faq.q}</span>
-                <ChevronDown
-                  className={`w-5 h-5 text-[#f59e0b] transition-transform ${openIdx === idx ? "rotate-180" : ""}`}
-                />
-              </button>
-              {openIdx === idx && (
-                <div className="p-5 bg-white text-slate-600 text-sm leading-relaxed border-t border-slate-100">
-                  {faq.a}
-                </div>
-              )}
-            </div>
-          ))}
+              Get in touch
+            </Link>
+            .
+          </p>
+        </div>
+
+        {/* Right: flat accordion */}
+        <div className="lg:col-span-8 border-t border-ink/20">
+          {faqs.map((faq, idx) => {
+            const isOpen = openIdx === idx;
+            return (
+              <div key={idx} className="border-b border-line">
+                <button
+                  onClick={() => setOpenIdx(isOpen ? null : idx)}
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-panel-${idx}`}
+                  className="w-full flex items-center justify-between gap-6 py-5 text-left cursor-pointer"
+                >
+                  <span className="font-serif text-lg sm:text-xl font-semibold text-ink">
+                    {faq.q}
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 flex-shrink-0 text-accent-dark transition-transform ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                {isOpen && (
+                  <div
+                    id={`faq-panel-${idx}`}
+                    className="pb-6 pr-10 text-muted leading-relaxed"
+                  >
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

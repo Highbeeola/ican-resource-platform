@@ -60,7 +60,7 @@ export default function PaystackEnrollButton({
         initializePayment({ onSuccess: handleSuccess, onClose: handleClose })
       }
       disabled={isVerifying || isPending}
-      className="w-full sm:w-auto px-8 py-3.5 bg-[#1e3a8a] hover:bg-blue-800 text-white font-bold rounded-xl flex flex-col justify-center items-center shadow-md transition disabled:opacity-50 cursor-pointer"
+      className="w-full sm:w-auto px-8 py-3.5 bg-ink hover:bg-blue-800 text-white font-bold rounded-xl flex flex-col justify-center items-center shadow-md transition disabled:opacity-50 cursor-pointer"
     >
       {isVerifying || isPending ? (
         <span className="flex items-center gap-2">

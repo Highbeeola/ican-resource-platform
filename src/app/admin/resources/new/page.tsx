@@ -23,7 +23,7 @@ export default async function AdminNewResourcePage() {
 
         {/* HEADER */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
             Upload ICAN Resource
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 mt-1">

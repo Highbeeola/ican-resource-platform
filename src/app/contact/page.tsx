@@ -31,7 +31,7 @@ export default function ContactPage() {
         <BackButton text="Back" />
 
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1e3a8a]">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-ink">
             Get in Touch
           </h1>
           <p className="text-slate-600 text-sm sm:text-base">
@@ -44,7 +44,7 @@ export default function ContactPage() {
           {/* CONTACT INFO */}
           <div className="lg:col-span-1 space-y-4">
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-start gap-4">
-              <div className="p-3 bg-blue-50 text-[#1e3a8a] rounded-xl">
+              <div className="p-3 bg-blue-50 text-ink rounded-xl">
                 <Mail className="w-5 h-5" />
               </div>
               <div>
@@ -55,7 +55,7 @@ export default function ContactPage() {
               </div>
             </div>
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-start gap-4">
-              <div className="p-3 bg-amber-50 text-[#f59e0b] rounded-xl">
+              <div className="p-3 bg-amber-50 text-accent rounded-xl">
                 <Phone className="w-5 h-5" />
               </div>
               <div>
@@ -78,7 +78,7 @@ export default function ContactPage() {
 
           {/* MESSAGE FORM */}
           <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
-            <h2 className="text-xl font-bold text-[#1e3a8a] mb-6">
+            <h2 className="text-xl font-bold text-ink mb-6">
               Send us a Message
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -92,7 +92,7 @@ export default function ContactPage() {
                     name="name"
                     required
                     placeholder="John Doe"
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
                   />
                 </div>
                 <div>
@@ -104,7 +104,7 @@ export default function ContactPage() {
                     name="email"
                     required
                     placeholder="john@example.com"
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
                   />
                 </div>
               </div>
@@ -117,13 +117,13 @@ export default function ContactPage() {
                   rows={4}
                   required
                   placeholder="How can we help you?"
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
                 ></textarea>
               </div>
               <button
                 type="submit"
                 disabled={isPending}
-                className="bg-[#f59e0b] hover:bg-[#d97706] active:scale-95 text-white font-bold px-6 py-3 rounded-xl text-sm transition flex items-center justify-center gap-2 disabled:opacity-50 w-full sm:w-auto cursor-pointer"
+                className="bg-accent hover:bg-accent-hover active:scale-95 text-white font-bold px-6 py-3 rounded-xl text-sm transition flex items-center justify-center gap-2 disabled:opacity-50 w-full sm:w-auto cursor-pointer"
               >
                 {isPending ? (
                   <>

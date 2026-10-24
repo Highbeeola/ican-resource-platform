@@ -35,7 +35,7 @@ export default function AddSubjectForm({ levels }: Props) {
       onSubmit={handleSubmit}
       className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-8 space-y-6 shadow-sm text-slate-900 w-full overflow-hidden"
     >
-      <h2 className="text-base sm:text-lg font-bold text-[#1e3a8a] border-b border-slate-100 pb-3">
+      <h2 className="text-base sm:text-lg font-bold text-ink border-b border-slate-100 pb-3">
         Add New Course / Subject
       </h2>
 

@@ -71,7 +71,7 @@ export default async function SubjectDetailsPage({
 
     // They have access IF: They are admin, OR they are enrolled, OR the course is Free (0)
     isEnrolled =
-      !!enrollment || isAdmin || (subject.level?.price === 0 || !subject.price)
+      !!enrollment || isAdmin || subject.level?.price === 0 || !subject.price;
   }
 
   // Format the price in Naira
@@ -175,7 +175,7 @@ export default async function SubjectDetailsPage({
           {/* BACK TO COURSES */}
           <Link
             href="/resources"
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-500 hover:text-[#1e3a8a] transition bg-white px-3.5 py-2 rounded-lg border border-slate-200 shadow-sm w-fit"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-500 hover:text-ink transition bg-white px-3.5 py-2 rounded-lg border border-slate-200 shadow-sm w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Courses</span>
@@ -184,13 +184,13 @@ export default async function SubjectDetailsPage({
           {/* COURSE HEADER CARD */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
             <div>
-              <span className="px-3 py-1 bg-blue-50 text-[#1e3a8a] border border-blue-200 text-xs font-semibold rounded-full uppercase">
+              <span className="px-3 py-1 bg-blue-50 text-ink border border-blue-200 text-xs font-semibold rounded-full uppercase">
                 {subject.level?.programme?.slug === "atswa" ? "ATSWA" : "ICAN"}{" "}
                 • {subject.level?.name} Stage
               </span>
 
               <div className="flex justify-between items-start gap-4 mt-3">
-                <h1 className="text-2xl sm:text-4xl font-extrabold text-[#1e3a8a]">
+                <h1 className="text-2xl sm:text-4xl font-extrabold text-ink">
                   {subject.name}
                 </h1>
                 <BookmarkButton resourceId={subject.id} />
@@ -220,7 +220,7 @@ export default async function SubjectDetailsPage({
 
               {subject.start_date && (
                 <p className="flex items-center gap-1.5">
-                  <CalendarRange className="w-4 h-4 text-[#f59e0b]" />
+                  <CalendarRange className="w-4 h-4 text-accent" />
                   Schedule:{" "}
                   <strong className="text-slate-900">
                     {new Date(subject.start_date).toLocaleDateString("en-GB", {
@@ -275,7 +275,7 @@ export default async function SubjectDetailsPage({
                 {!user ? (
                   <Link
                     href="/login"
-                    className="px-8 py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl flex justify-center items-center shadow-md transition"
+                    className="px-8 py-3.5 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl flex justify-center items-center shadow-md transition"
                   >
                     Login to Enroll
                   </Link>
@@ -284,12 +284,12 @@ export default async function SubjectDetailsPage({
                     levelId={subject.level_id}
                     amount={subject.level?.price || 0}
                     email={user.email || ""}
-                    levelName={subject.level?.name || 'this Stage'}
+                    levelName={subject.level?.name || "this Stage"}
                   />
                 ) : (
                   <Link
                     href={`/practice/${subject.id}`}
-                    className="px-8 py-3 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md transition"
+                    className="px-8 py-3 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md transition"
                   >
                     <Target className="w-4 h-4" /> Take Practice Test
                   </Link>
@@ -302,7 +302,7 @@ export default async function SubjectDetailsPage({
           {subject.meet_url && isEnrolled && (
             <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div>
-                <h3 className="text-lg font-bold text-[#1e3a8a] flex items-center gap-2">
+                <h3 className="text-lg font-bold text-ink flex items-center gap-2">
                   <span className="relative flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
@@ -318,7 +318,7 @@ export default async function SubjectDetailsPage({
                 href={subject.meet_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto px-8 py-3.5 bg-[#1e3a8a] hover:bg-blue-800 text-white font-bold rounded-xl text-center text-sm transition shadow-md whitespace-nowrap"
+                className="w-full sm:w-auto px-8 py-3.5 bg-ink hover:bg-blue-800 text-white font-bold rounded-xl text-center text-sm transition shadow-md whitespace-nowrap"
               >
                 Join Google Meet
               </a>
@@ -327,7 +327,7 @@ export default async function SubjectDetailsPage({
 
           {/* COURSE CONTENT BREAKDOWN */}
           <div className="space-y-6 pt-4">
-            <h2 className="text-xl font-bold text-[#1e3a8a] border-b border-slate-200 pb-2">
+            <h2 className="text-xl font-bold text-ink border-b border-slate-200 pb-2">
               Course Curriculum ({totalItems} Materials)
             </h2>
 
@@ -352,7 +352,7 @@ export default async function SubjectDetailsPage({
                       className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm"
                     >
                       <div className="bg-slate-50 border-b border-slate-200 p-5 sm:p-6">
-                        <h3 className="text-lg font-bold text-[#1e3a8a]">
+                        <h3 className="text-lg font-bold text-ink">
                           {mod.title}
                         </h3>
                         {mod.description && (
@@ -376,7 +376,7 @@ export default async function SubjectDetailsPage({
                                   <div className="flex items-start sm:items-center gap-3.5 min-w-0">
                                     <PlayCircle className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5 sm:mt-0" />
                                     <div className="min-w-0">
-                                      <h4 className="font-semibold text-slate-900 text-sm truncate sm:whitespace-normal group-hover:text-[#1e3a8a] transition-colors">
+                                      <h4 className="font-semibold text-slate-900 text-sm truncate sm:whitespace-normal group-hover:text-ink transition-colors">
                                         {vIdx + 1}. {vid.title}
                                       </h4>
                                       <span className="text-[10px] uppercase font-bold text-slate-400">
@@ -394,7 +394,7 @@ export default async function SubjectDetailsPage({
                                             vid.id,
                                           )}
                                         />
-                                        <span className="px-3.5 py-1.5 bg-blue-50 text-[#1e3a8a] text-xs font-bold rounded-xl group-hover:bg-[#1e3a8a] group-hover:text-white transition-colors h-9 flex items-center">
+                                        <span className="px-3.5 py-1.5 bg-blue-50 text-ink text-xs font-bold rounded-xl group-hover:bg-ink group-hover:text-white transition-colors h-9 flex items-center">
                                           Watch →
                                         </span>
                                       </>
@@ -426,7 +426,7 @@ export default async function SubjectDetailsPage({
                                   <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
                                     <FileText className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5 sm:mt-0" />
                                     <div className="min-w-0">
-                                      <h4 className="font-semibold text-slate-900 text-sm truncate sm:whitespace-normal group-hover:text-[#d97706] transition-colors">
+                                      <h4 className="font-semibold text-slate-900 text-sm truncate sm:whitespace-normal group-hover:text-accent-hover transition-colors">
                                         {modVideos.length + rIdx + 1}.{" "}
                                         {res.title}
                                       </h4>
@@ -446,7 +446,7 @@ export default async function SubjectDetailsPage({
                                             res.id,
                                           )}
                                         />
-                                        <span className="inline-flex items-center justify-center px-3.5 py-1.5 bg-amber-50 text-[#d97706] text-xs font-bold rounded-xl group-hover:bg-[#f59e0b] group-hover:text-white transition-colors h-9 shrink-0">
+                                        <span className="inline-flex items-center justify-center px-3.5 py-1.5 bg-amber-50 text-accent-hover text-xs font-bold rounded-xl group-hover:bg-accent group-hover:text-white transition-colors h-9 shrink-0">
                                           Read →
                                         </span>
                                       </>
@@ -507,7 +507,7 @@ export default async function SubjectDetailsPage({
                           <div className="group flex items-center justify-between p-4 hover:bg-blue-50 transition gap-4 cursor-pointer">
                             <div className="flex items-center gap-3 min-w-0">
                               <PlayCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
-                              <span className="text-sm font-semibold truncate group-hover:text-[#1e3a8a] transition-colors">
+                              <span className="text-sm font-semibold truncate group-hover:text-ink transition-colors">
                                 {vid.title}
                               </span>
                             </div>
@@ -521,7 +521,7 @@ export default async function SubjectDetailsPage({
                                       vid.id,
                                     )}
                                   />
-                                  <span className="px-3.5 py-1.5 bg-blue-50 text-[#1e3a8a] text-xs font-bold rounded-xl group-hover:bg-[#1e3a8a] group-hover:text-white transition-colors h-9 flex items-center">
+                                  <span className="px-3.5 py-1.5 bg-blue-50 text-ink text-xs font-bold rounded-xl group-hover:bg-ink group-hover:text-white transition-colors h-9 flex items-center">
                                     Watch →
                                   </span>
                                 </>
@@ -551,7 +551,7 @@ export default async function SubjectDetailsPage({
                           <div className="group flex items-center justify-between p-4 hover:bg-amber-50 transition gap-4 cursor-pointer">
                             <div className="flex items-center gap-3 min-w-0">
                               <FileText className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                              <span className="text-sm font-semibold truncate group-hover:text-[#d97706] transition-colors">
+                              <span className="text-sm font-semibold truncate group-hover:text-accent-hover transition-colors">
                                 {doc.title}
                               </span>
                             </div>
@@ -565,7 +565,7 @@ export default async function SubjectDetailsPage({
                                       doc.id,
                                     )}
                                   />
-                                  <span className="inline-flex items-center justify-center px-3.5 py-1.5 bg-amber-50 text-[#d97706] text-xs font-bold rounded-xl group-hover:bg-[#f59e0b] group-hover:text-white transition-colors h-9 shrink-0">
+                                  <span className="inline-flex items-center justify-center px-3.5 py-1.5 bg-amber-50 text-accent-hover text-xs font-bold rounded-xl group-hover:bg-accent group-hover:text-white transition-colors h-9 shrink-0">
                                     Read →
                                   </span>
                                 </>
@@ -599,8 +599,8 @@ export default async function SubjectDetailsPage({
           {/* DEDICATED EXAM PREP & PATHFINDERS SECTION */}
           {examPrepResources.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-lg font-bold text-[#1e3a8a] border-b border-slate-100 pb-3 flex items-center gap-2">
-                <Target className="w-5 h-5 text-[#f59e0b]" /> Pathfinders & Past
+              <h3 className="text-lg font-bold text-ink border-b border-slate-100 pb-3 flex items-center gap-2">
+                <Target className="w-5 h-5 text-accent" /> Pathfinders & Past
                 Questions
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -643,7 +643,7 @@ export default async function SubjectDetailsPage({
           {/* QUIZ ATTEMPTS & ANALYTICS SECTION */}
           {user && quizzes.length > 0 && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-lg font-bold text-[#1e3a8a] border-b border-slate-100 pb-3 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-ink border-b border-slate-100 pb-3 flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-blue-600" /> Recent Quiz
                 Attempts
               </h3>

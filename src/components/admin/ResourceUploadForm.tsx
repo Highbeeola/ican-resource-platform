@@ -213,8 +213,7 @@ export default function ResourceUploadForm({
           {selectedSubjectId && filteredModules.length === 0 && (
             <p className="text-[11px] text-slate-500 mt-1">
               No modules created yet. Build syllabus structure in the{" "}
-              <span className="font-semibold text-[#1e3a8a]">Curriculum</span>{" "}
-              tab.
+              <span className="font-semibold text-ink">Curriculum</span> tab.
             </p>
           )}
         </div>

@@ -17,7 +17,6 @@ export default function AnnouncementBanner({ announcement }: Props) {
 
   useEffect(() => {
     if (announcement) {
-      
       const isDismissedLocally = localStorage.getItem(
         `dismissed_banner_${announcement.id}`,
       );
@@ -37,7 +36,7 @@ export default function AnnouncementBanner({ announcement }: Props) {
   };
 
   return (
-    <div className="bg-blue-50 border-b border-blue-200 text-[#1e3a8a] py-2.5 px-4 text-xs sm:text-sm flex items-center justify-between gap-3 relative z-50">
+    <div className="bg-blue-50 border-b border-blue-200 text-ink py-2.5 px-4 text-xs sm:text-sm flex items-center justify-between gap-3 relative z-50">
       <Link
         href="/notifications"
         className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center flex-1 hover:opacity-80 transition cursor-pointer"

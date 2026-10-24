@@ -73,11 +73,11 @@ export default function NotificationsPage() {
 
         <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
           <div className="border-b border-slate-100 pb-4 flex items-center gap-3">
-            <div className="p-3 bg-blue-50 text-[#1e3a8a] rounded-xl">
+            <div className="p-3 bg-blue-50 text-ink rounded-xl">
               <Bell className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#1e3a8a]">
+              <h1 className="text-2xl font-bold text-ink">
                 Notification Center
               </h1>
               <p className="text-sm text-slate-500 mt-1">
@@ -89,7 +89,7 @@ export default function NotificationsPage() {
           <div className="mt-6 space-y-3">
             {isLoading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="w-6 h-6 text-[#1e3a8a] animate-spin" />
+                <Loader2 className="w-6 h-6 text-ink animate-spin" />
               </div>
             ) : notifications.length === 0 ? (
               <p className="text-center text-slate-500 py-8">
@@ -116,7 +116,7 @@ export default function NotificationsPage() {
                         className={`p-2 sm:p-2.5 rounded-lg flex-shrink-0 mt-0.5 ${
                           isRead
                             ? "bg-slate-100 text-slate-500"
-                            : "bg-[#f59e0b] text-white"
+                            : "bg-accent text-white"
                         }`}
                       >
                         <Megaphone className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -130,7 +130,7 @@ export default function NotificationsPage() {
                             className={`text-sm sm:text-base leading-snug break-words pr-2 ${
                               isRead
                                 ? "font-semibold text-slate-700"
-                                : "font-bold text-[#1e3a8a]"
+                                : "font-bold text-ink"
                             }`}
                           >
                             {note.title}

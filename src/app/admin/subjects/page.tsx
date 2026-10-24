@@ -22,7 +22,7 @@ export default async function AdminSubjectsPage() {
 
         {/* HEADER */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
             Manage ICAN Subjects
           </h1>
           <p className="text-slate-600 text-xs sm:text-sm mt-1">
@@ -39,7 +39,7 @@ export default async function AdminSubjectsPage() {
         {/* EXISTING SUBJECTS LIST */}
         <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
           <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-            <h2 className="text-base sm:text-lg font-bold text-[#1e3a8a] flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-bold text-ink flex items-center gap-2">
               <Layers className="w-5 h-5 text-amber-500" />
               <span>Current Subjects ({subjects.length})</span>
             </h2>
@@ -70,7 +70,7 @@ export default async function AdminSubjectsPage() {
                     </div>
                   </div>
 
-                  <span className="self-start sm:self-auto text-[11px] font-semibold uppercase px-3 py-1 bg-blue-50 text-[#1e3a8a] border border-blue-200 rounded-full">
+                  <span className="self-start sm:self-auto text-[11px] font-semibold uppercase px-3 py-1 bg-blue-50 text-ink border border-blue-200 rounded-full">
                     {sub.level?.name}
                   </span>
                 </div>

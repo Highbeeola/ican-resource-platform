@@ -159,7 +159,7 @@ export default function PracticeQuizPage() {
         {/* BACK BUTTON */}
         <Link
           href={`/resources/subject/${subjectId}`}
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-500 hover:text-[#1e3a8a] transition bg-white px-3.5 py-2 rounded-lg border border-slate-200 shadow-sm w-fit"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-500 hover:text-ink transition bg-white px-3.5 py-2 rounded-lg border border-slate-200 shadow-sm w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to {subject?.name || "Course"}</span>
@@ -168,7 +168,7 @@ export default function PracticeQuizPage() {
         {/* HEADER SECTION */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a]">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-ink">
               {subject?.name || "Subject"} Practice Test
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -185,10 +185,10 @@ export default function PracticeQuizPage() {
             className={`fixed bottom-6 right-6 sm:bottom-auto sm:top-20 sm:right-8 z-30 flex items-center gap-2 px-4 py-2.5 rounded-2xl border-2 shadow-xl font-mono text-base sm:text-lg font-bold transition-all ${
               timeLeft <= 60
                 ? "bg-rose-50 border-rose-500 text-rose-600 animate-pulse"
-                : "bg-white/95 backdrop-blur-md border-slate-200 text-[#1e3a8a]"
+                : "bg-paper/95 backdrop-blur-md border-slate-200 text-ink"
             }`}
           >
-            <Timer className="w-5 h-5 text-[#f59e0b]" />
+            <Timer className="w-5 h-5 text-accent" />
             <span>{formatTime(timeLeft)}</span>
           </div>
         )}
@@ -236,7 +236,7 @@ export default function PracticeQuizPage() {
                 setQuestions([]);
                 setUserAnswers({});
               }}
-              className="mt-4 px-6 py-2.5 bg-[#1e3a8a] text-white font-bold rounded-xl text-xs sm:text-sm hover:bg-[#162c6d] transition shadow-sm cursor-pointer"
+              className="mt-4 px-6 py-2.5 bg-ink text-white font-bold rounded-xl text-xs sm:text-sm hover:bg-[#162c6d] transition shadow-sm cursor-pointer"
             >
               Back to Exercise List
             </button>
@@ -246,7 +246,7 @@ export default function PracticeQuizPage() {
         {/* LOADING STATE */}
         {isLoading ? (
           <div className="bg-white border border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center space-y-3 shadow-sm">
-            <Loader2 className="w-8 h-8 text-[#f59e0b] animate-spin" />
+            <Loader2 className="w-8 h-8 text-accent animate-spin" />
             <p className="text-slate-500 font-medium">
               Loading practice test...
             </p>
@@ -255,8 +255,8 @@ export default function PracticeQuizPage() {
           /* EXERCISE SELECTION LOBBY */
           <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-5">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-              <BookOpen className="w-5 h-5 text-[#f59e0b]" />
-              <h3 className="text-lg font-bold text-[#1e3a8a]">
+              <BookOpen className="w-5 h-5 text-accent" />
+              <h3 className="text-lg font-bold text-ink">
                 Select a Practice Test / Exercise
               </h3>
             </div>
@@ -265,9 +265,9 @@ export default function PracticeQuizPage() {
                 <button
                   key={ex}
                   onClick={() => startExercise(ex)}
-                  className="p-5 text-left border border-slate-200 rounded-xl hover:border-[#f59e0b] hover:shadow-md transition group bg-slate-50/50 hover:bg-white cursor-pointer"
+                  className="p-5 text-left border border-slate-200 rounded-xl hover:border-accent hover:shadow-md transition group bg-slate-50/50 hover:bg-white cursor-pointer"
                 >
-                  <h4 className="font-bold text-slate-900 group-hover:text-[#1e3a8a] text-base">
+                  <h4 className="font-bold text-slate-900 group-hover:text-ink text-base">
                     {ex}
                   </h4>
                   <p className="text-xs font-semibold text-slate-500 mt-2 flex items-center gap-1">
@@ -283,7 +283,7 @@ export default function PracticeQuizPage() {
         ) : !selectedExercise && availableExercises.length === 0 ? (
           /* EMPTY STATE */
           <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-12 text-center space-y-3 shadow-sm">
-            <div className="w-12 h-12 bg-blue-50 text-[#1e3a8a] rounded-xl flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 bg-blue-50 text-ink rounded-xl flex items-center justify-center mx-auto">
               <HelpCircle className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-slate-900">
@@ -303,7 +303,7 @@ export default function PracticeQuizPage() {
                 className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4"
               >
                 <div className="flex justify-between items-start gap-4 border-b border-slate-100 pb-3">
-                  <span className="text-xs font-bold uppercase text-[#1e3a8a] px-3 py-1 bg-blue-50 rounded-md">
+                  <span className="text-xs font-bold uppercase text-ink px-3 py-1 bg-blue-50 rounded-md">
                     Question {qIdx + 1}
                   </span>
                   {q.topic_name && (
@@ -324,11 +324,11 @@ export default function PracticeQuizPage() {
                     const isCorrect = opt.is_correct;
 
                     let optionStyle =
-                      "bg-slate-50 border-slate-200 text-slate-700 hover:border-[#1e3a8a] hover:bg-blue-50";
+                      "bg-slate-50 border-slate-200 text-slate-700 hover:border-ink hover:bg-blue-50";
 
                     if (isSelected) {
                       optionStyle =
-                        "bg-blue-50 border-[#1e3a8a] text-[#1e3a8a] font-bold shadow-sm";
+                        "bg-blue-50 border-ink text-ink font-bold shadow-sm";
                     }
 
                     // REVEAL ANSWERS AFTER SUBMISSION
@@ -356,7 +356,7 @@ export default function PracticeQuizPage() {
                       >
                         <span>{opt.option_text}</span>
                         {isSelected && !result && (
-                          <CheckCircle2 className="w-5 h-5 text-[#1e3a8a] flex-shrink-0" />
+                          <CheckCircle2 className="w-5 h-5 text-ink flex-shrink-0" />
                         )}
                         {result && isCorrect && (
                           <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
@@ -387,7 +387,7 @@ export default function PracticeQuizPage() {
           <button
             onClick={() => setShowConfirmModal(true)}
             disabled={isPending || answeredCount === 0}
-            className="w-full py-4 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full py-4 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {isPending ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -453,7 +453,7 @@ export default function PracticeQuizPage() {
               <button
                 onClick={handleSubmitQuiz}
                 disabled={isPending}
-                className="flex-1 py-2.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-xs sm:text-sm transition shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="flex-1 py-2.5 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl text-xs sm:text-sm transition shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

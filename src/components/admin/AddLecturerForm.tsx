@@ -70,8 +70,8 @@ export default function AddLecturerForm() {
         className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm text-slate-900"
       >
         <div className="border-b border-slate-100 pb-3">
-          <h2 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-[#f59e0b]" />
+          <h2 className="font-bold text-ink text-base flex items-center gap-2">
+            <UserPlus className="w-5 h-5 text-accent" />
             <span>Create Lecturer Profile</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">
@@ -102,7 +102,7 @@ export default function AddLecturerForm() {
               name="full_name"
               required
               placeholder="e.g. CA Rajesh Kumar"
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
             />
           </div>
           <div>
@@ -113,7 +113,7 @@ export default function AddLecturerForm() {
               type="text"
               name="qualifications"
               placeholder="e.g. FCA, MBA Finance"
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
             />
           </div>
           <div>
@@ -124,7 +124,7 @@ export default function AddLecturerForm() {
               type="number"
               name="experience_years"
               placeholder="e.g. 15"
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
             />
           </div>
         </div>
@@ -137,14 +137,14 @@ export default function AddLecturerForm() {
             name="biography"
             rows={3}
             placeholder="Brief background about the lecturer..."
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
           ></textarea>
         </div>
 
         <button
           type="submit"
           disabled={isPending}
-          className="bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold px-6 py-3 rounded-xl text-sm transition flex items-center gap-2 disabled:opacity-50"
+          className="bg-accent hover:bg-accent-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition flex items-center gap-2 disabled:opacity-50"
         >
           {isPending ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -157,7 +157,7 @@ export default function AddLecturerForm() {
 
       {/* ACTIVE LECTURERS LIST */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-        <h3 className="font-bold text-[#1e3a8a] text-base border-b border-slate-100 pb-3">
+        <h3 className="font-bold text-ink text-base border-b border-slate-100 pb-3">
           Published Profiles ({lecturers.length})
         </h3>
 

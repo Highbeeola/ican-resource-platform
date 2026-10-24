@@ -26,7 +26,7 @@ export default async function AdminNewVideoPage() {
 
         {/* HEADER */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
             Publish Video Lecture
           </h1>
           <p className="text-slate-600 text-xs sm:text-sm mt-1">
@@ -37,7 +37,11 @@ export default async function AdminNewVideoPage() {
 
         {/* FORM CONTAINER */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-          <VideoUploadForm levels={levels} subjects={subjects} modules={modules} />
+          <VideoUploadForm
+            levels={levels}
+            subjects={subjects}
+            modules={modules}
+          />
         </div>
       </div>
     </div>

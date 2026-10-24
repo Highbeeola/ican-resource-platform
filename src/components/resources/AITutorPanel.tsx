@@ -86,7 +86,7 @@ export default function AITutorPanel({ subjectId, subjectName }: Props) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 p-4 bg-[#1e3a8a] hover:bg-blue-800 text-white rounded-full shadow-2xl transition-transform hover:scale-105 z-50 flex items-center gap-2 group"
+          className="fixed bottom-6 right-6 p-4 bg-ink hover:bg-blue-800 text-white rounded-full shadow-2xl transition-transform hover:scale-105 z-50 flex items-center gap-2 group"
         >
           <Bot className="w-6 h-6" />
           <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap font-bold text-sm">
@@ -106,9 +106,9 @@ export default function AITutorPanel({ subjectId, subjectName }: Props) {
 
           <div className="fixed bottom-0 right-0 w-full h-[85dvh] sm:bottom-6 sm:right-6 sm:w-[400px] sm:h-[500px] bg-white sm:border border-slate-200 rounded-t-3xl sm:rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
             {/* HEADER */}
-            <div className="bg-[#1e3a8a] p-4 flex items-center justify-between text-white">
+            <div className="bg-ink p-4 flex items-center justify-between text-white">
               <div className="flex items-center gap-2">
-                <div className="bg-[#f59e0b] p-1.5 rounded-lg">
+                <div className="bg-accent p-1.5 rounded-lg">
                   <Bot className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -138,7 +138,7 @@ export default function AITutorPanel({ subjectId, subjectName }: Props) {
                   <div
                     className={`max-w-[80%] p-3 rounded-2xl text-sm ${
                       chat.role === "user"
-                        ? "bg-[#1e3a8a] text-white rounded-tr-sm"
+                        ? "bg-ink text-white rounded-tr-sm"
                         : "bg-white border border-slate-200 text-slate-700 rounded-tl-sm shadow-sm"
                     }`}
                   >
@@ -151,7 +151,7 @@ export default function AITutorPanel({ subjectId, subjectName }: Props) {
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-sm flex items-center gap-2 shadow-sm">
-                    <Sparkles className="w-4 h-4 text-[#f59e0b] animate-pulse" />
+                    <Sparkles className="w-4 h-4 text-accent animate-pulse" />
                     <span className="text-xs text-slate-500 font-medium">
                       AI is thinking...
                     </span>
@@ -171,12 +171,12 @@ export default function AITutorPanel({ subjectId, subjectName }: Props) {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Ask about IAS 16, taxation..."
-                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm focus:outline-none focus:border-[#1e3a8a]"
+                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm focus:outline-none focus:border-ink"
               />
               <button
                 type="submit"
                 disabled={isTyping || !message.trim()}
-                className="p-2.5 bg-[#f59e0b] hover:bg-[#d97706] text-white rounded-xl transition disabled:opacity-50"
+                className="p-2.5 bg-accent hover:bg-accent-hover text-white rounded-xl transition disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
               </button>

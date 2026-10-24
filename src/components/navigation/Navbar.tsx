@@ -131,7 +131,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 text-slate-900 sticky top-0 z-40 transition-all">
+      <header className="bg-paper/95 backdrop-blur-md border-b border-slate-200 text-slate-900 sticky top-0 z-40 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex-shrink-0">
             <BrandLogo />
@@ -141,16 +141,16 @@ export default function Navbar() {
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
             <Link
               href="/"
-              className={`transition hover:text-[#1e3a8a] ${
-                isActive("/") ? "text-[#1e3a8a] font-semibold" : ""
+              className={`transition hover:text-ink ${
+                isActive("/") ? "text-ink font-semibold" : ""
               }`}
             >
               Home
             </Link>
             <Link
               href="/resources"
-              className={`transition hover:text-[#1e3a8a] ${
-                isActive("/resources") ? "text-[#1e3a8a] font-semibold" : ""
+              className={`transition hover:text-ink ${
+                isActive("/resources") ? "text-ink font-semibold" : ""
               }`}
             >
               Courses
@@ -171,13 +171,13 @@ export default function Navbar() {
               <>
                 <Link
                   href="/resources?type=pathfinder"
-                  className="hover:text-[#1e3a8a] transition"
+                  className="hover:text-ink transition"
                 >
                   Pathfinders
                 </Link>
                 <Link
                   href="/resources?type=past_question"
-                  className="hover:text-[#1e3a8a] transition"
+                  className="hover:text-ink transition"
                 >
                   Past Questions
                 </Link>
@@ -191,7 +191,7 @@ export default function Navbar() {
               <button
                 onMouseEnter={() => setMoreDropdownOpen(true)}
                 onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
-                className="flex items-center gap-1 hover:text-[#1e3a8a] transition py-2 focus:outline-none cursor-pointer"
+                className="flex items-center gap-1 hover:text-ink transition py-2 focus:outline-none cursor-pointer"
               >
                 <span>More</span>
                 <ChevronDown className="w-4 h-4" />
@@ -202,20 +202,20 @@ export default function Navbar() {
                   {user && (
                     <Link
                       href="/lecturers"
-                      className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                      className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-ink transition"
                     >
                       Faculty
                     </Link>
                   )}
                   <Link
                     href="/about"
-                    className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                    className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-ink transition"
                   >
                     About Us
                   </Link>
                   <Link
                     href="/contact"
-                    className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                    className="block px-4 py-2 text-sm hover:bg-slate-50 hover:text-ink transition"
                   >
                     Contact
                   </Link>
@@ -232,7 +232,7 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="text-sm font-bold bg-[#1e3a8a] hover:bg-blue-900 active:scale-95 text-white px-5 py-2 rounded-lg transition shadow-sm"
+                  className="text-sm font-bold bg-ink hover:bg-blue-900 active:scale-95 text-white px-5 py-2 rounded-lg transition shadow-sm"
                 >
                   Login
                 </Link>
@@ -253,14 +253,14 @@ export default function Navbar() {
                     href="/admin/resources"
                     className="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 px-3 py-1.5 rounded-lg border border-slate-300 flex items-center gap-1.5 transition"
                   >
-                    <Shield className="w-3.5 h-3.5 text-[#1e3a8a]" />
+                    <Shield className="w-3.5 h-3.5 text-ink" />
                     <span>Admin</span>
                   </Link>
                 )}
 
                 <Link
                   href="/notifications"
-                  className="relative p-2 text-slate-600 hover:text-[#1e3a8a] hover:bg-slate-100 rounded-full transition"
+                  className="relative p-2 text-slate-600 hover:text-ink hover:bg-slate-100 rounded-full transition"
                   title="Notifications"
                 >
                   <Bell className="w-5 h-5" />
@@ -282,25 +282,25 @@ export default function Navbar() {
                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                         Signed in as
                       </p>
-                      <p className="text-sm font-bold text-[#1e3a8a] truncate">
+                      <p className="text-sm font-bold text-ink truncate">
                         {user.email}
                       </p>
                     </div>
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-ink transition"
                     >
                       <LayoutDashboard className="w-4 h-4" /> Dashboard
                     </Link>
                     <Link
                       href="/performance"
-                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-ink transition"
                     >
                       <Target className="w-4 h-4" /> Performance Analytics
                     </Link>
                     <Link
                       href="/settings"
-                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-[#1e3a8a] transition"
+                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 hover:text-ink transition"
                     >
                       <Settings className="w-4 h-4" /> Settings
                     </Link>
@@ -358,7 +358,7 @@ export default function Navbar() {
                 href="/"
                 className={`p-2.5 rounded-xl flex items-center gap-3 transition font-medium text-sm ${
                   isActive("/")
-                    ? "bg-blue-50/80 text-[#1e3a8a] font-bold"
+                    ? "bg-blue-50/80 text-ink font-bold"
                     : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -368,7 +368,7 @@ export default function Navbar() {
                 href="/resources"
                 className={`p-2.5 rounded-xl flex items-center gap-3 transition font-medium text-sm ${
                   isActive("/resources")
-                    ? "bg-blue-50/80 text-[#1e3a8a] font-bold"
+                    ? "bg-blue-50/80 text-ink font-bold"
                     : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -409,7 +409,7 @@ export default function Navbar() {
                     href="/dashboard"
                     className={`p-2.5 rounded-xl flex items-center gap-3 transition font-medium text-sm ${
                       isActive("/dashboard")
-                        ? "bg-blue-50/80 text-[#1e3a8a] font-bold"
+                        ? "bg-blue-50/80 text-ink font-bold"
                         : "text-slate-700 hover:bg-slate-50"
                     }`}
                   >
@@ -493,7 +493,7 @@ export default function Navbar() {
               <div className="flex flex-col gap-2">
                 <Link
                   href="/login"
-                  className="w-full py-2.5 text-center bg-[#1e3a8a] text-white rounded-xl text-sm font-bold shadow-sm hover:bg-blue-900 transition"
+                  className="w-full py-2.5 text-center bg-ink text-white rounded-xl text-sm font-bold shadow-sm hover:bg-blue-900 transition"
                 >
                   Login
                 </Link>

@@ -83,7 +83,7 @@ export default function LoginPage() {
               name="email"
               required
               placeholder="student@example.com"
-              className="w-full h-11 px-3.5 bg-slate-50 border border-slate-300 rounded-xl text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition"
+              className="w-full h-11 px-3.5 bg-slate-50 border border-slate-300 rounded-xl text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-ink/20 focus:border-ink transition"
             />
           </div>
 
@@ -94,7 +94,7 @@ export default function LoginPage() {
               </label>
               <Link
                 href="/forgot-password"
-                className="text-xs font-semibold text-[#f59e0b] hover:text-[#d97706] hover:underline transition"
+                className="text-xs font-semibold text-accent hover:text-accent-hover hover:underline transition"
               >
                 Forgot password?
               </Link>
@@ -105,7 +105,7 @@ export default function LoginPage() {
                 name="password"
                 required
                 placeholder="••••••••"
-                className="w-full h-11 pl-3.5 pr-11 bg-slate-50 border border-slate-300 rounded-xl text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition"
+                className="w-full h-11 pl-3.5 pr-11 bg-slate-50 border border-slate-300 rounded-xl text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-ink/20 focus:border-ink transition"
               />
               <button
                 type="button"
@@ -125,7 +125,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isPending || isGoogleLoading}
-            className="w-full h-11 bg-[#f59e0b] hover:bg-[#d97706] active:scale-[0.99] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-md shadow-amber-500/10 disabled:opacity-50 disabled:active:scale-100 cursor-pointer mt-2"
+            className="w-full h-11 bg-accent hover:bg-accent-hover active:scale-[0.99] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-md shadow-amber-500/10 disabled:opacity-50 disabled:active:scale-100 cursor-pointer mt-2"
           >
             {isPending ? (
               <>
@@ -181,10 +181,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-slate-500 pt-1">
           Don't have an account?{" "}
-          <Link
-            href="/register"
-            className="font-bold text-[#1e3a8a] hover:underline"
-          >
+          <Link href="/register" className="font-bold text-ink hover:underline">
             Register free
           </Link>
         </p>

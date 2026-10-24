@@ -58,7 +58,7 @@ export default function AdminLoginPage() {
           <div className="w-12 h-12 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-center mx-auto text-amber-600">
             <Shield className="w-6 h-6" />
           </div>
-          <h1 className="text-xl font-bold text-[#1e3a8a] pt-2">
+          <h1 className="text-xl font-bold text-ink pt-2">
             Admin Portal Login
           </h1>
           <p className="text-xs text-slate-500">

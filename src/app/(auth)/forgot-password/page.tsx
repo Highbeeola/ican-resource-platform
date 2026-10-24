@@ -54,14 +54,14 @@ export default function ForgotPasswordPage() {
               name="email"
               required
               placeholder="student@example.com"
-              className="w-full h-11 px-3.5 bg-slate-50 border border-slate-300 rounded-xl text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]/20 focus:border-[#1e3a8a] transition"
+              className="w-full h-11 px-3.5 bg-slate-50 border border-slate-300 rounded-xl text-base md:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-ink/20 focus:border-ink transition"
             />
           </div>
 
           <button
             type="submit"
             disabled={isPending}
-            className="w-full h-11 bg-[#f59e0b] hover:bg-[#d97706] active:scale-[0.99] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-md shadow-amber-500/10 disabled:opacity-50 disabled:active:scale-100 cursor-pointer mt-2"
+            className="w-full h-11 bg-accent hover:bg-accent-hover active:scale-[0.99] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-md shadow-amber-500/10 disabled:opacity-50 disabled:active:scale-100 cursor-pointer mt-2"
           >
             {isPending ? (
               <>
@@ -76,10 +76,7 @@ export default function ForgotPasswordPage() {
 
         <p className="text-center text-sm text-slate-500 pt-1">
           Remembered your password?{" "}
-          <Link
-            href="/login"
-            className="font-bold text-[#1e3a8a] hover:underline"
-          >
+          <Link href="/login" className="font-bold text-ink hover:underline">
             Log in
           </Link>
         </p>

@@ -41,13 +41,13 @@ export default async function PerformancePage() {
           <div>
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#f59e0b] transition mb-3"
+              className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-accent transition mb-3"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Dashboard</span>
             </Link>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a] flex items-center gap-3">
-              <Target className="w-8 h-8 text-[#f59e0b]" />
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-ink flex items-center gap-3">
+              <Target className="w-8 h-8 text-accent" />
               <span>Performance Analytics</span>
             </h1>
             <p className="text-slate-600 text-xs sm:text-sm mt-1">
@@ -63,7 +63,7 @@ export default async function PerformancePage() {
             <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto text-slate-400">
               <BrainCircuit className="w-8 h-8" />
             </div>
-            <h2 className="text-xl font-extrabold text-[#1e3a8a]">
+            <h2 className="text-xl font-extrabold text-ink">
               No Performance Data Yet
             </h2>
             <p className="text-slate-500 max-w-md mx-auto text-xs sm:text-sm leading-relaxed">
@@ -72,7 +72,7 @@ export default async function PerformancePage() {
             </p>
             <Link
               href="/resources"
-              className="inline-flex items-center gap-2 mt-2 px-6 py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl transition shadow-sm text-xs sm:text-sm"
+              className="inline-flex items-center gap-2 mt-2 px-6 py-3.5 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl transition shadow-sm text-xs sm:text-sm"
             >
               <span>Explore Practice Quizzes</span>
             </Link>
@@ -82,7 +82,7 @@ export default async function PerformancePage() {
             {/* OVERALL METRICS CARDS */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               <div className="bg-white border border-slate-200 rounded-2xl p-6 relative overflow-hidden shadow-sm flex flex-col justify-between">
-                <div className="absolute -right-4 -top-4 opacity-5 text-[#1e3a8a]">
+                <div className="absolute -right-4 -top-4 opacity-5 text-ink">
                   <Award className="w-32 h-32" />
                 </div>
                 <div>
@@ -107,7 +107,7 @@ export default async function PerformancePage() {
                   <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">
                     Quizzes Completed
                   </p>
-                  <p className="text-4xl font-black text-[#1e3a8a]">
+                  <p className="text-4xl font-black text-ink">
                     {attempts.length}
                   </p>
                 </div>
@@ -121,7 +121,7 @@ export default async function PerformancePage() {
                   <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">
                     Questions Attempted
                   </p>
-                  <p className="text-4xl font-black text-[#d97706]">
+                  <p className="text-4xl font-black text-accent-hover">
                     {totalQuestions}
                   </p>
                 </div>
@@ -137,7 +137,7 @@ export default async function PerformancePage() {
               <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4 shadow-sm">
                 <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
                   <TrendingUp className="w-5 h-5 text-emerald-600" />
-                  <h3 className="font-bold text-[#1e3a8a] text-base">
+                  <h3 className="font-bold text-ink text-base">
                     Strong Subjects (70%+)
                   </h3>
                 </div>
@@ -174,7 +174,7 @@ export default async function PerformancePage() {
               <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4 shadow-sm">
                 <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
                   <TrendingDown className="w-5 h-5 text-rose-600" />
-                  <h3 className="font-bold text-[#1e3a8a] text-base">
+                  <h3 className="font-bold text-ink text-base">
                     Requires Attention (&lt; 50%)
                   </h3>
                 </div>
@@ -214,8 +214,8 @@ export default async function PerformancePage() {
             {/* RECENT ATTEMPTS TABLE */}
             <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
               <div className="p-6 border-b border-slate-100 flex items-center gap-2">
-                <Activity className="w-5 h-5 text-[#f59e0b]" />
-                <h2 className="font-bold text-[#1e3a8a] text-base">
+                <Activity className="w-5 h-5 text-accent" />
+                <h2 className="font-bold text-ink text-base">
                   Recent Quiz History
                 </h2>
               </div>

@@ -75,7 +75,7 @@ export default function RegisterPage() {
           <div className="flex justify-center">
             <BrandLogo />
           </div>
-          <h1 className="text-2xl font-bold text-[#1e3a8a] pt-1">
+          <h1 className="text-2xl font-bold text-ink pt-1">
             Create Your Account
           </h1>
           <p className="text-xs sm:text-sm text-slate-600">
@@ -231,10 +231,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-xs text-slate-600 pt-1">
           Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-[#1e3a8a] font-bold hover:underline"
-          >
+          <Link href="/login" className="text-ink font-bold hover:underline">
             Log in here
           </Link>
         </p>

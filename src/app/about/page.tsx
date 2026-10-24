@@ -8,10 +8,10 @@ export default function AboutPage() {
         <BackButton text="Back to Home" />
 
         <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-sm text-center space-y-6">
-          <div className="w-16 h-16 bg-blue-50 border-2 border-blue-100 rounded-2xl flex items-center justify-center mx-auto text-[#1e3a8a]">
+          <div className="w-16 h-16 bg-blue-50 border-2 border-blue-100 rounded-2xl flex items-center justify-center mx-auto text-ink">
             <GraduationCap className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1e3a8a]">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-ink">
             About KRL Academy
           </h1>
           <p className="text-slate-600 text-lg max-w-2xl mx-auto leading-relaxed">
@@ -23,8 +23,8 @@ export default function AboutPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-4">
-            <Target className="w-8 h-8 text-[#f59e0b]" />
-            <h2 className="text-xl font-bold text-[#1e3a8a]">Our Mission</h2>
+            <Target className="w-8 h-8 text-accent" />
+            <h2 className="text-xl font-bold text-ink">Our Mission</h2>
             <p className="text-slate-600 leading-relaxed">
               To provide accessible, high-quality, and structured preparation
               materials for ICAN and ATSWA professional examinations. We bridge
@@ -34,8 +34,8 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-4">
-            <Award className="w-8 h-8 text-[#f59e0b]" />
-            <h2 className="text-xl font-bold text-[#1e3a8a]">Why Choose Us?</h2>
+            <Award className="w-8 h-8 text-accent" />
+            <h2 className="text-xl font-bold text-ink">Why Choose Us?</h2>
             <p className="text-slate-600 leading-relaxed">
               Unlike traditional physical tutorials, our platform adapts to your
               schedule. With comprehensive analytics tracking your strong and

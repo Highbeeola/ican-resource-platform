@@ -8,7 +8,7 @@ export default async function LecturersPage() {
     <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 md:p-10">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1e3a8a]">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-ink">
             Our Expert Faculty
           </h1>
           <p className="text-slate-600 text-sm sm:text-base">
@@ -29,14 +29,14 @@ export default async function LecturersPage() {
                 className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition space-y-4"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-blue-50 border-2 border-blue-100 flex items-center justify-center text-[#1e3a8a] font-bold text-xl">
+                  <div className="w-16 h-16 rounded-full bg-blue-50 border-2 border-blue-100 flex items-center justify-center text-ink font-bold text-xl">
                     {lecturer.full_name.charAt(0)}
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-[#1e3a8a]">
+                    <h3 className="font-bold text-lg text-ink">
                       {lecturer.full_name}
                     </h3>
-                    <p className="text-sm font-semibold text-[#f59e0b]">
+                    <p className="text-sm font-semibold text-accent">
                       {lecturer.qualifications || "Subject Expert"}
                     </p>
                   </div>
@@ -49,11 +49,11 @@ export default async function LecturersPage() {
 
                 <div className="flex items-center gap-4 pt-2 text-xs font-semibold text-slate-500">
                   <span className="flex items-center gap-1.5">
-                    <Briefcase className="w-4 h-4 text-[#1e3a8a]" />
+                    <Briefcase className="w-4 h-4 text-ink" />
                     {lecturer.experience_years}+ Years Exp.
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <BookOpen className="w-4 h-4 text-[#1e3a8a]" />
+                    <BookOpen className="w-4 h-4 text-ink" />
                     KRL Academy
                   </span>
                 </div>

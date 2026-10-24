@@ -100,8 +100,8 @@ export default function AddQuestionForm({ subjects }: Props) {
       {/* HEADER & MODE TOGGLE */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-[#1e3a8a] flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-[#f59e0b]" />
+          <h2 className="text-base sm:text-lg font-bold text-ink flex items-center gap-2">
+            <HelpCircle className="w-5 h-5 text-accent" />
             <span>Manage Question Bank</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">
@@ -114,7 +114,7 @@ export default function AddQuestionForm({ subjects }: Props) {
             onClick={() => setMode("bulk")}
             className={`px-4 py-1.5 text-xs font-bold rounded-md transition cursor-pointer ${
               mode === "bulk"
-                ? "bg-white text-[#1e3a8a] shadow-sm"
+                ? "bg-white text-ink shadow-sm"
                 : "text-slate-500 hover:text-slate-900"
             }`}
           >
@@ -124,7 +124,7 @@ export default function AddQuestionForm({ subjects }: Props) {
             onClick={() => setMode("manual")}
             className={`px-4 py-1.5 text-xs font-bold rounded-md transition cursor-pointer ${
               mode === "manual"
-                ? "bg-white text-[#1e3a8a] shadow-sm"
+                ? "bg-white text-ink shadow-sm"
                 : "text-slate-500 hover:text-slate-900"
             }`}
           >
@@ -141,7 +141,7 @@ export default function AddQuestionForm({ subjects }: Props) {
             <a
               href="data:text/csv;charset=utf-8,Question,Option A,Option B,Option C,Option D,Correct Option,Explanation%0A%22Which financial statement shows assets and liabilities?%22,%22Income Statement%22,%22Balance Sheet%22,%22Cash Flow%22,%22Equity Statement%22,%22B%22,%22The Balance Sheet shows financial position.%22"
               download="KRL_Academy_Quiz_Template.csv"
-              className="text-xs font-bold text-[#1e3a8a] bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg border border-blue-200 transition"
+              className="text-xs font-bold text-ink bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg border border-blue-200 transition"
             >
               ↓ Download Sample Template (.csv)
             </a>
@@ -155,7 +155,7 @@ export default function AddQuestionForm({ subjects }: Props) {
               <select
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               >
                 <option value="" disabled>
                   Select Subject
@@ -174,7 +174,7 @@ export default function AddQuestionForm({ subjects }: Props) {
                 value={exerciseName}
                 onChange={(e) => setExerciseName(e.target.value)}
                 placeholder="e.g. May 2026 Mock Exam"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               />
             </div>
           </div>
@@ -182,12 +182,10 @@ export default function AddQuestionForm({ subjects }: Props) {
           {/* UPLOAD DRAG & DROP ZONE */}
           <div className="bg-blue-50 border-2 border-dashed border-blue-200 rounded-2xl p-8 text-center space-y-4">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm">
-              <FileSpreadsheet className="w-6 h-6 text-[#1e3a8a]" />
+              <FileSpreadsheet className="w-6 h-6 text-ink" />
             </div>
             <div>
-              <p className="font-bold text-[#1e3a8a]">
-                Upload CSV or XLSX File
-              </p>
+              <p className="font-bold text-ink">Upload CSV or XLSX File</p>
               <p className="text-xs text-slate-500 mt-1">
                 Please use the exact headers from the downloaded sample
                 template.
@@ -204,7 +202,7 @@ export default function AddQuestionForm({ subjects }: Props) {
               />
               <button
                 disabled={!selectedSubject || !exerciseName || isPending}
-                className="px-6 py-2.5 bg-[#1e3a8a] text-white font-bold rounded-lg text-sm transition shadow-md disabled:opacity-50 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-ink text-white font-bold rounded-lg text-sm transition shadow-md disabled:opacity-50 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
               >
                 {isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -236,7 +234,7 @@ export default function AddQuestionForm({ subjects }: Props) {
               <select
                 name="subject_id"
                 required
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               >
                 <option value="" disabled>
                   Select Subject
@@ -254,7 +252,7 @@ export default function AddQuestionForm({ subjects }: Props) {
                 name="topic_name"
                 required
                 placeholder="e.g. Summer Coaching Practice Test"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               />
             </div>
           </div>
@@ -268,7 +266,7 @@ export default function AddQuestionForm({ subjects }: Props) {
               rows={2}
               required
               placeholder="Enter the examination question..."
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
             ></textarea>
           </div>
 
@@ -281,7 +279,7 @@ export default function AddQuestionForm({ subjects }: Props) {
                 type="text"
                 name="option_a"
                 required
-                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               />
             </div>
             <div>
@@ -292,7 +290,7 @@ export default function AddQuestionForm({ subjects }: Props) {
                 type="text"
                 name="option_b"
                 required
-                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               />
             </div>
             <div>
@@ -303,7 +301,7 @@ export default function AddQuestionForm({ subjects }: Props) {
                 type="text"
                 name="option_c"
                 required
-                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               />
             </div>
             <div>
@@ -314,7 +312,7 @@ export default function AddQuestionForm({ subjects }: Props) {
                 type="text"
                 name="option_d"
                 required
-                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               />
             </div>
           </div>
@@ -327,7 +325,7 @@ export default function AddQuestionForm({ subjects }: Props) {
               <select
                 name="correct_option"
                 required
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-[#1e3a8a] font-bold rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-ink font-bold rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               >
                 <option value="A">Option A is Correct</option>
                 <option value="B">Option B is Correct</option>
@@ -343,7 +341,7 @@ export default function AddQuestionForm({ subjects }: Props) {
                 type="text"
                 name="explanation"
                 placeholder="Why this option is correct..."
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               />
             </div>
           </div>
@@ -351,7 +349,7 @@ export default function AddQuestionForm({ subjects }: Props) {
           <button
             type="submit"
             disabled={isPending}
-            className="bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold px-6 py-3 rounded-xl text-sm transition flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="bg-accent hover:bg-accent-hover text-white font-bold px-6 py-3 rounded-xl text-sm transition flex items-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />

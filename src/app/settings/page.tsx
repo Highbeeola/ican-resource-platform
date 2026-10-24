@@ -67,8 +67,8 @@ export default function SettingsPage() {
 
         <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
           <div className="border-b border-slate-100 pb-4">
-            <h1 className="text-2xl font-bold text-[#1e3a8a] flex items-center gap-2">
-              <Settings className="w-6 h-6 text-[#f59e0b]" />
+            <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
+              <Settings className="w-6 h-6 text-accent" />
               Account Settings
             </h1>
             <p className="text-sm text-slate-500 mt-1">
@@ -128,7 +128,7 @@ export default function SettingsPage() {
                   required
                   value={selectedLevelId}
                   onChange={(e) => setSelectedLevelId(e.target.value)}
-                  className="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                  className="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
                 >
                   <option value="" disabled>
                     Select your current stage...
@@ -150,7 +150,7 @@ export default function SettingsPage() {
                 !selectedLevelId ||
                 selectedLevelId === profile?.current_level_id
               }
-              className="w-full sm:w-auto px-8 py-3 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl text-sm transition shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl text-sm transition shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

@@ -358,6 +358,14 @@ export default function AdminDashboardTabs({
       icon: Layers,
       visible: true,
     },
+    {
+      id: "applications",
+      label: "Job Applications",
+      shortLabel: "Applications",
+      icon: Briefcase,
+      visible: isSuperAdmin,
+      badge: applications.length > 0 ? applications.length : undefined,
+    },
   ];
 
   const visibleTabs = tabs.filter((t) => t.visible);
@@ -368,8 +376,8 @@ export default function AdminDashboardTabs({
     flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap cursor-pointer flex-1 justify-center
     ${
       activeTab === tab
-        ? "bg-[#1e3a8a] text-white shadow-md"
-        : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+        ? "bg-ink text-white shadow-md"
+        : "text-muted hover:text-slate-900 hover:bg-slate-200/50"
     }
   `;
 
@@ -384,7 +392,7 @@ export default function AdminDashboardTabs({
       <div className="md:hidden">
         <button
           onClick={() => setMobilePickerOpen(true)}
-          className="w-full flex items-center justify-between gap-3 bg-[#1e3a8a] text-white px-4 py-3 rounded-2xl shadow-sm cursor-pointer"
+          className="w-full flex items-center justify-between gap-3 bg-ink text-white px-4 py-3 rounded-lg cursor-pointer"
         >
           <span className="flex items-center gap-2.5 font-bold text-sm">
             <activeTabConfig.icon className="w-4 h-4" />
@@ -410,12 +418,10 @@ export default function AdminDashboardTabs({
               className="w-full bg-white rounded-t-3xl max-h-[80vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom duration-200"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="sticky top-0 bg-white pt-3 px-5 pb-4 border-b border-slate-100">
+              <div className="sticky top-0 bg-white pt-3 px-5 pb-4 border-b border-line">
                 <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-3" />
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-[#1e3a8a] text-sm">
-                    Go to section
-                  </h3>
+                  <h3 className="font-bold text-ink text-sm">Go to section</h3>
                   <button
                     onClick={() => setMobilePickerOpen(false)}
                     className="p-1.5 text-slate-400 hover:text-slate-700 cursor-pointer"
@@ -438,10 +444,10 @@ export default function AdminDashboardTabs({
                     <button
                       key={tab.id}
                       onClick={() => selectTab(tab.id)}
-                      className={`flex flex-col items-start gap-2 p-4 rounded-2xl border text-left transition cursor-pointer relative ${
+                      className={`flex flex-col items-start gap-2 p-4 rounded-lg border text-left transition cursor-pointer relative ${
                         isActive
-                          ? "bg-[#1e3a8a] border-[#1e3a8a] text-white"
-                          : "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300"
+                          ? "bg-ink border-ink text-white"
+                          : "bg-paper-2 border-line text-slate-700 hover:border-slate-300"
                       }`}
                     >
                       {tab.badge ? (
@@ -451,7 +457,7 @@ export default function AdminDashboardTabs({
                       ) : null}
                       <Icon
                         className={`w-5 h-5 ${
-                          isActive ? "text-white" : "text-[#1e3a8a]"
+                          isActive ? "text-white" : "text-ink"
                         }`}
                       />
                       <span className="text-xs font-bold leading-tight">
@@ -467,7 +473,7 @@ export default function AdminDashboardTabs({
       </div>
 
       {/* ===== DESKTOP NAV: original scrollable tab bar, unchanged, hidden on mobile ===== */}
-      <div className="hidden md:flex bg-slate-100 border border-slate-200 p-1.5 rounded-2xl w-full overflow-x-auto">
+      <div className="hidden md:flex bg-paper-2 border border-line p-1.5 rounded-lg w-full overflow-x-auto">
         {isSuperAdmin && (
           <button
             onClick={() => setActiveTab("analytics")}
@@ -597,74 +603,74 @@ export default function AdminDashboardTabs({
       {/* ANALYTICS TAB */}
       {isSuperAdmin && activeTab === "analytics" && (
         <div className="space-y-6">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="font-bold text-[#1e3a8a] text-lg border-b border-slate-100 pb-3 mb-4">
+          <div className="bg-white border border-line rounded-lg p-6">
+            <h2 className="font-bold text-ink text-lg border-b border-line pb-3 mb-4">
               Platform Overview
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
               {/* Total Students */}
-              <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
-                <div className="flex justify-between items-center text-slate-500 mb-2">
+              <div className="bg-paper-2 border border-line rounded-xl p-5">
+                <div className="flex justify-between items-center text-muted mb-2">
                   <span className="text-xs font-semibold uppercase">
                     Total Students
                   </span>
-                  <Users className="w-4 h-4 text-blue-500" />
+                  <Users className="w-4 h-4 text-accent-dark" />
                 </div>
-                <p className="text-3xl font-extrabold text-[#1e3a8a]">
+                <p className="text-3xl font-extrabold text-ink">
                   {analytics.totalStudents}
                 </p>
               </div>
 
               {/* PDF Materials */}
-              <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
-                <div className="flex justify-between items-center text-slate-500 mb-2">
+              <div className="bg-paper-2 border border-line rounded-xl p-5">
+                <div className="flex justify-between items-center text-muted mb-2">
                   <span className="text-xs font-semibold uppercase">
                     PDF Materials
                   </span>
-                  <FileText className="w-4 h-4 text-emerald-500" />
+                  <FileText className="w-4 h-4 text-accent-dark" />
                 </div>
-                <p className="text-3xl font-extrabold text-[#1e3a8a]">
+                <p className="text-3xl font-extrabold text-ink">
                   {analytics.totalResources}
                 </p>
               </div>
 
               {/* Video Lectures */}
-              <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
-                <div className="flex justify-between items-center text-slate-500 mb-2">
+              <div className="bg-paper-2 border border-line rounded-xl p-5">
+                <div className="flex justify-between items-center text-muted mb-2">
                   <span className="text-xs font-semibold uppercase">
                     Video Lectures
                   </span>
-                  <PlayCircle className="w-4 h-4 text-rose-500" />
+                  <PlayCircle className="w-4 h-4 text-accent-dark" />
                 </div>
-                <p className="text-3xl font-extrabold text-[#1e3a8a]">
+                <p className="text-3xl font-extrabold text-ink">
                   {analytics.totalVideos}
                 </p>
               </div>
 
               {/* Quizzes Taken */}
-              <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
-                <div className="flex justify-between items-center text-slate-500 mb-2">
+              <div className="bg-paper-2 border border-line rounded-xl p-5">
+                <div className="flex justify-between items-center text-muted mb-2">
                   <span className="text-xs font-semibold uppercase">
                     Quizzes Taken
                   </span>
-                  <Award className="w-4 h-4 text-amber-500" />
+                  <Award className="w-4 h-4 text-accent-dark" />
                 </div>
-                <p className="text-3xl font-extrabold text-[#1e3a8a]">
+                <p className="text-3xl font-extrabold text-ink">
                   {analytics.totalQuizAttempts}
                 </p>
               </div>
 
               {/* Support Messages */}
-              <div className="bg-slate-50 border border-slate-100 rounded-xl p-5">
-                <div className="flex justify-between items-center text-slate-500 mb-2">
+              <div className="bg-paper-2 border border-line rounded-xl p-5">
+                <div className="flex justify-between items-center text-muted mb-2">
                   <span className="text-xs font-semibold uppercase">
                     Support Messages
                   </span>
-                  <Mail className="w-4 h-4 text-purple-500" />
+                  <Mail className="w-4 h-4 text-accent-dark" />
                 </div>
-                <p className="text-3xl font-extrabold text-[#1e3a8a]">
+                <p className="text-3xl font-extrabold text-ink">
                   {analytics.unreadMessages}{" "}
-                  <span className="text-xs font-semibold text-slate-500">
+                  <span className="text-xs font-semibold text-muted">
                     Unread
                   </span>
                 </p>
@@ -675,14 +681,14 @@ export default function AdminDashboardTabs({
       )}
       {/* TAB: SUPPORT INBOX */}
       {isSuperAdmin && activeTab === "inbox" && (
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-          <div className="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <div className="bg-white border border-line rounded-lg overflow-hidden">
+          <div className="p-4 sm:p-6 border-b border-line flex justify-between items-center bg-paper-2">
             <div>
-              <h2 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
-                <Mail className="w-5 h-5 text-purple-500" />
+              <h2 className="font-bold text-ink text-base flex items-center gap-2">
+                <Mail className="w-5 h-5 text-accent-dark" />
                 Support Inbox
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-muted mt-1">
                 Read and manage messages sent from the Contact Us page.
               </p>
             </div>
@@ -690,7 +696,7 @@ export default function AdminDashboardTabs({
 
           <div className="divide-y divide-slate-100">
             {!messages || messages.length === 0 ? (
-              <div className="p-12 text-center text-slate-500">
+              <div className="p-12 text-center text-muted">
                 <Mail className="w-8 h-8 mx-auto text-slate-300 mb-3" />
                 <p>Your inbox is empty!</p>
               </div>
@@ -719,7 +725,7 @@ export default function AdminDashboardTabs({
                         )}
                       </div>
 
-                      <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap bg-slate-50 p-4 rounded-xl border border-slate-100">
+                      <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap bg-paper-2 p-4 rounded-xl border border-line">
                         {msg.message}
                       </p>
 
@@ -736,7 +742,7 @@ export default function AdminDashboardTabs({
                             const res = await markMessageAsRead(msg.id);
                             if (res.success) toast.success("Marked as read");
                           }}
-                          className="flex-1 md:w-full px-4 py-2 bg-[#1e3a8a] text-white text-xs font-bold rounded-lg hover:bg-blue-800 transition flex items-center justify-center gap-1.5"
+                          className="flex-1 md:w-full px-4 py-2 bg-ink text-white text-xs font-bold rounded-lg hover:bg-ink/90 transition flex items-center justify-center gap-1.5"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           Mark Read
@@ -766,14 +772,14 @@ export default function AdminDashboardTabs({
 
       {/* TAB: TUTOR APPLICATIONS */}
       {activeTab === "applications" && (
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-          <div className="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <div className="bg-white border border-line rounded-lg overflow-hidden">
+          <div className="p-4 sm:p-6 border-b border-line flex justify-between items-center bg-paper-2">
             <div>
-              <h2 className="font-bold text-[#1e3a8a] text-base flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-emerald-600" />
+              <h2 className="font-bold text-ink text-base flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-accent-dark" />
                 Tutor Applications
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-muted mt-1">
                 Review CVs and cover letters submitted by prospective lecturers.
               </p>
             </div>
@@ -781,20 +787,20 @@ export default function AdminDashboardTabs({
 
           <div className="divide-y divide-slate-100">
             {!applications || applications.length === 0 ? (
-              <div className="p-12 text-center text-slate-500">
+              <div className="p-12 text-center text-muted">
                 <Briefcase className="w-8 h-8 mx-auto text-slate-300 mb-3" />
                 <p>No new tutor applications.</p>
               </div>
             ) : (
               applications.map((app: any) => (
-                <div key={app.id} className="p-6 hover:bg-slate-50 transition">
+                <div key={app.id} className="p-6 hover:bg-paper-2 transition">
                   <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-3">
                         <h3 className="font-bold text-slate-900 text-lg">
                           {app.full_name}
                         </h3>
-                        <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded-md text-xs font-semibold">
+                        <span className="px-2 py-1 bg-paper-2 text-muted rounded-md text-xs font-semibold">
                           {app.phone}
                         </span>
                       </div>
@@ -805,8 +811,8 @@ export default function AdminDashboardTabs({
                         {app.email}
                       </a>
 
-                      <div className="bg-slate-100 p-4 rounded-xl border border-slate-200 mt-2">
-                        <p className="text-xs font-bold text-slate-500 uppercase mb-1">
+                      <div className="bg-paper-2 p-4 rounded-xl border border-line mt-2">
+                        <p className="text-xs font-bold text-muted uppercase mb-1">
                           Cover Letter / Experience
                         </p>
                         <p className="text-sm text-slate-700 whitespace-pre-wrap">
@@ -824,7 +830,7 @@ export default function AdminDashboardTabs({
                         href={app.cv_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full md:w-auto px-6 py-3 bg-[#1e3a8a] text-white text-sm font-bold rounded-xl hover:bg-blue-800 transition flex items-center justify-center gap-2 shadow-sm"
+                        className="w-full md:w-auto px-6 py-3 bg-ink text-white text-sm font-bold rounded-xl hover:bg-ink/90 transition flex items-center justify-center gap-2"
                       >
                         <Download className="w-4 h-4" /> Download CV (PDF)
                       </a>
@@ -840,9 +846,9 @@ export default function AdminDashboardTabs({
       {/* PDF UPLOADER */}
       {activeTab === "pdf" && (
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 text-xs sm:text-sm text-slate-600 flex items-center justify-between shadow-sm">
+          <div className="bg-white border border-line rounded-lg p-4 sm:p-6 text-xs sm:text-sm text-muted flex items-center justify-between">
             <div>
-              <h2 className="font-bold text-[#1e3a8a] text-base">
+              <h2 className="font-bold text-ink text-base">
                 Upload PDF Study Material
               </h2>
               <p className="mt-1">
@@ -862,9 +868,9 @@ export default function AdminDashboardTabs({
       {/* VIDEO UPLOADER */}
       {activeTab === "video" && (
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 text-xs sm:text-sm text-slate-600 flex items-center justify-between shadow-sm">
+          <div className="bg-white border border-line rounded-lg p-4 sm:p-6 text-xs sm:text-sm text-muted flex items-center justify-between">
             <div>
-              <h2 className="font-bold text-[#1e3a8a] text-base">
+              <h2 className="font-bold text-ink text-base">
                 Embed Video Lecture
               </h2>
               <p className="mt-1">
@@ -884,9 +890,9 @@ export default function AdminDashboardTabs({
       {/* ARTICLE EDITOR */}
       {activeTab === "article" && (
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 text-xs sm:text-sm text-slate-600 flex items-center justify-between shadow-sm">
+          <div className="bg-white border border-line rounded-lg p-4 sm:p-6 text-xs sm:text-sm text-muted flex items-center justify-between">
             <div>
-              <h2 className="font-bold text-[#1e3a8a] text-base">
+              <h2 className="font-bold text-ink text-base">
                 Publish Article or Typed Lesson
               </h2>
               <p className="mt-1">
@@ -915,8 +921,8 @@ export default function AdminDashboardTabs({
         <div className="space-y-6">
           <AddSubjectForm levels={levels} />
           <UpdateLiveClassForm subjects={subjects} />
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-            <h3 className="font-bold text-[#1e3a8a] text-base border-b border-slate-100 pb-3">
+          <div className="bg-white border border-line rounded-lg p-6 space-y-4">
+            <h3 className="font-bold text-ink text-base border-b border-line pb-3">
               Existing Courses ({subjects.length})
             </h3>
 
@@ -930,10 +936,10 @@ export default function AdminDashboardTabs({
                     <p className="font-semibold text-slate-900">
                       {sub.name}{" "}
                       {sub.code && (
-                        <span className="text-slate-500">({sub.code})</span>
+                        <span className="text-muted">({sub.code})</span>
                       )}
                     </p>
-                    <p className="text-slate-500 text-xs mt-0.5">
+                    <p className="text-muted text-xs mt-0.5">
                       {sub.level?.programme?.name || "Programme"} •{" "}
                       {sub.level?.name} Stage •{" "}
                       {sub.instructor_name || "KRL Academy"}
@@ -941,7 +947,7 @@ export default function AdminDashboardTabs({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="px-3 py-1 bg-blue-50 text-[#1e3a8a] rounded-full font-bold uppercase text-[10px] hidden sm:block">
+                    <span className="px-3 py-1 bg-blue-50 text-ink rounded-full font-bold uppercase text-[10px] hidden sm:block">
                       {sub.level?.name}
                     </span>
 
@@ -991,13 +997,13 @@ export default function AdminDashboardTabs({
 
       {/* ALL PUBLISHED MATERIALS LIBRARY */}
       {activeTab === "list" && (
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-          <div className="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center">
+        <div className="bg-white border border-line rounded-lg overflow-hidden">
+          <div className="p-4 sm:p-6 border-b border-line flex justify-between items-center">
             <div>
-              <h2 className="font-bold text-[#1e3a8a] text-base">
+              <h2 className="font-bold text-ink text-base">
                 Published Resources Library ({totalPublishedCount})
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-muted mt-1">
                 View and manage all uploaded documents, videos, and questions.
               </p>
             </div>
@@ -1010,7 +1016,7 @@ export default function AdminDashboardTabs({
                 <button
                   onClick={handleBulkDelete}
                   disabled={isDeletingBulk}
-                  className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm disabled:opacity-50 cursor-pointer"
+                  className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition disabled:opacity-50 cursor-pointer"
                 >
                   {isDeletingBulk ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -1025,11 +1031,11 @@ export default function AdminDashboardTabs({
           </div>
 
           {/* ====== MOBILE VIEW (STACKED CARDS) ====== */}
-          <div className="md:hidden flex flex-col p-4 gap-3 bg-slate-50">
+          <div className="md:hidden flex flex-col p-4 gap-3 bg-paper-2">
             {resourcesList.length === 0 &&
             videosList.length === 0 &&
             questionsList.length === 0 ? (
-              <p className="text-center text-slate-500 text-sm py-8">
+              <p className="text-center text-muted text-sm py-8">
                 No materials published yet.
               </p>
             ) : (
@@ -1037,7 +1043,7 @@ export default function AdminDashboardTabs({
                 {resourcesList.map((res: Resource) => (
                   <div
                     key={res.id}
-                    className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3"
+                    className="bg-white p-4 rounded-xl border border-line flex flex-col gap-3"
                   >
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex items-center gap-2">
@@ -1047,7 +1053,7 @@ export default function AdminDashboardTabs({
                             !!selectedItems?.find((i) => i.id === res.id)
                           }
                           onChange={() => toggleSelection(res.id, "resource")}
-                          className="w-4 h-4 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
+                          className="w-4 h-4 text-ink rounded border-slate-300 cursor-pointer"
                         />
                         <h4 className="font-bold text-slate-900 text-sm leading-snug">
                           {res.article_content ? "📝" : "📄"} {res.title}
@@ -1056,7 +1062,7 @@ export default function AdminDashboardTabs({
                     </div>
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-muted">
                           {res.subject?.name || "No Subject"}
                         </p>
                         <span className="inline-block mt-1 px-2 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-bold rounded-full uppercase">
@@ -1069,7 +1075,7 @@ export default function AdminDashboardTabs({
                             href={res.file_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 bg-blue-50 text-[#1e3a8a] rounded-lg text-xs font-semibold"
+                            className="p-2 bg-blue-50 text-ink rounded-lg text-xs font-semibold"
                             title="View PDF"
                           >
                             <Download className="w-4 h-4" />
@@ -1093,7 +1099,7 @@ export default function AdminDashboardTabs({
                 {videosList.map((vid: Video) => (
                   <div
                     key={vid.id}
-                    className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3"
+                    className="bg-white p-4 rounded-xl border border-line flex flex-col gap-3"
                   >
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex items-center gap-2">
@@ -1103,7 +1109,7 @@ export default function AdminDashboardTabs({
                             !!selectedItems?.find((i) => i.id === vid.id)
                           }
                           onChange={() => toggleSelection(vid.id, "video")}
-                          className="w-4 h-4 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
+                          className="w-4 h-4 text-ink rounded border-slate-300 cursor-pointer"
                         />
                         <h4 className="font-bold text-slate-900 text-sm leading-snug">
                           🎥 {vid.title}
@@ -1112,7 +1118,7 @@ export default function AdminDashboardTabs({
                     </div>
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-muted">
                           {vid.subject?.name || "No Subject"}
                         </p>
                         <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-[9px] font-bold rounded-full uppercase">
@@ -1134,7 +1140,7 @@ export default function AdminDashboardTabs({
                 {questionsList.map((q: any) => (
                   <div
                     key={q.id}
-                    className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3"
+                    className="bg-white p-4 rounded-xl border border-line flex flex-col gap-3"
                   >
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex items-start gap-2">
@@ -1142,7 +1148,7 @@ export default function AdminDashboardTabs({
                           type="checkbox"
                           checked={!!selectedItems?.find((i) => i.id === q.id)}
                           onChange={() => toggleSelection(q.id, "question")}
-                          className="w-4 h-4 mt-0.5 text-[#1e3a8a] rounded border-slate-300 cursor-pointer"
+                          className="w-4 h-4 mt-0.5 text-ink rounded border-slate-300 cursor-pointer"
                         />
                         <h4 className="font-bold text-slate-900 text-sm leading-snug line-clamp-2">
                           ❓ {q.question_text}
@@ -1151,7 +1157,7 @@ export default function AdminDashboardTabs({
                     </div>
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-muted">
                           {q.subject?.level?.name || "No Subject"}
                         </p>
                         <span className="inline-block mt-1 px-2 py-0.5 bg-purple-100 text-purple-800 text-[9px] font-bold rounded-full uppercase">
@@ -1176,7 +1182,7 @@ export default function AdminDashboardTabs({
           {/* ====== DESKTOP VIEW (TRADITIONAL TABLE) ====== */}
           <div className="hidden md:block overflow-x-auto w-full">
             <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[600px]">
-              <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] sm:text-[11px] font-semibold border-b border-slate-200">
+              <thead className="bg-paper-2 text-muted uppercase text-[10px] sm:text-[11px] font-semibold border-b border-line">
                 <tr>
                   <th className="p-3 sm:p-4 w-10">
                     <input
@@ -1207,7 +1213,7 @@ export default function AdminDashboardTabs({
                   <>
                     {/* PDF / ARTICLES LIST */}
                     {resourcesList.map((res: Resource) => (
-                      <tr key={res.id} className="hover:bg-slate-50 transition">
+                      <tr key={res.id} className="hover:bg-paper-2 transition">
                         <td className="p-3 sm:p-4">
                           <input
                             type="checkbox"
@@ -1221,10 +1227,10 @@ export default function AdminDashboardTabs({
                         <td className="p-3 sm:p-4 font-semibold text-slate-900">
                           {res.article_content ? "📝" : "📄"} {res.title}
                         </td>
-                        <td className="p-3 sm:p-4 text-slate-500">
+                        <td className="p-3 sm:p-4 text-muted">
                           {res.subject?.name || "—"}
                         </td>
-                        <td className="p-3 sm:p-4 text-slate-500">
+                        <td className="p-3 sm:p-4 text-muted">
                           {res.level?.name || "—"}
                         </td>
                         <td className="p-3 sm:p-4">
@@ -1238,7 +1244,7 @@ export default function AdminDashboardTabs({
                               href={res.file_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-xs text-[#1e3a8a] font-semibold hover:underline flex items-center gap-1"
+                              className="text-xs text-ink font-semibold hover:underline flex items-center gap-1"
                             >
                               <Download className="w-3.5 h-3.5" /> PDF
                             </a>
@@ -1259,7 +1265,7 @@ export default function AdminDashboardTabs({
 
                     {/* VIDEOS LIST */}
                     {videosList.map((vid: Video) => (
-                      <tr key={vid.id} className="hover:bg-slate-50 transition">
+                      <tr key={vid.id} className="hover:bg-paper-2 transition">
                         <td className="p-3 sm:p-4">
                           <input
                             type="checkbox"
@@ -1273,10 +1279,10 @@ export default function AdminDashboardTabs({
                         <td className="p-3 sm:p-4 font-semibold text-slate-900">
                           🎥 {vid.title}
                         </td>
-                        <td className="p-3 sm:p-4 text-slate-500">
+                        <td className="p-3 sm:p-4 text-muted">
                           {vid.subject?.name || "—"}
                         </td>
-                        <td className="p-3 sm:p-4 text-slate-500">
+                        <td className="p-3 sm:p-4 text-muted">
                           {vid.level?.name || "—"}
                         </td>
                         <td className="p-3 sm:p-4">
@@ -1299,7 +1305,7 @@ export default function AdminDashboardTabs({
 
                     {/* PRACTICE QUESTIONS LIST */}
                     {questionsList.map((q: any) => (
-                      <tr key={q.id} className="hover:bg-slate-50 transition">
+                      <tr key={q.id} className="hover:bg-paper-2 transition">
                         <td className="p-3 sm:p-4">
                           <input
                             type="checkbox"
@@ -1313,10 +1319,10 @@ export default function AdminDashboardTabs({
                         <td className="p-3 sm:p-4 font-semibold text-slate-900 truncate max-w-xs">
                           ❓ {q.question_text}
                         </td>
-                        <td className="p-3 sm:p-4 text-slate-500">
+                        <td className="p-3 sm:p-4 text-muted">
                           {q.subject?.level?.name || "—"}
                         </td>
-                        <td className="p-3 sm:p-4 text-slate-500">—</td>
+                        <td className="p-3 sm:p-4 text-muted">—</td>
                         <td className="p-3 sm:p-4">
                           <span className="px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-200/60 text-[10px] font-bold rounded-full uppercase whitespace-nowrap">
                             PRACTICE QUESTION
@@ -1344,7 +1350,7 @@ export default function AdminDashboardTabs({
 
       {/* DISMISSIBLE LECTURER DIRECTORY NUDGE */}
       {isSuperAdmin && !hideNudge && activeTab !== "lecturer_profile" && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm relative gap-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between relative gap-4">
           <button
             onClick={() => setHideNudge(true)}
             className="absolute top-2 right-2 p-1 text-blue-400 hover:text-blue-700 transition cursor-pointer"
@@ -1354,14 +1360,14 @@ export default function AdminDashboardTabs({
           </button>
 
           <div className="flex items-center gap-3 pr-6">
-            <div className="bg-[#1e3a8a] text-white p-2 rounded-lg flex-shrink-0">
+            <div className="bg-ink text-white p-2 rounded-lg flex-shrink-0">
               <UserPlus className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-[#1e3a8a] text-sm">
+              <h3 className="font-bold text-ink text-sm">
                 Update Faculty Directory
               </h3>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-muted">
                 Don't forget to create public profiles for your lecturers so
                 students can see their qualifications!
               </p>
@@ -1369,7 +1375,7 @@ export default function AdminDashboardTabs({
           </div>
           <button
             onClick={() => setActiveTab("lecturer_profile")}
-            className="w-full sm:w-auto px-4 py-2 bg-white border border-blue-200 text-[#1e3a8a] text-xs font-bold rounded-lg hover:bg-blue-100 transition whitespace-nowrap cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2 bg-white border border-blue-200 text-ink text-xs font-bold rounded-lg hover:bg-blue-100 transition whitespace-nowrap cursor-pointer"
           >
             Create Profile
           </button>

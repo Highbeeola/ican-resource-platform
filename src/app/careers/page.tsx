@@ -58,9 +58,7 @@ export default function CareersPage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="bg-white border border-slate-200 rounded-3xl p-10 max-w-lg text-center shadow-xl space-y-4">
           <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto" />
-          <h1 className="text-2xl font-bold text-[#1e3a8a]">
-            Application Received!
-          </h1>
+          <h1 className="text-2xl font-bold text-ink">Application Received!</h1>
           <p className="text-slate-600">
             Thank you for your interest in joining KRL Academy. Our academic
             directors will review your CV and reach out to you shortly.
@@ -77,7 +75,7 @@ export default function CareersPage() {
         <BackButton text="Back to Home" />
 
         <div className="text-center space-y-3">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1e3a8a]">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-ink">
             Teach at KRL Academy
           </h1>
           <p className="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto">
@@ -99,7 +97,7 @@ export default function CareersPage() {
                 type="text"
                 name="full_name"
                 required
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               />
             </div>
             <div>
@@ -110,7 +108,7 @@ export default function CareersPage() {
                 type="email"
                 name="email"
                 required
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               />
             </div>
           </div>
@@ -123,7 +121,7 @@ export default function CareersPage() {
               type="tel"
               name="phone"
               required
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
             />
           </div>
 
@@ -134,7 +132,7 @@ export default function CareersPage() {
             <textarea
               name="cover_letter"
               rows={4}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#1e3a8a] outline-none"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-ink outline-none"
               placeholder="Tell us about your ICAN qualifications and teaching experience..."
             ></textarea>
           </div>
@@ -148,14 +146,14 @@ export default function CareersPage() {
               name="cv_file"
               accept=".pdf,.doc,.docx"
               required
-              className="w-full p-2 bg-slate-50 border border-slate-200 border-dashed rounded-xl text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#1e3a8a] file:text-white cursor-pointer"
+              className="w-full p-2 bg-slate-50 border border-slate-200 border-dashed rounded-xl text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-ink file:text-white cursor-pointer"
             />
           </div>
 
           <button
             type="submit"
             disabled={isPending || isUploading}
-            className="w-full py-4 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-xl flex items-center justify-center gap-2 transition disabled:opacity-50"
+            className="w-full py-4 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl flex items-center justify-center gap-2 transition disabled:opacity-50"
           >
             {isPending || isUploading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
