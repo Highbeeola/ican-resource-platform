@@ -1,21 +1,10 @@
-import React from "react";
-import Image from "next/image";
-
-interface Props {
-  className?: string;
-}
-
-export default function BrandLogo({ className = "" }: Props) {
+// Interim text wordmark. When the client has a real logo, change ONLY this file.
+// (Your old BrandLogo is safe in git history; back it up before replacing.)
+export default function BrandLogo() {
   return (
-    <div className={`flex items-center ${className}`}>
-      <Image
-        src="/logo.png"
-        alt="KRL Academy"
-        width={180}
-        height={48}
-        className="h-10 w-auto object-contain"
-        priority
-      />
-    </div>
+    <span className="flex items-baseline gap-1.5 font-serif text-[1.4rem] leading-none tracking-tight text-ink">
+      <span className="font-semibold">KRL</span>
+      <span className="font-normal text-ink/70">Academy</span>
+    </span>
   );
 }

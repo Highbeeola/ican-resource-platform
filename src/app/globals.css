@@ -1,4 +1,65 @@
 @import "tailwindcss";
+
+/* =========================================================
+   KRL ACADEMY THEME
+   Change the look of the whole app by editing the values here.
+   Palette: warm paper background, deep ink navy, one muted gold.
+   ========================================================= */
+
+/* Fonts: set up with next/font in app/layout.tsx (see notes) */
+@theme inline {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-heading), Georgia, "Times New Roman", serif;
+}
+
+@theme {
+  /* Core tokens: use as bg-paper, text-ink, border-line, bg-accent ... */
+  --color-paper: #faf8f4; /* page background */
+  --color-paper-2: #f3efe7; /* alternate section background */
+  --color-ink: #0f1b33; /* text, headings, primary buttons, dark bands */
+  --color-muted: #5a6475; /* secondary text */
+  --color-line: #e4ded2; /* borders and dividers */
+  --color-accent: #b8862b; /* muted gold: highlights, secondary buttons */
+  --color-accent-hover: #9e7220;
+  --color-accent-dark: #8a6420; /* gold used for small text (readable) */
+
+  /* ---- BRIDGE: re-colours old amber-* and blue-* classes still used
+     in pages we haven't redesigned yet. Delete once those pages are
+     converted to the tokens above. ---- */
+  --color-amber-50: #fbf6ea;
+  --color-amber-100: #f5ead0;
+  --color-amber-200: #ebd8a8;
+  --color-amber-400: #d2a545;
+  --color-amber-500: #b8862b;
+  --color-amber-600: #9e7220;
+  --color-amber-700: #7d5a19;
+
+  --color-blue-50: #eef1f6;
+  --color-blue-100: #e1e6ef;
+  --color-blue-200: #c9d2e2;
+  --color-blue-600: #2c4470;
+  --color-blue-800: #14264a;
+  --color-blue-900: #0f1b33;
+}
+
+/* Base styles live in a layer so utility classes (font-bold etc.) still win */
+@layer base {
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.015em;
+  }
+}
+
+/* =========================================================
+   EXISTING RULES (unchanged)
+   ========================================================= */
+
 /* AUTO-GROWING QUILL EDITOR */
 .quill {
   display: flex;
