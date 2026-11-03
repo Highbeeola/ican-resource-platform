@@ -10,7 +10,8 @@ import BrandLogo from "@/components/BrandLogo";
 const SOCIAL = {
   facebook: "",
   x: "",
-  instagram: "",
+  instagram:
+    "https://www.instagram.com/ibrahim__ola?psln=MTdtN2dhMWhrNDc0aA%3D%3D&utm_source=qr",
   linkedin: "",
 };
 

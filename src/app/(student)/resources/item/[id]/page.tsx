@@ -100,21 +100,47 @@ export default async function ResourceItemPage({
 
   const isCompleted = !!progress;
 
-  // Query other PDF resources (excluding current item)
-  const { data: otherResources } = await supabase
+  // ---------------------------------------------------------------
+  // SMART SIDEBAR FETCH: Check if current item is Exam Prep
+  // ---------------------------------------------------------------
+  const isExamPrep =
+    !isVideo &&
+    ["pathfinder", "past_question", "mock_question", "solution"].includes(
+      itemData.resource_type,
+    );
+
+  let query = supabase
     .from("resources")
     .select("id, title, resource_type")
     .eq("subject_id", itemData.subject_id)
     .eq("is_published", true)
     .neq("id", id);
 
+  // If viewing an Exam Prep item, only show other Exam Prep resources in the sidebar!
+  if (isExamPrep) {
+    query = query.in("resource_type", [
+      "pathfinder",
+      "past_question",
+      "mock_question",
+      "solution",
+    ]);
+  } else if (!isVideo) {
+    // If viewing a normal resource/study text, hide exam prep items
+    query = query.in("resource_type", ["study_text", "notes", "other"]);
+  }
+
+  const { data: otherResources } = await query.limit(5);
+
   // Query other Video lectures (excluding current item)
-  const { data: otherVideos } = await supabase
-    .from("videos")
-    .select("id, title")
-    .eq("subject_id", itemData.subject_id)
-    .eq("is_published", true)
-    .neq("id", id);
+  const { data: otherVideos } = isVideo
+    ? await supabase
+        .from("videos")
+        .select("id, title")
+        .eq("subject_id", itemData.subject_id)
+        .eq("is_published", true)
+        .neq("id", id)
+        .limit(5)
+    : { data: [] };
 
   // Format YouTube URL safely
   const embedVideoUrl = isVideo ? getYouTubeEmbedUrl(itemData.video_url) : "";
@@ -255,8 +281,10 @@ export default async function ResourceItemPage({
 
           {/* OTHER COURSE MODULES SIDEBAR */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-fit space-y-4">
-            <h3 className="font-bold text-ink text-base border-b border-slate-100 pb-3">
-              Other Course Modules
+            <h3 className="font-bold text-[#1e3a8a] text-base border-b border-slate-100 pb-3">
+              {isExamPrep
+                ? "Other Exam Prep Materials"
+                : "Other Course Modules"}
             </h3>
 
             <div className="space-y-2">
@@ -271,7 +299,7 @@ export default async function ResourceItemPage({
                 </Link>
               ))}
 
-              {/* LIST OTHER DOCUMENTS / ARTICLES */}
+              {/* LIST OTHER DOCUMENTS / ARTICLES / EXAM PREP */}
               {otherResources?.map((res: any) => (
                 <Link
                   key={res.id}
